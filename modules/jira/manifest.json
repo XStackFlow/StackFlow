@@ -1,0 +1,34 @@
+{
+  "id": "jira",
+  "name": "Jira",
+  "version": "1.0.0",
+  "description": "Create and manage Jira tickets directly from your workflows",
+  "nodes": ["JiraTicketPreparer"],
+  "color": "#0052CC",
+  "setup": {
+    "env_vars": [],
+    "steps": [
+      {
+        "type": "check_command",
+        "command": "jira",
+        "message": "The Jira CLI (ankitpokhrel/jira-cli) must be installed.",
+        "install_hint": {
+          "macos": "brew install ankitpokhrel/jira-cli/jira-cli",
+          "linux": "See https://github.com/ankitpokhrel/jira-cli#installation"
+        }
+      },
+      {
+        "type": "run_command",
+        "command": "jira init",
+        "message": "Configuring Jira CLI credentials (URL, username, API token)...",
+        "interactive": true
+      },
+      {
+        "type": "check_connectivity",
+        "command": "jira me",
+        "message": "Checking Jira connectivity",
+        "error_hint": "Run 'jira init' to configure your Jira credentials."
+      }
+    ]
+  }
+}

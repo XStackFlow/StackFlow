@@ -1,0 +1,43 @@
+{
+  "id": "pr",
+  "name": "Pull Requests",
+  "version": "1.0.0",
+  "description": "Create PRs, gather feedback, analyze issues, and automate review cycles",
+  "nodes": [
+    "PRCreator",
+    "PRFeedbackGetter",
+    "PRStageGetter",
+    "PRFeedbackFormatter",
+    "PRCommentResolver",
+    "GoConfigExtractor",
+    "PRUnresolvedCommentsFinder",
+    "PRCategorizer",
+    "FetchAllPRs"
+  ],
+  "dependencies": [
+    "git"
+  ],
+  "color": "#059669",
+  "setup": {
+    "env_vars": [
+      "WHITELISTED_COMMENT_AUTHORS"
+    ],
+    "steps": [
+      {
+        "type": "check_command",
+        "command": "gh",
+        "message": "GitHub CLI (gh) must be installed.",
+        "install_hint": {
+          "macos": "brew install gh",
+          "linux": "See https://github.com/cli/cli#installation"
+        }
+      },
+      {
+        "type": "check_connectivity",
+        "command": "gh auth status",
+        "message": "Checking GitHub authentication",
+        "error_hint": "Run 'gh auth login' to authenticate with GitHub."
+      }
+    ]
+  }
+}

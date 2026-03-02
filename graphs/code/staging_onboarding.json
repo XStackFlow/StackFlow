@@ -1,0 +1,1756 @@
+{
+  "last_node_id": 119,
+  "last_link_id": 228,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "langgraph/start",
+      "pos": [
+        140,
+        497
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            79
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 63,
+      "type": "common/StubNode",
+      "pos": [
+        1520,
+        584.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 103
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            104
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 64,
+      "type": "common/StubNode",
+      "pos": [
+        1520,
+        393.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 101
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            102
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 42,
+      "type": "common/WithState",
+      "pos": [
+        1230,
+        556.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 81
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            103
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/go-segment\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/GoSegmentStagingDeploymentSetup\",\"recursion_limit\":200},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/GoSegmentSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}",
+        "interrupt_before": false
+      }
+    },
+    {
+      "id": 45,
+      "type": "common/WithState",
+      "pos": [
+        1230,
+        365.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 84
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            101
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/access\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/AccessStagingDBRoleSetup\",\"recursion_limit\":200},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/AccessSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}",
+        "interrupt_before": false
+      }
+    },
+    {
+      "id": 39,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        940,
+        186.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 51
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            83
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: infra",
+      "properties": {
+        "namespace": "infra"
+      }
+    },
+    {
+      "id": 84,
+      "type": "common/StubNode",
+      "pos": [
+        2797.6000061035156,
+        202.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 158
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            142
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "jira/JiraTicketPreparer",
+      "pos": [
+        650,
+        426.5
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 80
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            49,
+            51,
+            52,
+            114
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "JiraTicketPreparer",
+      "properties": {
+        "name": "JiraTicketPreparer",
+        "type": "standard",
+        "project_key": "{{project_key}}",
+        "keyword_templates": "{{state.service_name}}",
+        "summary_template": "Onboard {{state.service_name}} to staging",
+        "issue_type": "Task",
+        "interrupt_before": false
+      }
+    },
+    {
+      "id": 41,
+      "type": "common/WithStateMapper",
+      "pos": [
+        360,
+        461
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 79
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            80
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"service_name_underscore\":\"{{state.service_name.replace('-', '_')}}\"}"
+      }
+    },
+    {
+      "id": 44,
+      "type": "common/WithState",
+      "pos": [
+        1230,
+        174.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 83
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            144
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/infra\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/InfraAWSSetup\",\"recursion_limit\":200},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/InfraSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}",
+        "interrupt_before": false
+      }
+    },
+    {
+      "id": 40,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        940,
+        377.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 52
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            84
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: access",
+      "properties": {
+        "namespace": "access"
+      }
+    },
+    {
+      "id": 58,
+      "type": "langgraph/end",
+      "pos": [
+        4513.600006103516,
+        584.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 177
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "title": "END",
+      "properties": {}
+    },
+    {
+      "id": 100,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        3526,
+        568.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 174
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            175
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: access",
+      "properties": {
+        "namespace": "access"
+      }
+    },
+    {
+      "id": 101,
+      "type": "common/WithState",
+      "pos": [
+        3816,
+        556.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 175
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            176
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/access\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/AccessCleanUp\",\"recursion_limit\":200},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/AccessSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}"
+      }
+    },
+    {
+      "id": 68,
+      "type": "common/StubNode",
+      "pos": [
+        2797.6000061035156,
+        584.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 111
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            112
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 47,
+      "type": "langgraph/subgraph",
+      "pos": [
+        1810,
+        353.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 102
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": null
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 102,
+      "type": "langgraph/subgraph",
+      "pos": [
+        4106,
+        544.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 176
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            177
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 85,
+      "type": "github/RepoFileFetcher",
+      "pos": [
+        1520,
+        140
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 144
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            145
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 RepoFileFetcher",
+      "properties": {
+        "name": "RepoFileFetcher",
+        "type": "standard",
+        "repo": "StackAdapt/access",
+        "file_path": "policies/vault/k-{{service_name}}.tf",
+        "ref": "main",
+        "optional": true,
+        "state_key": "vault_policy_content",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 38,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        940,
+        568.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 49
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            81
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: go-segment",
+      "properties": {
+        "namespace": "go-segment"
+      }
+    },
+    {
+      "id": 43,
+      "type": "langgraph/subgraph",
+      "pos": [
+        1810,
+        544.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 104
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            198
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 46,
+      "type": "langgraph/subgraph",
+      "pos": [
+        1810,
+        162.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 145
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            199
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 48,
+      "type": "common/WithState",
+      "pos": [
+        2507.6000061035156,
+        174.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 211
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            158
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/infra\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/InfraSGSetup\",\"recursion_limit\":200},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/InfraSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}"
+      }
+    },
+    {
+      "id": 53,
+      "type": "aws/GetAWSSecurityGroupID",
+      "pos": [
+        2217.6000061035156,
+        544.5
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 198
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            209
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GetAWSSecurityGroupID",
+      "properties": {
+        "name": "GetAWSSecurityGroupID",
+        "type": "standard",
+        "security_group_name": "{{service_name}}-staging-dev",
+        "region": "us-east-1",
+        "output_key": "security_group_id"
+      }
+    },
+    {
+      "id": 52,
+      "type": "langgraph/subgraph",
+      "pos": [
+        3017.6000061035156,
+        544.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 112
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            174
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 49,
+      "type": "langgraph/subgraph",
+      "pos": [
+        3017.6000061035156,
+        162.5
+      ],
+      "size": {
+        "0": 327.6000061035156,
+        "1": 126
+      },
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 142
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/perform_coding_task.json",
+      "properties": {
+        "subgraph": "code/perform_coding_task.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 109,
+      "type": "common/StubNode",
+      "pos": [
+        2217.6000061035156,
+        202.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 199
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            211
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 114,
+      "type": "common/StubNode",
+      "pos": [
+        1520,
+        775.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 226
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            219
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 115,
+      "type": "common/StubNode",
+      "pos": [
+        1810,
+        775.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 219
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            220
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 118,
+      "type": "common/StubNode",
+      "pos": [
+        2797.6000061035156,
+        775.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 228
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            223
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 71,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        940,
+        759.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 114
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            225
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: config",
+      "properties": {
+        "namespace": "config"
+      }
+    },
+    {
+      "id": 117,
+      "type": "common/StubNode",
+      "pos": [
+        1230,
+        775.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 225
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            226
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 116,
+      "type": "common/StubNode",
+      "pos": [
+        2217.6000061035156,
+        775.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 220
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            227
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 119,
+      "type": "langgraph/subgraph",
+      "pos": [
+        3017.6000061035156,
+        735.5
+      ],
+      "size": {
+        "0": 428.3999938964844,
+        "1": 126
+      },
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 223
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/staging_onboarding_inner_config.json",
+      "properties": {
+        "subgraph": "code/staging_onboarding_inner_config.json",
+        "inline": false
+      }
+    },
+    {
+      "id": 72,
+      "type": "common/WithState",
+      "pos": [
+        2507.6000061035156,
+        747.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 227
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            228
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/config\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/ConfigGenerateConfig\",\"recursion_limit\":100},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/GeneralSummarizeForPR\",\"recursion_limit\":50,\"required_keys\":\"pr_title\"}}",
+        "interrupt_before": false
+      }
+    },
+    {
+      "id": 51,
+      "type": "common/WithState",
+      "pos": [
+        2507.6000061035156,
+        556.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 209
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            111
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"branch_template\":\"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\"repo_name\":\"StackAdapt/go-segment\",\"coding_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.1,\"prompt_name\":\"stackadapt/GoSegmentConfluxSetup\",\"recursion_limit\":200,\"required_keys\":\"config_file_name\"},\"pr_model\":{\"model\":\"google|gemini-3-flash-preview\",\"temperature\":0.3,\"prompt_name\":\"stackadapt/GoSegmentSummarizeForPR\",\"recursion_limit\":100,\"required_keys\":\"pr_title\"}}"
+      }
+    }
+  ],
+  "links": [
+    [
+      49,
+      3,
+      0,
+      38,
+      0,
+      "state"
+    ],
+    [
+      51,
+      3,
+      0,
+      39,
+      0,
+      "state"
+    ],
+    [
+      52,
+      3,
+      0,
+      40,
+      0,
+      "state"
+    ],
+    [
+      79,
+      1,
+      0,
+      41,
+      0,
+      "state"
+    ],
+    [
+      80,
+      41,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      81,
+      38,
+      0,
+      42,
+      0,
+      "state"
+    ],
+    [
+      83,
+      39,
+      0,
+      44,
+      0,
+      "state"
+    ],
+    [
+      84,
+      40,
+      0,
+      45,
+      0,
+      "state"
+    ],
+    [
+      101,
+      45,
+      0,
+      64,
+      0,
+      "state"
+    ],
+    [
+      102,
+      64,
+      0,
+      47,
+      0,
+      "state"
+    ],
+    [
+      103,
+      42,
+      0,
+      63,
+      0,
+      "state"
+    ],
+    [
+      104,
+      63,
+      0,
+      43,
+      0,
+      "state"
+    ],
+    [
+      111,
+      51,
+      0,
+      68,
+      0,
+      "state"
+    ],
+    [
+      112,
+      68,
+      0,
+      52,
+      0,
+      "state"
+    ],
+    [
+      114,
+      3,
+      0,
+      71,
+      0,
+      "state"
+    ],
+    [
+      142,
+      84,
+      0,
+      49,
+      0,
+      "state"
+    ],
+    [
+      144,
+      44,
+      0,
+      85,
+      0,
+      "state"
+    ],
+    [
+      145,
+      85,
+      0,
+      46,
+      0,
+      "state"
+    ],
+    [
+      158,
+      48,
+      0,
+      84,
+      0,
+      "state"
+    ],
+    [
+      174,
+      52,
+      0,
+      100,
+      0,
+      "state"
+    ],
+    [
+      175,
+      100,
+      0,
+      101,
+      0,
+      "state"
+    ],
+    [
+      176,
+      101,
+      0,
+      102,
+      0,
+      "state"
+    ],
+    [
+      177,
+      102,
+      0,
+      58,
+      0,
+      "state"
+    ],
+    [
+      198,
+      43,
+      0,
+      53,
+      0,
+      "state"
+    ],
+    [
+      199,
+      46,
+      0,
+      109,
+      0,
+      "state"
+    ],
+    [
+      209,
+      53,
+      0,
+      51,
+      0,
+      "state"
+    ],
+    [
+      211,
+      109,
+      0,
+      48,
+      0,
+      "state"
+    ],
+    [
+      219,
+      114,
+      0,
+      115,
+      0,
+      "state"
+    ],
+    [
+      220,
+      115,
+      0,
+      116,
+      0,
+      "state"
+    ],
+    [
+      223,
+      118,
+      0,
+      119,
+      0,
+      "state"
+    ],
+    [
+      225,
+      71,
+      0,
+      117,
+      0,
+      "state"
+    ],
+    [
+      226,
+      117,
+      0,
+      114,
+      0,
+      "state"
+    ],
+    [
+      227,
+      116,
+      0,
+      72,
+      0,
+      "state"
+    ],
+    [
+      228,
+      72,
+      0,
+      118,
+      0,
+      "state"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "initial_state": "{\n  \"project_key\": \"ING\",\n  \"service_name\": \"shopify-events-tidb-consumer\"\n}"
+  },
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      -60,
+      612.6143798828125
+    ],
+    "scale": 0.41081821240426325
+  }
+}

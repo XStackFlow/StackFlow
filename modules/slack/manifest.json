@@ -1,0 +1,25 @@
+{
+  "id": "slack",
+  "name": "Slack",
+  "version": "1.0.0",
+  "description": "Send messages, listen for replies, and route workflows via Slack",
+  "nodes": [
+    "SlackNotifier",
+    "SlackReplyGetter",
+    "SlackReplyListener",
+    "SlackMessageRouterDeploymentVerification",
+    "SlackAssistantRouter",
+    "GraphDetailsRouter",
+    "GraphExecutor",
+    "SlackMessageRouterGeneral",
+    "SlackMessageReactor",
+    "SlackMessageReactionRemover",
+    "SlackConversationHistory",
+    "EmojiCategorizer"
+  ],
+  "color": "#4A154B",
+  "setup": {
+    "env_vars": ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "SLACK_USER_ID"],
+    "steps": []
+  }
+}

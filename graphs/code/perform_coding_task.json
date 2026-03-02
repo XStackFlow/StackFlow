@@ -1,0 +1,413 @@
+{
+  "last_node_id": 19,
+  "last_link_id": 22,
+  "nodes": [
+    {
+      "id": 11,
+      "type": "langgraph/start",
+      "pos": [
+        140,
+        261
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 9,
+      "type": "pr/PRCreator",
+      "pos": [
+        1230,
+        190.5
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 22
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "PRCreator",
+      "properties": {
+        "name": "PRCreator",
+        "type": "standard",
+        "branch_name": "{{branch_name}}",
+        "pr_title": "{{pr_title}}",
+        "pr_body": "{{pr_body}}",
+        "repo_path": "{{repo_path}}"
+      }
+    },
+    {
+      "id": 15,
+      "type": "langgraph/end",
+      "pos": [
+        2125.199996948242,
+        253
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 15
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "title": "END",
+      "properties": {}
+    },
+    {
+      "id": 19,
+      "type": "llm/LLMRepoAgent",
+      "pos": [
+        940,
+        140
+      ],
+      "size": [
+        210,
+        272
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 21
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "PRSummarizerAgent",
+      "properties": {
+        "name": "LLMRepoAgent",
+        "type": "standard",
+        "model": "{{pr_model.model}}",
+        "temperature": "{{pr_model.temperature}}",
+        "prompt_name": "{{pr_model.prompt_name}}",
+        "recursion_limit": "{{pr_model.recursion_limit}}",
+        "tool_sets": [
+          "READ_TOOLS",
+          "GIT_TOOLS"
+        ],
+        "required_keys": "pr_title",
+        "repo_path": "{{repo_path}}"
+      }
+    },
+    {
+      "id": 7,
+      "type": "llm/LLMRepoAgent",
+      "pos": [
+        650,
+        140
+      ],
+      "size": [
+        210,
+        272
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 19
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "CodingAgent",
+      "properties": {
+        "name": "LLMRepoAgent",
+        "type": "standard",
+        "model": "{{coding_model.model}}",
+        "temperature": "{{coding_model.temperature}}",
+        "prompt_name": "{{coding_model.prompt_name}}",
+        "recursion_limit": "{{coding_model.recursion_limit}}",
+        "tool_sets": [
+          "CODE_EDIT_TOOLS"
+        ],
+        "required_keys": "{{coding_model.required_keys}}",
+        "repo_path": "{{repo_path}}"
+      }
+    },
+    {
+      "id": 17,
+      "type": "slack/SlackNotifier",
+      "pos": [
+        1520,
+        190.5
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 16
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackNotifier",
+      "properties": {
+        "name": "SlackNotifier",
+        "type": "standard",
+        "slack_message": "PR created: {{pr_title}}\\n{{pr_url}}",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": ""
+      }
+    },
+    {
+      "id": 6,
+      "type": "git/BranchPreparer",
+      "pos": [
+        360,
+        214.5
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 9
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "BranchPreparer",
+      "properties": {
+        "name": "BranchPreparer",
+        "type": "standard",
+        "repo_name": "{{repo_name}}",
+        "branch_template": "{{branch_template}}"
+      }
+    },
+    {
+      "id": 10,
+      "type": "langgraph/subgraph",
+      "pos": [
+        1810,
+        213
+      ],
+      "size": {
+        "0": 235.1999969482422,
+        "1": 126
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 17
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: code/pr_fixer.json",
+      "properties": {
+        "subgraph": "code/pr_fixer.json",
+        "inline": false
+      }
+    }
+  ],
+  "links": [
+    [
+      9,
+      11,
+      0,
+      6,
+      0,
+      "state"
+    ],
+    [
+      15,
+      10,
+      0,
+      15,
+      0,
+      "state"
+    ],
+    [
+      16,
+      9,
+      0,
+      17,
+      0,
+      "state"
+    ],
+    [
+      17,
+      17,
+      0,
+      10,
+      0,
+      "state"
+    ],
+    [
+      19,
+      6,
+      0,
+      7,
+      0,
+      "state"
+    ],
+    [
+      21,
+      7,
+      0,
+      19,
+      0,
+      "state"
+    ],
+    [
+      22,
+      19,
+      0,
+      9,
+      0,
+      "state"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "initial_state": "{\n  \"branch_template\": \"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\n  \"repo_name\": \"StackAdapt/infra\",\n  \"coding_model\": {\n    \"model\": \"google|gemini-3-flash-preview\",\n    \"temperature\": 0.1,\n    \"prompt_name\": \"stackadapt/InfraSGSetup\",\n    \"recursion_limit\": 100\n  },\n  \"pr_model\": {\n    \"model\": \"google|gemini-3-flash-preview\",\n    \"temperature\": 0.3,\n    \"prompt_name\": \"stackadapt/InfraSummarizeForPR\",\n    \"recursion_limit\": 25,\n    \"required_keys\": \"pr_title\"\n  },\n  \"service_name\": \"cdp-event-ingestor\",\n  \"service_name_underscore\": \"cdp_event_ingestor\",\n  \"ticket_key\": \"ING-140\"\n}"
+  },
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      100.07977294921875,
+      234.67630004882812
+    ],
+    "scale": 0.6830134553650711
+  }
+}

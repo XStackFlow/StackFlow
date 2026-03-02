@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "name": "cursor",
+      "type": "cursor_cli",
+      "options": {}
+    },
+    {
+      "name": "gemini",
+      "type": "gemini_cli",
+      "options": {}
+    },
+    {
+      "name": "ollama-gpu",
+      "type": "ollama",
+      "options": {
+        "BASE_URL": "http://192.168.1.209:11434"
+      }
+    },
+    {
+      "name": "google",
+      "type": "google_vertex_ai",
+      "options": {
+        "PROJECT": "eastern-road-486015-k5"
+      }
+    },
+    {
+      "name": "ollama",
+      "type": "ollama",
+      "options": {
+        "BASE_URL": "http://192.168.1.208:11434"
+      }
+    }
+  ]
+}

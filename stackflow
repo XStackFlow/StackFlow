@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+# StackFlow CLI — hybrid mode: Docker for infra, local for API + editor.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# ── Resolve compose command ───────────────────────────────
+if docker compose version &>/dev/null; then
+    DC="docker compose"
+else
+    DC="docker-compose"
+fi
+
+# ── Colours ──────────────────────────────────────────────────────────
+RESET="\033[0m"; BOLD="\033[1m"; CYAN="\033[36m"; GREEN="\033[32m"
+YELLOW="\033[33m"; RED="\033[31m"; DIM="\033[2m"
+
+BANNER="${BOLD}${CYAN}  ┌─┐┌┬┐┌─┐┌─┐┬┌─┌─┐┬  ┌─┐┬ ┬${RESET}
+${CYAN}  └─┐ │ ├─┤│  ├┴┐├┤ │  │ ││││${RESET}
+${CYAN}  └─┘ ┴ ┴ ┴└─┘┴ ┴└  ┴─┘└─┘└┴┘${RESET}"
+
+PIDFILE="$SCRIPT_DIR/.stackflow.pids"
+LOGDIR="$SCRIPT_DIR/logs"
+VENV_PYTHON="$SCRIPT_DIR/venv/bin/python"
+
+usage() {
+    printf "\n%b\n\n" "$BANNER"
+    printf "  ${BOLD}Usage:${RESET}  stackflow <command>\n\n"
+    printf "  ${BOLD}Commands:${RESET}\n"
+    printf "    ${CYAN}start${RESET}            Start infra + API + editor (default)\n"
+    printf "    ${CYAN}stop${RESET}             Stop API + editor (infra keeps running)\n"
+    printf "    ${CYAN}stop all${RESET}         Stop everything including Docker infra\n"
+    printf "    ${CYAN}restart${RESET} [ui]      Restart the API server (or UI with 'ui')\n"
+    printf "    ${CYAN}docker${RESET}           Show infra container status\n"
+    printf "    ${CYAN}logs${RESET} [api|ui] [-f]  Show logs (api, ui/editor, or all)\n"
+    printf "    ${CYAN}pm${RESET} <command>     Package manager (list, install, uninstall, info)\n"
+    printf "    ${CYAN}install${RESET}          Re-run the setup script\n"
+    printf "\n"
+}
+
+_docker_ready() {
+    # macOS doesn't ship `timeout`; use perl alarm as a portable alternative
+    perl -e 'alarm 5; exec @ARGV' -- docker info &>/dev/null 2>&1
+}
+
+ensure_infra() {
+    if ! command -v colima &>/dev/null; then
+        printf "  ${YELLOW}⚠  Colima is not installed${RESET}\n"
+        printf "  ${DIM}Install with: brew install colima${RESET}\n"
+        return
+    fi
+
+    if ! _docker_ready; then
+        # Colima may report "running" but Docker daemon is frozen — use list to check
+        if colima list 2>/dev/null | grep -q "Running"; then
+            printf "  ${YELLOW}⚠  Colima running but Docker unresponsive — restarting…${RESET}\n"
+            colima restart
+        else
+            printf "  ${CYAN}→${RESET} Starting Colima…\n"
+            colima start
+        fi
+
+        # Verify Docker is actually working now
+        if ! _docker_ready; then
+            printf "  ${RED}✗  Docker is still not responding after Colima restart${RESET}\n"
+            return
+        fi
+    fi
+
+    # Start Docker infra if not already running
+    if ! $DC ps 2>/dev/null | grep -q "running"; then
+        printf "  ${CYAN}→${RESET} Starting infrastructure services…\n"
+        $DC up -d --quiet-pull 2>/dev/null || $DC up -d 2>/dev/null
+    fi
+}
+
+wait_for_langfuse() {
+    local url="http://localhost:3000/api/public/health"
+    local max_attempts=30
+    local attempt=0
+    printf "  ${CYAN}→${RESET} Waiting for Langfuse…"
+    while (( attempt < max_attempts )); do
+        if curl -sf "$url" &>/dev/null; then
+            printf " ${GREEN}ready${RESET}\n"
+            return 0
+        fi
+        printf "."
+        sleep 2
+        (( attempt++ ))
+    done
+    printf " ${YELLOW}timed out (API will retry on its own)${RESET}\n"
+    return 0
+}
+
+start_api() {
+    local api_env=(
+        "PYTHONPATH=$SCRIPT_DIR${PYTHONPATH:+:$PYTHONPATH}"
+        "PYTHONUNBUFFERED=1"
+    )
+    env "${api_env[@]}" "$VENV_PYTHON" src/api_server.py >> "$LOGDIR/api.log" 2>&1 &
+    echo $! >> "$PIDFILE"
+}
+
+start_editor() {
+    (cd litegraph-editor && npm run dev) >> "$LOGDIR/editor.log" 2>&1 &
+    echo $! >> "$PIDFILE"
+}
+
+stop_local() {
+    if [[ -f "$PIDFILE" ]]; then
+        while IFS= read -r pid; do
+            kill "$pid" 2>/dev/null || true
+            # Also kill child processes (uvicorn workers, vite)
+            pkill -P "$pid" 2>/dev/null || true
+        done < "$PIDFILE"
+        rm -f "$PIDFILE"
+    fi
+    # Belt and suspenders: kill any remaining processes on our ports
+    lsof -ti:8000 2>/dev/null | xargs kill 2>/dev/null || true
+    lsof -ti:5173 2>/dev/null | xargs kill 2>/dev/null || true
+}
+
+cmd="${1:-}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  start|"")
+    printf "\n%b\n\n" "$BANNER"
+
+    if [[ ! -f "$VENV_PYTHON" ]]; then
+        printf "  ${RED}venv not found. Run: stackflow install${RESET}\n"
+        exit 1
+    fi
+
+    # Stop any existing local processes
+    stop_local
+
+    # Prepare log directory and truncate old logs
+    mkdir -p "$LOGDIR"
+    > "$LOGDIR/api.log"
+    > "$LOGDIR/editor.log"
+
+    # Ensure Docker infra is up
+    ensure_infra
+
+    # Wait for Langfuse before starting API
+    wait_for_langfuse
+
+    # Start API + editor
+    start_api
+    start_editor
+
+    printf "\n"
+    printf "  ${GREEN}${BOLD}Services running:${RESET}\n"
+    printf "    ${CYAN}API${RESET}      http://localhost:8000\n"
+    printf "    ${CYAN}Editor${RESET}   http://localhost:5173\n"
+    printf "    ${CYAN}Langfuse${RESET} http://localhost:3000  ${DIM}(admin@stackflow.local / adminadmin)${RESET}\n"
+    printf "\n"
+    printf "  ${DIM}Use ${RESET}${CYAN}stackflow logs -f${RESET}${DIM} to follow logs${RESET}\n"
+    printf "  ${DIM}Use ${RESET}${CYAN}stackflow stop${RESET}${DIM} to stop services${RESET}\n\n"
+    ;;
+
+  stop)
+    stop_local
+    if [[ "${1:-}" == "all" ]]; then
+        printf "  ${CYAN}→${RESET} Stopping Docker infrastructure…\n"
+        $DC down 2>/dev/null
+        printf "  ${GREEN}Everything stopped${RESET}\n"
+    else
+        printf "  ${GREEN}API + editor stopped${RESET}\n"
+    fi
+    ;;
+
+  restart)
+    case "${1:-api}" in
+      ui|editor)
+        lsof -ti:5173 2>/dev/null | xargs kill 2>/dev/null || true
+        sleep 1
+        > "$LOGDIR/editor.log"
+        start_editor
+        printf "  ${GREEN}Editor restarted${RESET}\n"
+        ;;
+      *)
+        lsof -ti:8000 2>/dev/null | xargs kill 2>/dev/null || true
+        sleep 1
+        > "$LOGDIR/api.log"
+        start_api
+        printf "  ${GREEN}API restarted${RESET}\n"
+        ;;
+    esac
+    ;;
+
+  docker)
+    $DC ps
+    ;;
+
+  logs)
+    follow=false
+    target=""
+    for arg in "$@"; do
+      case "$arg" in
+        --follow|-f) follow=true ;;
+        api)         target="api" ;;
+        editor|ui)   target="editor" ;;
+      esac
+    done
+    case "$target" in
+      api)    logfiles=("$LOGDIR/api.log") ;;
+      editor) logfiles=("$LOGDIR/editor.log") ;;
+      *)      logfiles=("$LOGDIR/api.log") ;;
+    esac
+    if $follow; then
+      tail -50 -f "${logfiles[@]}" 2>/dev/null \
+        || printf "  ${YELLOW}No log files found. Run ${CYAN}stackflow start${YELLOW} first.${RESET}\n"
+    else
+      tail -50 "${logfiles[@]}" 2>/dev/null \
+        || printf "  ${YELLOW}No log files found. Run ${CYAN}stackflow start${YELLOW} first.${RESET}\n"
+    fi
+    ;;
+
+  pm)
+    env PYTHONPATH="$SCRIPT_DIR${PYTHONPATH:+:$PYTHONPATH}" "$VENV_PYTHON" -m src.pm "$@"
+    ;;
+
+  install)
+    exec bash "$SCRIPT_DIR/install.sh"
+    ;;
+
+  help|--help|-h)
+    usage
+    ;;
+
+  *)
+    printf "  ${YELLOW}Unknown command:${RESET} %s\n" "$cmd"
+    usage
+    exit 1
+    ;;
+esac

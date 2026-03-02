@@ -1,0 +1,27 @@
+{
+  "id": "git",
+  "name": "Git",
+  "version": "1.0.0",
+  "description": "Prepare and manage Git branches within workflows",
+  "nodes": [
+    "BranchPreparer",
+    "CommitAndPush"
+  ],
+  "color": "#F05032",
+  "setup": {
+    "env_vars": [
+      "WORKING_DIR"
+    ],
+    "steps": [
+      {
+        "type": "check_command",
+        "command": "git",
+        "message": "Git must be installed.",
+        "install_hint": {
+          "macos": "brew install git",
+          "linux": "sudo apt-get install git"
+        }
+      }
+    ]
+  }
+}

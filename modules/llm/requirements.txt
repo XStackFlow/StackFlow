@@ -1,0 +1,19 @@
+# LLM module — language models, embeddings, vector store, memory
+langchain==1.2.8
+langchain-community==0.4.1
+langchain-openai==1.1.7
+langchain-ollama==1.0.1
+langchain-google-genai==4.2.0
+langchain-chroma==1.1.0
+langchain-text-splitters==1.1.0
+langgraph-prebuilt==1.0.7
+chromadb==1.4.1
+openai==2.16.0
+ollama==0.6.1
+google-genai==1.62.0
+google-generativeai==0.8.6
+google-cloud-aiplatform==1.136.0
+tiktoken==0.12.0
+huggingface_hub==1.4.1
+rank-bm25==0.2.2
+GitPython==3.1.46

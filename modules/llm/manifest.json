@@ -1,0 +1,55 @@
+{
+  "id": "llm",
+  "name": "LLM",
+  "version": "1.0.0",
+  "description": "LLM-powered agents for code analysis and repository-aware reasoning",
+  "nodes": ["LLMRepoAgent"],
+  "color": "#7C3AED",
+  "setup": {
+    "env_vars": [],
+    "steps": [],
+    "configurations": {
+      "label": "Providers",
+      "types": {
+        "openai": {
+          "label": "OpenAI",
+          "description": "OpenAI API. Requires an API key. BASE_URL can point at any OpenAI-compatible server that requires authentication.",
+          "options": [
+            {"key": "BASE_URL", "label": "Base URL", "placeholder": "https://api.openai.com/v1"},
+            {"key": "API_KEY", "label": "API Key", "placeholder": "sk-...", "secret": true}
+          ],
+          "status_check": {"type": "http", "url_template": "{BASE_URL}/", "auth_header": "Bearer {API_KEY}"}
+        },
+        "ollama": {
+          "label": "Ollama",
+          "description": "Ollama local LLM server. No API key required. Set BASE_URL to your Ollama instance.",
+          "options": [
+            {"key": "BASE_URL", "label": "Base URL", "placeholder": "http://localhost:11434", "required": true}
+          ],
+          "status_check": {"type": "http", "url_template": "{BASE_URL}/api/tags"}
+        },
+        "cursor_cli": {
+          "label": "Cursor CLI",
+          "description": "Executes prompts via the Cursor agent CLI. Requires Cursor to be installed and authenticated.",
+          "options": [],
+          "status_check": {"type": "command", "command": "agent"}
+        },
+        "gemini_cli": {
+          "label": "Gemini CLI",
+          "description": "Executes prompts via the Gemini CLI. Requires the gemini CLI to be installed and authenticated.",
+          "options": [],
+          "status_check": {"type": "command", "command": "gemini"}
+        },
+        "google_vertex_ai": {
+          "label": "Google Vertex AI",
+          "description": "Uses LangChain's Vertex AI integration. Requires gcloud authentication.",
+          "options": [
+            {"key": "PROJECT", "label": "GCP Project", "placeholder": "my-gcp-project", "required": true},
+            {"key": "LOCATION", "label": "Location", "placeholder": "us-central1"}
+          ],
+          "status_check": {"type": "command", "command": "gcloud"}
+        }
+      }
+    }
+  }
+}
