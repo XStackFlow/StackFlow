@@ -1282,10 +1282,10 @@
         4262.399993896484,
         1897.5
       ],
-      "size": {
-        "0": 218.39999389648438,
-        "1": 78
-      },
+      "size": [
+        218.39999389648438,
+        78
+      ],
       "flags": {},
       "order": 43,
       "mode": 0,
@@ -1457,10 +1457,10 @@
         1560,
         2271
       ],
-      "size": {
-        "0": 226.8000030517578,
-        "1": 146
-      },
+      "size": [
+        226.8000030517578,
+        146
+      ],
       "flags": {},
       "order": 26,
       "mode": 0,
@@ -1607,56 +1607,6 @@
       }
     },
     {
-      "id": 18,
-      "type": "slack/SlackNotifier",
-      "pos": [
-        1883.6000061035156,
-        1825.5
-      ],
-      "size": {
-        "0": 210,
-        "1": 191
-      },
-      "flags": {},
-      "order": 29,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 118
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 93
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            22
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SlackNotifier",
-      "properties": {
-        "name": "SlackNotifier",
-        "type": "standard",
-        "slack_message": "Launching `{{graph_name}}` with config:\n```\n{{pending_graph_params}}\n```\nPlease reply in the thread before continuing.",
-        "slack_user_id": "{{SLACK_USER_ID}}",
-        "thread_ts": ""
-      }
-    },
-    {
       "id": 53,
       "type": "langgraph/port_out",
       "pos": [
@@ -1697,7 +1647,7 @@
         78
       ],
       "flags": {},
-      "order": 28,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -1752,10 +1702,10 @@
         1560,
         2482
       ],
-      "size": {
-        "0": 243.60000610351562,
-        "1": 78
-      },
+      "size": [
+        243.60000610351562,
+        78
+      ],
       "flags": {},
       "order": 24,
       "mode": 0,
@@ -1783,10 +1733,10 @@
         1270,
         2428.25
       ],
-      "size": {
-        "0": 140,
-        "1": 46
-      },
+      "size": [
+        140,
+        46
+      ],
       "flags": {},
       "order": 21,
       "mode": 0,
@@ -1817,6 +1767,56 @@
       "properties": {
         "name": "StubNode",
         "type": "standard"
+      }
+    },
+    {
+      "id": 18,
+      "type": "slack/SlackNotifier",
+      "pos": [
+        1883.6000061035156,
+        1825.5
+      ],
+      "size": [
+        210,
+        191
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 118
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 93
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackNotifier",
+      "properties": {
+        "name": "SlackNotifier",
+        "type": "standard",
+        "slack_message": "Launching `{{graph_name}}` with config:\n```\n{{pending_graph_params}}\n```\nPlease reply in the thread or react with :white_check_mark: before continuing.",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": ""
       }
     }
   ],
@@ -2216,5 +2216,12 @@
   "extra": {
     "initial_state": "{\n  \"input\": \"\"\n}"
   },
-  "version": 0.4
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      -777.1422119140625,
+      -1501.380615234375
+    ],
+    "scale": 0.6727499949325649
+  }
 }

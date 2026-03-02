@@ -220,11 +220,18 @@ def commit_and_push_changes(
     if result.returncode == 0 and not allow_empty:
         raise ValueError("No changes to commit")
     
-    # Commit changes with [AI Generated] prefix
-    prefixed_message = f"[AI Generated] {commit_message}"
-    logger.info("Committing changes with message: %s", prefixed_message)
-    
-    commit_cmd = ["git", "commit", "-m", prefixed_message]
+    # Detect if we're completing a merge (use git's auto-generated merge message)
+    merge_head = repo / ".git" / "MERGE_HEAD"
+    is_merge = merge_head.exists()
+
+    if is_merge:
+        logger.info("Completing merge commit (using git's default merge message)")
+        commit_cmd = ["git", "commit", "--no-edit"]
+    else:
+        prefixed_message = f"[AI Generated] {commit_message}"
+        logger.info("Committing changes with message: %s", prefixed_message)
+        commit_cmd = ["git", "commit", "-m", prefixed_message]
+
     if allow_empty:
         commit_cmd.append("--allow-empty")
         

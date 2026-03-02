@@ -11,11 +11,12 @@ class PRStageGetter(BaseNode):
     """Parses pr_feedback and writes the derived stage string to pr_state.
 
     Stage values:
-        pr_merged           — PR has been merged
-        pr_approved         — PR has been approved, waiting for merge
-        pr_in_progress      — CI checks are still running
-        pr_has_issue        — Failed checks or unresolved comments
-        pr_pending_review   — No notable condition yet, still waiting
+        pr_merged              — PR has been merged
+        pr_approved            — PR has been approved, waiting for merge
+        pr_has_merge_conflict  — PR branch has merge conflicts with the base branch
+        pr_in_progress         — CI checks are still running
+        pr_has_issue           — Failed checks or unresolved comments
+        pr_pending_review      — No notable condition yet, still waiting
     """
 
     def _get_stage(self, feedback: Dict[str, Any]) -> str:
@@ -25,6 +26,9 @@ class PRStageGetter(BaseNode):
 
         if feedback.get("reviewDecision") == "APPROVED":
             return "pr_approved"
+
+        if feedback.get("mergeable") == "CONFLICTING":
+            return "pr_has_merge_conflict"
 
         checks = feedback.get("statusCheckRollup", [])
         if any(c.get("status") == "IN_PROGRESS" for c in checks):

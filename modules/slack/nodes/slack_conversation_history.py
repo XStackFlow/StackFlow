@@ -73,6 +73,10 @@ class SlackConversationHistory(BaseNode):
             role = "User" if msg.get("user") == user_id_clean else "Assistant"
             history.append({"role": role, "content": text})
 
+        # Drop leading Assistant messages so history always starts with a User turn
+        while history and history[0]["role"] != "User":
+            history.pop(0)
+
         return {
             "slack_conversation_history": history,
         }

@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+import time
 from typing import Any, Dict, List, Optional
 
 from src.nodes.abstract.base_node import BaseNode
@@ -169,15 +170,21 @@ class PRFeedbackGetter(BaseNode):
             repo = f"{owner}/{repo_short}"
             pr_number = url_parts[3]
 
-            # 1. Basic PR info
-            fields = ["statusCheckRollup", "state", "reviewDecision", "headRefName"]
-            result = subprocess.run(
-                ["gh", "pr", "view", pr_url, "--json", ",".join(fields)],
-                capture_output=True, text=True, timeout=60,
-            )
-            if result.returncode != 0:
-                raise RuntimeError(f"Failed to fetch PR info: {result.stderr}")
-            feedback = json.loads(result.stdout)
+            # 1. Basic PR info (retry if mergeable is UNKNOWN — GitHub computes it async)
+            fields = ["statusCheckRollup", "state", "reviewDecision", "headRefName", "mergeable"]
+            feedback = None
+            for attempt in range(3):
+                result = subprocess.run(
+                    ["gh", "pr", "view", pr_url, "--json", ",".join(fields)],
+                    capture_output=True, text=True, timeout=60,
+                )
+                if result.returncode != 0:
+                    raise RuntimeError(f"Failed to fetch PR info: {result.stderr}")
+                feedback = json.loads(result.stdout)
+                if feedback.get("mergeable") != "UNKNOWN":
+                    break
+                logger.info("mergeable is UNKNOWN, retrying in 3s (attempt %d/3)...", attempt + 1)
+                time.sleep(3)
 
             # 2. Top-level issue comments (GraphQL — excludes minimized/hidden comments)
             issue_comments = self._fetch_issue_comments(owner, repo_short, pr_number)

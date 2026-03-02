@@ -190,4 +190,42 @@ def git_diff(target: Optional[str] = None, files: Optional[List[str]] = None) ->
     except Exception as e:
         return [{"error": f"Error performing git diff: {str(e)}"}]
 
+@tool
+def git_merge(source_branch: Optional[str] = None) -> Dict[str, Any]:
+    """Merge a branch into the current branch.
+
+    Args:
+        source_branch: Branch to merge from. If None, merges the default branch (e.g. main).
+
+    Returns:
+        {"status": "merged"} on success, or
+        {"status": "conflict", "conflicted_files": [...]} if conflicts occur.
+    """
+    try:
+        repo = _get_repo()
+
+        if not source_branch:
+            from modules.git.utils.repo_manager import get_default_branch
+            source_branch = get_default_branch(get_repo_path())
+
+        # Fetch latest from origin
+        repo.git.fetch("origin", source_branch)
+        remote_ref = f"origin/{source_branch}"
+
+        try:
+            repo.git.merge(remote_ref)
+            return {"status": "merged"}
+        except exc.GitCommandError:
+            # Merge failed — collect conflicted files
+            unmerged = repo.index.unmerged_blobs()
+            conflicted_files = sorted(set(unmerged.keys()))
+            return {
+                "status": "conflict",
+                "conflicted_files": conflicted_files,
+            }
+    except Exception as e:
+        return {"error": f"Error performing git merge: {str(e)}"}
+
+
 GIT_TOOLS = [git_status, git_diff]
+GIT_MERGE_TOOLS = [git_merge]

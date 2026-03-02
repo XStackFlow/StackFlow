@@ -1,4 +1,4 @@
-from modules.llm.tools.git_tools import GIT_TOOLS, git_status, git_diff
+from modules.llm.tools.git_tools import GIT_TOOLS, GIT_MERGE_TOOLS, git_status, git_diff, git_merge
 from modules.llm.tools.go_build_tools import GO_BUILD_TOOLS, go_build, go_test, golangci_lint
 from modules.llm.tools.terraform_tools import TERRAFORM_TOOLS, terraform_fmt
 from modules.llm.tools.write_tools import WRITE_TOOLS, patch_file, create_file, move_file, copy_file, file_delete
@@ -15,6 +15,7 @@ CODE_EDIT_TOOLS = GIT_TOOLS + GO_BUILD_TOOLS + TERRAFORM_TOOLS + WRITE_TOOLS + R
 __all__ = [
     # Tool lists
     "GIT_TOOLS",
+    "GIT_MERGE_TOOLS",
     "GO_BUILD_TOOLS",
     "TERRAFORM_TOOLS",
     "WRITE_TOOLS",
@@ -25,6 +26,7 @@ __all__ = [
     # Git tools
     "git_status",
     "git_diff",
+    "git_merge",
 
     # Go build tools
     "go_build",
