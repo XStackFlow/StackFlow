@@ -825,6 +825,26 @@ export async function openPackageManager(refreshNodes) {
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
+    // ── Loading skeleton ────────────────────────────────────────────
+    function showSkeleton() {
+        grid.innerHTML = "";
+        for (let i = 0; i < 6; i++) {
+            const card = document.createElement("div");
+            card.className = "pm-card pm-skeleton-card";
+            card.innerHTML = `
+                <div class="pm-skeleton-line" style="width:60%;height:14px;margin-bottom:10px;"></div>
+                <div class="pm-skeleton-line" style="width:90%;height:10px;margin-bottom:6px;"></div>
+                <div class="pm-skeleton-line" style="width:75%;height:10px;margin-bottom:12px;"></div>
+                <div style="display:flex;gap:4px;">
+                    <div class="pm-skeleton-line" style="width:50px;height:16px;border-radius:3px;"></div>
+                    <div class="pm-skeleton-line" style="width:60px;height:16px;border-radius:3px;"></div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    }
+    showSkeleton();
+
     // ── Fetch & render ───────────────────────────────────────────────
     let allModules = [];
     try {

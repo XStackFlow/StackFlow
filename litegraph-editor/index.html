@@ -1538,6 +1538,21 @@
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
         }
+        /* Skeleton loading */
+        @keyframes pmShimmer {
+            0%   { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+        .pm-skeleton-card {
+            pointer-events: none;
+            min-height: 120px;
+        }
+        .pm-skeleton-line {
+            background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+            background-size: 400px 100%;
+            animation: pmShimmer 1.4s ease infinite;
+            border-radius: 4px;
+        }
         .pm-card {
             background: #161616;
             border: 1px solid #222;
