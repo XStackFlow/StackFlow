@@ -1,0 +1,12 @@
+{
+  "installed": [
+    "aws",
+    "git",
+    "jira",
+    "k8s",
+    "pr",
+    "github",
+    "llm",
+    "slack"
+  ]
+}

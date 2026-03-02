@@ -1,0 +1,39 @@
+{
+    "id": "k8s",
+    "name": "Kubernetes",
+    "version": "1.0.0",
+    "description": "Interact with Kubernetes clusters, fetch pod logs, and monitor deployments",
+    "nodes": [
+        "PodErrorLogFetcher"
+    ],
+    "color": "#326CE5",
+    "setup": {
+        "env_vars": [],
+        "steps": [
+            {
+                "type": "check_command",
+                "command": "kubectl",
+                "message": "kubectl must be installed.",
+                "install_hint": {
+                    "macos": "brew install kubectl",
+                    "linux": "See https://kubernetes.io/docs/tasks/tools/"
+                }
+            },
+            {
+                "type": "check_command",
+                "command": "kubectx",
+                "message": "kubectx must be installed.",
+                "install_hint": {
+                    "macos": "brew install kubectx",
+                    "linux": "See https://github.com/ahmetb/kubectx"
+                }
+            },
+            {
+                "type": "check_connectivity",
+                "command": "kubectl cluster-info --request-timeout=5s",
+                "message": "Checking Kubernetes cluster connectivity",
+                "error_hint": "Run 'kubectx' to select a cluster, or check your kubeconfig."
+            }
+        ]
+    }
+}

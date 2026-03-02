@@ -1,0 +1,453 @@
+{
+  "last_node_id": 13,
+  "last_link_id": 23,
+  "nodes": [
+    {
+      "id": 11,
+      "type": "common/StubNode",
+      "pos": [
+        1160,
+        263.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 23
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            20,
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 4,
+      "type": "common/DelayNode",
+      "pos": [
+        1380,
+        331
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 20
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "DelayNode",
+      "properties": {
+        "name": "DelayNode",
+        "type": "standard",
+        "delay_seconds": 1
+      }
+    },
+    {
+      "id": 12,
+      "type": "common/StubNode",
+      "pos": [
+        940,
+        263.5
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 22
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 1,
+      "type": "langgraph/start",
+      "pos": [
+        140,
+        271.5
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 9,
+      "type": "common/WithState",
+      "pos": [
+        360,
+        235.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 10
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"test_2\": \"In Child Graph\"}"
+      }
+    },
+    {
+      "id": 2,
+      "type": "langgraph/end",
+      "pos": [
+        2027.2000122070312,
+        180
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 18
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "title": "END",
+      "properties": {}
+    },
+    {
+      "id": 3,
+      "type": "common/DelayNode",
+      "pos": [
+        650,
+        247.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 11
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "DelayNode",
+      "properties": {
+        "name": "DelayNode",
+        "type": "standard",
+        "delay_seconds": "{{delay_seconds}}"
+      }
+    },
+    {
+      "id": 6,
+      "type": "common/DelayNode",
+      "pos": [
+        1737.2000122070312,
+        154
+      ],
+      "size": [
+        210,
+        98
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 17
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 6
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "DelayNode",
+      "properties": {
+        "name": "DelayNode",
+        "type": "standard",
+        "delay_seconds": 1
+      }
+    },
+    {
+      "id": 10,
+      "type": "langgraph/subgraph",
+      "pos": [
+        1380,
+        140
+      ],
+      "size": {
+        "0": 277.20001220703125,
+        "1": 126
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 21
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SUBGRAPH: test/test_subgraph.json",
+      "properties": {
+        "subgraph": "test/test_subgraph.json",
+        "inline": false
+      }
+    }
+  ],
+  "links": [
+    [
+      6,
+      4,
+      0,
+      6,
+      1,
+      "state"
+    ],
+    [
+      10,
+      1,
+      0,
+      9,
+      0,
+      "state"
+    ],
+    [
+      11,
+      9,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      17,
+      10,
+      0,
+      6,
+      0,
+      "state"
+    ],
+    [
+      18,
+      6,
+      0,
+      2,
+      0,
+      "state"
+    ],
+    [
+      20,
+      11,
+      0,
+      4,
+      0,
+      "state"
+    ],
+    [
+      21,
+      11,
+      0,
+      10,
+      0,
+      "state"
+    ],
+    [
+      22,
+      3,
+      0,
+      12,
+      0,
+      "state"
+    ],
+    [
+      23,
+      12,
+      0,
+      11,
+      0,
+      "state"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "initial_state": "{\"delay_seconds\":10}"
+  },
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      72.4000244140625,
+      264.5
+    ],
+    "scale": 1
+  }
+}

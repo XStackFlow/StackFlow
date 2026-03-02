@@ -1,0 +1,34 @@
+{
+  "id": "github",
+  "name": "GitHub",
+  "version": "1.0.0",
+  "description": "Trigger GitHub Actions, fetch repo files, and monitor workflow runs",
+  "nodes": [
+    "RunGithubAction",
+    "RepoFileFetcher",
+    "GithubWorkflowErrorFetcher",
+    "WorkflowResultFormatter",
+    "ImageTagExtractor"
+  ],
+  "color": "#24292E",
+  "setup": {
+    "env_vars": [],
+    "steps": [
+      {
+        "type": "check_command",
+        "command": "gh",
+        "message": "GitHub CLI (gh) must be installed.",
+        "install_hint": {
+          "macos": "brew install gh",
+          "linux": "See https://github.com/cli/cli#installation"
+        }
+      },
+      {
+        "type": "check_connectivity",
+        "command": "gh auth status",
+        "message": "Checking GitHub authentication",
+        "error_hint": "Run 'gh auth login' to authenticate with GitHub."
+      }
+    ]
+  }
+}

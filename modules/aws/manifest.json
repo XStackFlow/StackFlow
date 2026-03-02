@@ -1,0 +1,36 @@
+{
+  "id": "aws",
+  "name": "AWS",
+  "version": "1.0.0",
+  "description": "Interact with AWS services such as EC2 security groups",
+  "nodes": ["GetAWSSecurityGroupID"],
+  "color": "#FF9900",
+  "setup": {
+    "env_vars": [
+      "AWS_PROFILE"
+    ],
+    "steps": [
+      {
+        "type": "check_command",
+        "command": "aws",
+        "message": "The AWS CLI must be installed.",
+        "install_hint": {
+          "macos": "brew install awscli",
+          "linux": "See https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
+        }
+      },
+      {
+        "type": "run_command",
+        "command": "aws configure sso",
+        "message": "Configuring AWS SSO credentials...",
+        "interactive": true
+      },
+      {
+        "type": "check_connectivity",
+        "command": "aws sts get-caller-identity",
+        "message": "Checking AWS authentication",
+        "error_hint": "Run 'aws configure' or set AWS_PROFILE / AWS_ACCESS_KEY_ID to authenticate."
+      }
+    ]
+  }
+}

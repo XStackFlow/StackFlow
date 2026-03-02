@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.local
+
+# Module configuration encryption keys (Fernet — must never be committed)
+modules/*/.config_secret_key
+modules/*/.provider_secret_key
+*.json.bak
+
+# Module environment files (may contain tokens/secrets)
+modules/*/.env
+
+# Memory / vector store (internal data, large)
+memory/
+
+# Prompts (internal/org-specific — users bring their own)
+prompts/
+
+# Runtime files
+.stackflow.pids
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files (generated)
+*_test.go
+
+# Workspace
+workspace/
+*.log
+logs/
+
+# Temporary repository clones (symlinks named after repo)
+# Add specific repo names as needed, or use pattern matching
+.thread_id/
+
+**/node_modules/**
+**/memory/chroma_db/**

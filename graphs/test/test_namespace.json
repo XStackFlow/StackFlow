@@ -1,0 +1,408 @@
+{
+  "last_node_id": 9,
+  "last_link_id": 16,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "langgraph/start",
+      "pos": [
+        140,
+        331
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            1,
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 1,
+      "type": "langgraph/end",
+      "pos": [
+        1520,
+        158
+      ],
+      "size": [
+        140,
+        66
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 16
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 14
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "title": "END",
+      "properties": {}
+    },
+    {
+      "id": 3,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        360,
+        235.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 1
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: test",
+      "properties": {
+        "namespace": "test"
+      }
+    },
+    {
+      "id": 8,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        940,
+        235.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 12
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            13,
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: Global",
+      "properties": {
+        "namespace": ""
+      }
+    },
+    {
+      "id": 7,
+      "type": "langgraph/WithNamespace",
+      "pos": [
+        360,
+        378.5
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 8
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "NS: Global",
+      "properties": {
+        "namespace": ""
+      }
+    },
+    {
+      "id": 6,
+      "type": "common/WithState",
+      "pos": [
+        1230,
+        307
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 13
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            14
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"test@@namespace\":{\"new_value\":\"123\"}}"
+      }
+    },
+    {
+      "id": 9,
+      "type": "common/WithState",
+      "pos": [
+        1230,
+        140
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 15
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"new_value\":\"asd\"}"
+      }
+    },
+    {
+      "id": 5,
+      "type": "common/WithState",
+      "pos": [
+        650,
+        213.5
+      ],
+      "size": [
+        210,
+        122
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 10
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 11
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"value\":\"test\"}"
+      }
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      8,
+      2,
+      0,
+      7,
+      0,
+      "state"
+    ],
+    [
+      10,
+      3,
+      0,
+      5,
+      0,
+      "state"
+    ],
+    [
+      11,
+      7,
+      0,
+      5,
+      1,
+      "state"
+    ],
+    [
+      12,
+      5,
+      0,
+      8,
+      0,
+      "state"
+    ],
+    [
+      13,
+      8,
+      0,
+      6,
+      0,
+      "state"
+    ],
+    [
+      14,
+      6,
+      0,
+      1,
+      1,
+      "state"
+    ],
+    [
+      15,
+      8,
+      0,
+      9,
+      0,
+      "state"
+    ],
+    [
+      16,
+      9,
+      0,
+      1,
+      0,
+      "state"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "initial_state": "{}"
+  },
+  "version": 0.4
+}
