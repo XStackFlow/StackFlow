@@ -31,7 +31,7 @@
     },
     {
       "id": 8,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         478.3999938964844,
         622.5
@@ -65,9 +65,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "{{reply}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -333,7 +333,7 @@
     },
     {
       "id": 3,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         470,
         214
@@ -372,9 +372,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Hello! Assistant is running! :rocket: How can I help you? :smile:",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -531,7 +531,7 @@
     },
     {
       "id": 26,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         3375.6000061035156,
         1639
@@ -565,9 +565,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Aborted",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -1138,7 +1138,7 @@
     },
     {
       "id": 19,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         2215.6000061035156,
         1825.5
@@ -1177,9 +1177,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Please reply:\n- `YES` or react with \u2705 to run the graph\n- `NO` to abort.",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -1232,7 +1232,7 @@
     },
     {
       "id": 55,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         3674,
         1851
@@ -1266,9 +1266,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": ":white_check_mark: Launched <http://localhost:5173/?thread_id={{graph_name}}_{{launched_session_id}}&graph={{graph_name}}.json|{{graph_name}}> (session: `{{launched_session_id}}`):rocket:\n",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -1771,7 +1771,7 @@
     },
     {
       "id": 18,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         1883.6000061035156,
         1825.5
@@ -1810,9 +1810,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Launching `{{graph_name}}` with config:\n```\n{{pending_graph_params}}\n```\nPlease reply in the thread or react with :white_check_mark: before continuing.",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -2216,12 +2216,5 @@
   "extra": {
     "initial_state": "{\n  \"input\": \"\"\n}"
   },
-  "version": 0.4,
-  "_viewport": {
-    "offset": [
-      -777.1422119140625,
-      -1501.380615234375
-    ],
-    "scale": 0.6727499949325649
-  }
+  "version": 0.4
 }

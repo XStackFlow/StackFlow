@@ -1,0 +1,65 @@
+"""Slack Channel Notifier - Sends messages to a Slack channel."""
+
+from typing import Any, Dict
+
+from src.nodes.abstract.base_node import BaseNode
+from src.inputs.standard_inputs import Resolvable
+from modules.slack.inputs import SlackMessageString
+from src.utils.setup.logger import get_logger
+from modules.slack.utils import send_slack_message
+
+logger = get_logger(__name__)
+
+
+class SlackChannelNotifier(BaseNode):
+    """Node that sends Slack messages to a channel directly by channel ID."""
+
+    def __init__(
+        self,
+        slack_message: Resolvable[SlackMessageString] = "{{slack_message}}",
+        channel_id: Resolvable[str] = "{{SLACK_CHANNEL_ID}}",
+        thread_ts: Resolvable[str] = "{{thread_sent_ts}}",
+        **kwargs
+    ):
+        """Initialize the SlackChannelNotifier node.
+
+        Args:
+            slack_message: Message to send (template supported).
+            channel_id: Slack channel ID (e.g. C01234567) to post to (template supported).
+            thread_ts: Optional thread ID to reply to a specific message thread.
+            **kwargs: Additional properties from LiteGraph.
+        """
+        super().__init__(**kwargs)
+        self.slack_message = slack_message
+        self.channel_id = channel_id
+        self.thread_ts = thread_ts
+
+    def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute the node logic."""
+        slack_message = self._slack_message
+        if not slack_message:
+            logger.info("slack_message is empty, skipping Slack channel notification")
+            return {}
+
+        channel_id = self._channel_id
+        if not channel_id:
+            logger.info("channel_id not provided and SLACK_CHANNEL_ID not set in env, skipping Slack channel notification")
+            return {}
+
+        thread_ts = self._thread_ts
+        # Normalize: if thread_ts is the template string itself, treat as None
+        if thread_ts == "{{thread_sent_ts}}":
+            thread_ts = None
+
+        result = send_slack_message(channel_id, slack_message, thread_ts=thread_ts)
+        logger.info("Sent Slack message to channel %s", channel_id)
+
+        # Extract the timestamp (ts) to allow downstream nodes to thread
+        slack_ts = result.get("ts")
+        # The thread ID is either the existing one we replied to, or the ts of this new message
+        final_thread_ts = thread_ts if thread_ts else slack_ts
+
+        return {
+            "slack_sent_ts": slack_ts,
+            "thread_sent_ts": final_thread_ts
+        }

@@ -145,7 +145,7 @@
     },
     {
       "id": 3,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         1230,
         140
@@ -179,9 +179,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "{{slack_message}}",
         "slack_user_id": "{{SLACK_USER_ID}}",

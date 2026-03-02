@@ -524,16 +524,12 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
             graph.configure(data);
             setHistoryBlock(false);
 
-            // Restore saved viewport (pan + zoom) if present
-            if (canvas?.ds && data._viewport) {
+            // Restore saved viewport (pan + zoom), or reset to default if absent
+            if (canvas?.ds) {
                 const vp = data._viewport;
-                if (Array.isArray(vp.offset) && vp.offset.length === 2) {
-                    canvas.ds.offset[0] = vp.offset[0];
-                    canvas.ds.offset[1] = vp.offset[1];
-                }
-                if (typeof vp.scale === "number") {
-                    canvas.ds.scale = vp.scale;
-                }
+                canvas.ds.offset[0] = (vp && Array.isArray(vp.offset)) ? vp.offset[0] : 0;
+                canvas.ds.offset[1] = (vp && Array.isArray(vp.offset)) ? vp.offset[1] : 0;
+                canvas.ds.scale     = (vp && typeof vp.scale === "number") ? vp.scale : 1;
                 canvas.setDirty(true, true);
             }
 

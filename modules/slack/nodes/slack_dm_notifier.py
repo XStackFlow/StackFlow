@@ -1,4 +1,4 @@
-"""Slack Notifier  - Sends Slack notifications."""
+"""Slack DM Notifier - Sends Slack direct messages to a user."""
 
 import os
 from typing import Any, Dict
@@ -12,8 +12,8 @@ from modules.slack.utils import send_slack_message
 logger = get_logger(__name__)
 
 
-class SlackNotifier(BaseNode):
-    """Node that sends Slack notifications."""
+class SlackDMNotifier(BaseNode):
+    """Node that sends Slack direct messages to a user."""
 
     def __init__(
         self,
@@ -22,7 +22,7 @@ class SlackNotifier(BaseNode):
         thread_ts: Resolvable[str] = "{{thread_sent_ts}}",
         **kwargs
     ):
-        """Initialize the SlackNotifier node.
+        """Initialize the SlackDMNotifier node.
 
         Args:
             slack_message: Message to send (template supported).
@@ -39,12 +39,12 @@ class SlackNotifier(BaseNode):
         """Execute the node logic."""
         slack_message = self._slack_message
         if not slack_message:
-            logger.info("slack_message is empty, skipping Slack notification")
+            logger.info("slack_message is empty, skipping Slack DM notification")
             return {}
 
         slack_user_id = self._slack_user_id
         if not slack_user_id:
-            logger.info("slack_user_id not provided and SLACK_USER_ID not set in env, skipping Slack notification")
+            logger.info("slack_user_id not provided and SLACK_USER_ID not set in env, skipping Slack DM notification")
             return {}
 
         thread_ts = self._thread_ts
@@ -54,53 +54,18 @@ class SlackNotifier(BaseNode):
 
         try:
             result = send_slack_message(slack_user_id, slack_message, thread_ts=thread_ts)
-            logger.info("Sent Slack notification to %s", slack_user_id)
-            
+            logger.info("Sent Slack DM to %s", slack_user_id)
+
             # Extract the timestamp (ts) to allow downstream nodes to thread
             slack_ts = result.get("ts")
             # The thread ID is either the existing one we replied to, or the ts of this new message
             final_thread_ts = thread_ts if thread_ts else slack_ts
-            
+
             return {
                 "slack_sent_ts": slack_ts,
                 "thread_sent_ts": final_thread_ts
             }
         except Exception as e:
             # Don't fail the workflow if Slack notification fails
-            logger.warning("Failed to send Slack notification: %s", e)
+            logger.warning("Failed to send Slack DM: %s", e)
             return {}
-
-
-if __name__ == "__main__":
-    """Test the SlackNotifier directly."""
-    import sys
-
-    # Add project root to path
-    from src.utils.setup.const import PROJECT_ROOT
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-    from dotenv import load_dotenv
-
-    # Load environment variables
-    load_dotenv()
-
-    # Create test state
-    test_state: Dict[str, Any] = {
-        "slack_message": "PR created: Test PR https://github.com/StackAdapt/access/pull/123",
-        "slack_user_id": os.getenv("SLACK_USER_ID"),
-    }
-
-    try:
-        node = SlackNotifier()
-        result = node.run(test_state)
-
-        print("\n" + "=" * 80)
-        print(" Execution Result:")
-        print("=" * 80)
-        print("=" * 80)
-    except Exception as e:
-        print(f"Error running : {e}", file=sys.stderr)
-        import traceback
-
-        traceback.print_exc()
-        sys.exit(1)

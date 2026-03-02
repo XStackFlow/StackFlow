@@ -479,8 +479,7 @@
             bottom: 0;
             right: 0;
             width: 320px;
-            height: 600px;
-            max-height: calc(100vh - 100px);
+            height: calc(100vh - 100px);
             display: flex;
             flex-direction: column;
             z-index: 100;
@@ -524,6 +523,7 @@
 
         #state-editor-container {
             flex: 1;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             overflow: hidden;

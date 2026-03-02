@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "Send messages, listen for replies, and route workflows via Slack",
   "nodes": [
-    "SlackNotifier",
+    "SlackDMNotifier",
+    "SlackChannelNotifier",
     "SlackReplyGetter",
     "SlackReplyListener",
     "SlackMessageRouterDeploymentVerification",

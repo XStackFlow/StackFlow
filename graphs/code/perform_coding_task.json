@@ -209,7 +209,7 @@
     },
     {
       "id": 17,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         1520,
         190.5
@@ -243,9 +243,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "PR created: {{pr_title}}\\n{{pr_url}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -402,12 +402,5 @@
   "extra": {
     "initial_state": "{\n  \"branch_template\": \"{{BRANCH_PREFIX}}/{{state.ticket_key}}-{{timestamp}}\",\n  \"repo_name\": \"StackAdapt/infra\",\n  \"coding_model\": {\n    \"model\": \"google|gemini-3-flash-preview\",\n    \"temperature\": 0.1,\n    \"prompt_name\": \"stackadapt/InfraSGSetup\",\n    \"recursion_limit\": 100\n  },\n  \"pr_model\": {\n    \"model\": \"google|gemini-3-flash-preview\",\n    \"temperature\": 0.3,\n    \"prompt_name\": \"stackadapt/InfraSummarizeForPR\",\n    \"recursion_limit\": 25,\n    \"required_keys\": \"pr_title\"\n  },\n  \"service_name\": \"cdp-event-ingestor\",\n  \"service_name_underscore\": \"cdp_event_ingestor\",\n  \"ticket_key\": \"ING-140\"\n}"
   },
-  "version": 0.4,
-  "_viewport": {
-    "offset": [
-      100.07977294921875,
-      234.67630004882812
-    ],
-    "scale": 0.6830134553650711
-  }
+  "version": 0.4
 }

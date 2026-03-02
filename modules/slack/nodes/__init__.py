@@ -1,4 +1,5 @@
-from .slack_notifier import SlackNotifier
+from .slack_dm_notifier import SlackDMNotifier
+from .slack_channel_notifier import SlackChannelNotifier
 from .slack_reply_getter import SlackReplyGetter
 from .slack_reply_listener import SlackReplyListener
 from .slack_message_router_deployment_verification import SlackMessageRouterDeploymentVerification
@@ -11,7 +12,7 @@ from .slack_message_reaction_remover import SlackMessageReactionRemover
 from .slack_conversation_history import SlackConversationHistory
 from .emoji_categorizer import EmojiCategorizer
 __all__ = [
-    "SlackNotifier", "SlackReplyGetter", "SlackReplyListener",
+    "SlackDMNotifier", "SlackChannelNotifier", "SlackReplyGetter", "SlackReplyListener",
     "SlackConversationHistory",
     "SlackMessageRouterDeploymentVerification",
     "SlackAssistantRouter", "GraphDetailsRouter",

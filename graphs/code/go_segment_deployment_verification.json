@@ -76,7 +76,7 @@
     },
     {
       "id": 6,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         2108.3999938964844,
         360.5000000000002
@@ -110,9 +110,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "{{formatted_result}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -268,7 +268,7 @@
     },
     {
       "id": 11,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         2398.3999938964844,
         350.5000000000002
@@ -307,9 +307,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Please reply:\n- `RETRY` to deploy again\n- `LGTM` to stop deployment verification",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -753,7 +753,7 @@
     },
     {
       "id": 18,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         3268.3999938964844,
         140
@@ -787,9 +787,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Deployment verification completed for: {{service_name}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
@@ -798,7 +798,7 @@
     },
     {
       "id": 19,
-      "type": "slack/SlackNotifier",
+      "type": "slack/SlackDMNotifier",
       "pos": [
         3268.3999938964844,
         376.0000000000002
@@ -832,9 +832,9 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackNotifier",
+      "title": "SlackDMNotifier",
       "properties": {
-        "name": "SlackNotifier",
+        "name": "SlackDMNotifier",
         "type": "standard",
         "slack_message": "Retrying Deployment",
         "slack_user_id": "{{SLACK_USER_ID}}",

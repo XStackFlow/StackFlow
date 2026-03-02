@@ -52,7 +52,7 @@ def get_or_clone_repository(repo_url: str, repo_name: str, temp_prefix: str = "s
     working_dir_env = os.getenv("WORKING_DIR")
     if not working_dir_env:
         raise ValueError("WORKING_DIR environment variable is required.")
-    working_dir = Path(working_dir_env)
+    working_dir = Path(working_dir_env).expanduser()
     working_dir.mkdir(parents=True, exist_ok=True)
 
     if not repo_url.endswith(".git"):
@@ -216,9 +216,36 @@ def commit_and_push_changes(
         check=False
     )
     
-    # If returncode is 0, there are no changes
+    # If returncode is 0, there are no staged changes to commit.
+    # But the local branch may still be ahead of remote (e.g. a clean git_merge
+    # already auto-committed the merge locally). In that case, skip the commit
+    # step and fall through to the push.
     if result.returncode == 0 and not allow_empty:
-        raise ValueError("No changes to commit")
+        ahead_result = subprocess.run(
+            ["git", "rev-list", "@{upstream}..HEAD", "--count"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        ahead = int(ahead_result.stdout.strip() or "0") if ahead_result.returncode == 0 else 0
+        if ahead == 0:
+            raise ValueError("No changes to commit")
+        # Local branch is ahead of remote — skip commit, just push below
+        logger.info("Nothing to commit but local branch is %d commit(s) ahead of remote — pushing", ahead)
+        result = subprocess.run(
+            ["git", "push", "origin", "HEAD"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise RepositoryError(f"Failed to push: {result.stderr.strip()}")
+        logger.info("Pushed %d commit(s) to remote", ahead)
+        return
     
     # Detect if we're completing a merge (use git's auto-generated merge message)
     merge_head = repo / ".git" / "MERGE_HEAD"

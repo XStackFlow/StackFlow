@@ -149,14 +149,17 @@ def execute_langchain(
         # Use thread-safe context var instead of os.chdir() so parallel
         # LLM agents each get their own isolated repo path.
         with repo_path_context(repo_path.resolve()):
-            # Get system-level instructions (from Langfuse SYSTEM prompt)
-            system_message = get_system_message()
+            # Get system-level instructions (from Langfuse SYSTEM prompt).
+            # Only include the memory section if memory tools are provided.
+            memory_tool_names = {t.name for t in MEMORY_TOOLS}
+            has_memory_tools = any(t.name in memory_tool_names for t in tools)
+            system_message = get_system_message(include_memory=has_memory_tools)
 
             # Combine instructions and task-specific content.
             # We only use a SystemMessage if tools are provided, as ReAct agents
             # benefit from it, while simple LLM calls are more direct with just a HumanMessage.
             prompt_parts = []
-            if tools and system_message:
+            if tools:
                 prompt_parts.append(system_message)
 
             prompt_parts.append("# TASK DESCRIPTION")

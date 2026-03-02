@@ -687,10 +687,6 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
                             res[k] = [recursive_unwrap(i, merge_to_root=merge_to_root, depth=depth+1) if isinstance(i, dict) else i for i in v]
                         else:
                             res[k] = v
-                for ns_key, ns_val in namespaces.items():
-                    unwrapped_ns = recursive_unwrap(ns_val, merge_to_root=merge_to_root, depth=depth+1)
-                    if unwrapped_ns:
-                        res[ns_key] = unwrapped_ns
                 return res
 
             extracted_db_state = recursive_unwrap(raw_values) if raw_values else {}

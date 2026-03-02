@@ -63,7 +63,7 @@ class BranchPreparer(BaseNode):
             raise ValueError("branch_template resolved to an empty string. Please provide a valid branch name or template.")
 
         # 3. Setup Workspace (Symlink + Clone)
-        symlink_name = f"{repo_name.replace('/', '_')}_{thread_id}"
+        symlink_name = f"{repo_name.replace('/', '_')}_{thread_id}".replace('/', '_')
         repo_url = f"https://github.com/{repo_name}.git"
         
         logger.info("Preparing workspace for %s (branch: %s)", repo_name, branch_name)

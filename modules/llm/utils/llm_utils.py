@@ -10,29 +10,49 @@ from src.utils.setup.langfuse_helper import get_langfuse_client
 
 logger = get_logger(__name__)
 
-# Cache for system message
+# Cache for system message (full and memory-stripped variants)
 _system_message_cache = None
+_system_message_no_memory_cache = None
 
-def get_system_message() -> str:
+_MEMORY_SECTION_HEADER = "## 🚨 MANDATORY: Learning & Memory"
+
+
+def _strip_memory_section(text: str) -> str:
+    """Remove the memory section from the system prompt."""
+    idx = text.find(_MEMORY_SECTION_HEADER)
+    if idx == -1:
+        return text
+    # Find the next ## heading after the memory section
+    next_section = text.find("\n## ", idx + 1)
+    if next_section == -1:
+        return text[:idx].rstrip()
+    return text[:idx] + text[next_section + 1:]
+
+
+def get_system_message(include_memory: bool = True) -> str:
     """Load system-level instructions from Langfuse SYSTEM prompt (cached).
 
+    Args:
+        include_memory: If False, strips the Learning & Memory section.
+                        Use when memory tools are not provided to the agent.
+
     Returns:
-        System message content, or empty string if prompt doesn't exist.
+        System message content, or None if prompt doesn't exist.
     """
-    global _system_message_cache
+    global _system_message_cache, _system_message_no_memory_cache
 
-    if _system_message_cache is not None:
-        return _system_message_cache
+    if include_memory:
+        if _system_message_cache is not None:
+            return _system_message_cache
+    else:
+        if _system_message_no_memory_cache is not None:
+            return _system_message_no_memory_cache
 
-    try:
-        client = get_langfuse_client()
-        prompt_obj = client.get_prompt("llm/SYSTEM")
-        _system_message_cache = prompt_obj.prompt
-        return _system_message_cache
-    except Exception as e:
-        # If SYSTEM prompt doesn't exist, cache empty string
-        logger.warning("No SYSTEM prompt found in Langfuse: %s", e)
-        return None
+    client = get_langfuse_client()
+    prompt_obj = client.get_prompt("llm/SYSTEM")
+    _system_message_cache = prompt_obj.prompt
+    _system_message_no_memory_cache = _strip_memory_section(_system_message_cache)
+    return _system_message_cache if include_memory else _system_message_no_memory_cache
 
 def parse_llm_json(text: str) -> Dict[str, Any]:
     """Parse JSON from LLM output, finding the last valid JSON block.
