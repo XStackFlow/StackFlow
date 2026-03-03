@@ -1,6 +1,6 @@
 {
-  "last_node_id": 65,
-  "last_link_id": 119,
+  "last_node_id": 66,
+  "last_link_id": 124,
   "nodes": [
     {
       "id": 1,
@@ -101,37 +101,6 @@
       "title": "Portal Exit [Conversation]",
       "properties": {
         "tag": "Conversation"
-      }
-    },
-    {
-      "id": 9,
-      "type": "langgraph/port_in",
-      "pos": [
-        768.3999938964844,
-        669
-      ],
-      "size": [
-        218.39999389648438,
-        78
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 7
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [MainLoop]",
-      "properties": {
-        "tag": "MainLoop"
       }
     },
     {
@@ -386,7 +355,7 @@
       "type": "langgraph/port_out",
       "pos": [
         180,
-        2398.25
+        2353
       ],
       "size": [
         210,
@@ -415,7 +384,7 @@
       "type": "common/StubNode",
       "pos": [
         470,
-        2404.25
+        2359
       ],
       "size": [
         140,
@@ -489,7 +458,7 @@
       "type": "slack/SlackReplyListener",
       "pos": [
         2505.6000061035156,
-        1847.5
+        1847.5000000000002
       ],
       "size": [
         210,
@@ -945,7 +914,7 @@
       "type": "common/DynamicRouter",
       "pos": [
         3085.6000061035156,
-        1825.5
+        1825.5000000000002
       ],
       "size": [
         210,
@@ -1007,7 +976,7 @@
       "type": "slack/SlackMessageReactor",
       "pos": [
         690,
-        2265.75
+        2220.5
       ],
       "size": [
         210,
@@ -1053,7 +1022,7 @@
       "type": "common/GraphSchemaLoader",
       "pos": [
         690,
-        2477.75
+        2432.5
       ],
       "size": [
         210,
@@ -1095,7 +1064,7 @@
       "type": "slack/GraphExecutor",
       "pos": [
         3375.6000061035156,
-        1875
+        1875.0000000000002
       ],
       "size": [
         210,
@@ -1131,7 +1100,7 @@
         "name": "GraphExecutor",
         "type": "standard",
         "graph_name": "{{graph_name}}",
-        "graph_params": "{{graph_params}}",
+        "graph_params": "{{pending_graph_params}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
         "api_base_url": "http://localhost:8000"
       }
@@ -1141,7 +1110,7 @@
       "type": "slack/SlackDMNotifier",
       "pos": [
         2215.6000061035156,
-        1825.5
+        1825.5000000000002
       ],
       "size": [
         210,
@@ -1191,7 +1160,7 @@
       "type": "slack/EmojiCategorizer",
       "pos": [
         2795.6000061035156,
-        1847.5
+        1847.5000000000002
       ],
       "size": [
         210,
@@ -1235,7 +1204,7 @@
       "type": "slack/SlackDMNotifier",
       "pos": [
         3674,
-        1851
+        1851.0000000000002
       ],
       "size": [
         210,
@@ -1280,7 +1249,7 @@
       "type": "langgraph/port_in",
       "pos": [
         4262.399993896484,
-        1897.5
+        1897.5000000000002
       ],
       "size": [
         218.39999389648438,
@@ -1311,7 +1280,7 @@
       "type": "common/WithStateMapper",
       "pos": [
         3972.3999938964844,
-        1885.5
+        1885.5000000000002
       ],
       "size": [
         210,
@@ -1393,73 +1362,18 @@
       }
     },
     {
-      "id": 57,
-      "type": "slack/GraphDetailsRouter",
-      "pos": [
-        1560,
-        2015
-      ],
-      "size": [
-        210,
-        191
-      ],
-      "flags": {},
-      "order": 25,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 94
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "ready_to_launch",
-          "type": "state",
-          "links": [
-            93
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "missing_params",
-          "type": "state",
-          "links": [
-            92
-          ],
-          "slot_index": 1
-        },
-        {
-          "name": "OTHER",
-          "type": "state",
-          "links": null
-        }
-      ],
-      "title": "GraphDetailsRouter",
-      "properties": {
-        "name": "GraphDetailsRouter",
-        "type": "router"
-      }
-    },
-    {
       "id": 41,
       "type": "slack/SlackMessageReactionRemover",
       "pos": [
         1560,
-        2271
+        2208.75
       ],
       "size": [
         226.8000030517578,
         146
       ],
       "flags": {},
-      "order": 26,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -1500,7 +1414,7 @@
       "type": "common/DynamicRouter",
       "pos": [
         980,
-        2243.75
+        2198.5
       ],
       "size": [
         210,
@@ -1554,55 +1468,6 @@
       }
     },
     {
-      "id": 12,
-      "type": "llm/LLMRepoAgent",
-      "pos": [
-        1270,
-        2091.25
-      ],
-      "size": [
-        210,
-        272
-      ],
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 105
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            94,
-            115
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "LLMRepoAgent",
-      "properties": {
-        "name": "LLMRepoAgent",
-        "type": "standard",
-        "model": "{{CHAT_MODEL}}",
-        "temperature": "0.3",
-        "prompt_name": "stackadapt/GraphDetailsPreparer",
-        "recursion_limit": "25",
-        "tool_sets": [],
-        "repo_path": "./"
-      }
-    },
-    {
       "id": 53,
       "type": "langgraph/port_out",
       "pos": [
@@ -1632,42 +1497,11 @@
       }
     },
     {
-      "id": 35,
-      "type": "langgraph/port_in",
-      "pos": [
-        1883.6000061035156,
-        2204.5
-      ],
-      "size": [
-        252,
-        78
-      ],
-      "flags": {},
-      "order": 29,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 92
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [Conversation]",
-      "properties": {
-        "tag": "Conversation"
-      }
-    },
-    {
       "id": 64,
       "type": "langgraph/port_out",
       "pos": [
         1560,
-        1892
+        1892.0000000000002
       ],
       "size": [
         210,
@@ -1696,7 +1530,7 @@
       "type": "langgraph/port_in",
       "pos": [
         1560,
-        2482
+        2419.75
       ],
       "size": [
         243.60000610351562,
@@ -1727,7 +1561,7 @@
       "type": "common/StubNode",
       "pos": [
         1270,
-        2428.25
+        2383
       ],
       "size": [
         140,
@@ -1770,7 +1604,7 @@
       "type": "slack/SlackDMNotifier",
       "pos": [
         1883.6000061035156,
-        1825.5
+        1825.5000000000002
       ],
       "size": [
         210,
@@ -1788,7 +1622,7 @@
         {
           "name": "In",
           "type": "state",
-          "link": 93
+          "link": 124
         },
         {
           "name": "In",
@@ -1813,6 +1647,170 @@
         "slack_message": "Launching `{{graph_name}}` with config:\n```\n{{pending_graph_params}}\n```\nPlease reply in the thread or react with :white_check_mark: before continuing.",
         "slack_user_id": "{{SLACK_USER_ID}}",
         "thread_ts": ""
+      }
+    },
+    {
+      "id": 35,
+      "type": "langgraph/port_in",
+      "pos": [
+        1883.6000061035156,
+        2204.5
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 123
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [Conversation]",
+      "properties": {
+        "tag": "Conversation"
+      }
+    },
+    {
+      "id": 66,
+      "type": "slack/GraphDetailsRouter",
+      "pos": [
+        1560,
+        2020.7500000000002
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 120
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ready_to_launch",
+          "type": "state",
+          "links": [
+            124
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "missing_params",
+          "type": "state",
+          "links": [
+            123
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GraphDetailsRouter",
+      "properties": {
+        "name": "GraphDetailsRouter",
+        "type": "router",
+        "example_input": "{{example_input}}",
+        "pending_graph_params": "{{pending_graph_params}}"
+      }
+    },
+    {
+      "id": 12,
+      "type": "llm/LLMRepoAgent",
+      "pos": [
+        1270,
+        2046.0000000000002
+      ],
+      "size": [
+        210,
+        272
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 105
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            115,
+            120
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "LLMRepoAgent",
+      "properties": {
+        "name": "LLMRepoAgent",
+        "type": "standard",
+        "model": "{{CHAT_MODEL}}",
+        "temperature": "0.3",
+        "prompt_name": "stackadapt/GraphDetailsPreparer",
+        "recursion_limit": "25",
+        "tool_sets": [],
+        "required_keys": [],
+        "repo_path": "./"
+      }
+    },
+    {
+      "id": 9,
+      "type": "langgraph/port_in",
+      "pos": [
+        768.3999938964844,
+        669
+      ],
+      "size": [
+        218.39999389648438,
+        78
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 7
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [MainLoop]",
+      "properties": {
+        "tag": "MainLoop"
       }
     }
   ],
@@ -2050,30 +2048,6 @@
       "state"
     ],
     [
-      92,
-      57,
-      1,
-      35,
-      0,
-      "state"
-    ],
-    [
-      93,
-      57,
-      0,
-      18,
-      1,
-      "state"
-    ],
-    [
-      94,
-      12,
-      0,
-      57,
-      0,
-      "state"
-    ],
-    [
       103,
       38,
       0,
@@ -2160,6 +2134,30 @@
       65,
       0,
       "state"
+    ],
+    [
+      120,
+      12,
+      0,
+      66,
+      0,
+      "state"
+    ],
+    [
+      123,
+      66,
+      1,
+      35,
+      0,
+      "state"
+    ],
+    [
+      124,
+      66,
+      0,
+      18,
+      1,
+      "state"
     ]
   ],
   "groups": [
@@ -2202,7 +2200,7 @@
         140,
         1565,
         4381,
-        1045
+        993
       ],
       "color": "#3f789e",
       "font_size": 24

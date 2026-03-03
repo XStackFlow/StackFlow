@@ -192,6 +192,13 @@ async def lifespan(app: FastAPI):
 
         yield  # Wait for the application to shut down
 
+        # Clean up Socket Mode connection so Slack stops routing events to this session
+        try:
+            from modules.slack.socket_manager import get_socket_manager
+            get_socket_manager().disconnect()
+        except Exception:
+            pass
+
 app = FastAPI(title="StackFlow Graph API", lifespan=lifespan)
 
 # Enable CORS for the LiteGraph editor
@@ -459,6 +466,7 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                     if thread_id in active_tasks:
                         active_tasks[thread_id]["status"] = "completed"
                         active_tasks[thread_id]["active_nodes"] = set()
+                        active_tasks[thread_id]["ended_at"] = time.time()
                     observation.update(output={"status": "completed"})
                 
                 # Flush Langfuse traces
@@ -489,12 +497,13 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                 logger.error("Graph execution failed for thread %s:\n%s", thread_id, error_trace)
                 if thread_id in active_tasks:
                     active_tasks[thread_id].update({
-                        "status": "failed", 
-                        "error": str(e) or "Unknown error", 
-                        "traceback": error_trace
+                        "status": "failed",
+                        "error": str(e) or "Unknown error",
+                        "traceback": error_trace,
+                        "ended_at": time.time()
                     })
                 else:
-                    active_tasks[thread_id] = {"status": "failed", "error": str(e) or "Unknown error", "traceback": error_trace}
+                    active_tasks[thread_id] = {"status": "failed", "error": str(e) or "Unknown error", "traceback": error_trace, "ended_at": time.time()}
                 # Update observation with error
                 observation.update(output={"status": "failed", "error": str(e)}, level="ERROR", status_message=str(e))
 
@@ -1010,17 +1019,27 @@ async def sync_session_logs(request: SyncLogsRequest):
 
 @app.get("/active_sessions")
 async def list_active_sessions():
-    """List all currently running sessions."""
+    """List all currently running sessions, plus recently ended ones (within 10s) so the frontend can detect them."""
     active = []
+    now = time.time()
     for tid, info in active_tasks.items():
         status = info.get("status")
-        # Only include sessions that are actually running or naturally interrupted (not manually stopped)
+        # Always include running/interrupted sessions
         if status in ["running", "interrupted"] and not info.get("stop_requested"):
             active.append({
                 "thread_id": tid,
                 "active_nodes": list(info.get("active_nodes", [])),
                 "status": status
             })
+        # Include recently ended (completed/failed) sessions for up to 10s so the frontend catches them
+        elif status in ["completed", "failed"]:
+            ended_at = info.get("ended_at")
+            if ended_at and (now - ended_at) < 10:
+                active.append({
+                    "thread_id": tid,
+                    "active_nodes": [],
+                    "status": status
+                })
     return {"active_sessions": active}
 
 def _extract_output_keys(cls) -> list[str]:

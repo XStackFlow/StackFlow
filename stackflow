@@ -97,6 +97,7 @@ start_api() {
     local api_env=(
         "PYTHONPATH=$SCRIPT_DIR${PYTHONPATH:+:$PYTHONPATH}"
         "PYTHONUNBUFFERED=1"
+        "PATH=/opt/homebrew/bin:/usr/local/bin:${PATH}"
     )
     env "${api_env[@]}" "$VENV_PYTHON" src/api_server.py >> "$LOGDIR/api.log" 2>&1 &
     echo $! >> "$PIDFILE"

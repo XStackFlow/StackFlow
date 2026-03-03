@@ -281,11 +281,18 @@
     "initial_state": "{}"
   },
   "version": 0.4,
-  "_viewport": {
-    "offset": [
-      60,
-      228.94444274902344
-    ],
-    "scale": 1
+  "_module_deps": {
+    "pr": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "slack": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "common": {
+      "origin": "core",
+      "source_url": null
+    }
   }
 }

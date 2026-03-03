@@ -1000,5 +1000,31 @@
       ]
     }
   },
-  "version": 0.4
+  "version": 0.4,
+  "_module_deps": {
+    "pr": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "slack": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "git": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "github": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "k8s": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "common": {
+      "origin": "core",
+      "source_url": null
+    }
+  }
 }
