@@ -1840,7 +1840,8 @@ async def _module_has_warnings(module_id: str, manifest: dict, is_installed: boo
     setup = manifest.get("setup", {})
     module_env = read_env_file(module_id)
     for var in setup.get("env_vars", []):
-        if not (module_env.get(var) or os.environ.get(var)):
+        var_name = var if isinstance(var, str) else var.get("name", "")
+        if var_name and not (module_env.get(var_name) or os.environ.get(var_name)):
             return True
     loop = asyncio.get_event_loop()
     for step in setup.get("steps", []):

@@ -1394,7 +1394,7 @@
     },
     {
       "id": 57,
-      "type": "common/DynamicRouter",
+      "type": "slack/GraphDetailsRouter",
       "pos": [
         1560,
         2015
@@ -1441,13 +1441,10 @@
           "links": null
         }
       ],
-      "title": "DynamicRouter",
+      "title": "GraphDetailsRouter",
       "properties": {
-        "name": "DynamicRouter",
-        "type": "router",
-        "value": "{{pending_next_step}}",
-        "route_options": "[\"ready_to_launch\",\"missing_params\"]",
-        "fuzzy": false
+        "name": "GraphDetailsRouter",
+        "type": "router"
       }
     },
     {
@@ -1602,7 +1599,6 @@
         "prompt_name": "stackadapt/GraphDetailsPreparer",
         "recursion_limit": "25",
         "tool_sets": [],
-        "required_keys": "pending_next_step",
         "repo_path": "./"
       }
     },
@@ -2217,11 +2213,18 @@
     "initial_state": "{}"
   },
   "version": 0.4,
-  "_viewport": {
-    "offset": [
-      0,
-      0
-    ],
-    "scale": 1
+  "_module_deps": {
+    "slack": {
+      "origin": "builtin",
+      "source_url": null
+    },
+    "common": {
+      "origin": "core",
+      "source_url": null
+    },
+    "llm": {
+      "origin": "builtin",
+      "source_url": null
+    }
   }
 }
