@@ -46,6 +46,10 @@ class PodErrorLogFetcher(BaseNode):
         if not service_name:
             raise ValueError("service_name is required.")
 
+        if not image_tag:
+            logger.info("No image_tag available — skipping pod log fetch.")
+            return {"pod_logs": None}
+
         logger.info(f"Probing K8s logs (Cluster: {cluster}, Service: {service_name}, Image Tag: {image_tag})...")
         
         # 1. Switch context

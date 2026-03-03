@@ -61,8 +61,8 @@ class SlackSocketManager:
             thread_ts:       Thread timestamp to match, or None for DM/channel.
             timeout_seconds: How long to wait before giving up.
         """
-        self._ensure_started()
-
+        # Register the waiter BEFORE starting the socket so that any event
+        # arriving the moment the connection opens is captured.
         waiter_q: queue.Queue = queue.Queue()
         key: _WaiterKey = (user_id, thread_ts)
 
@@ -70,6 +70,7 @@ class SlackSocketManager:
             self._waiters.setdefault(key, []).append(waiter_q)
 
         try:
+            self._ensure_started()
             return waiter_q.get(timeout=timeout_seconds)
         except queue.Empty:
             return None

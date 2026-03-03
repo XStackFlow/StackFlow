@@ -35,6 +35,13 @@ class SlackReplyListener(BaseNode):
         self.thread_ts = thread_ts
         self.timeout_minutes = timeout_minutes
 
+        # Eagerly start the socket so it is connected before upstream
+        # SlackDMNotifier nodes send messages the user might reply to.
+        try:
+            get_socket_manager()._ensure_started()
+        except Exception:
+            pass  # Will be retried in wait_for_reply
+
     def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         slack_user_id = self._slack_user_id
         if not slack_user_id:

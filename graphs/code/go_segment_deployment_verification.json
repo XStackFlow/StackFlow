@@ -1,6 +1,6 @@
 {
-  "last_node_id": 30,
-  "last_link_id": 58,
+  "last_node_id": 31,
+  "last_link_id": 60,
   "nodes": [
     {
       "id": 2,
@@ -176,37 +176,6 @@
       }
     },
     {
-      "id": 16,
-      "type": "langgraph/port_in",
-      "pos": [
-        3558.3999938964844,
-        945.175
-      ],
-      "size": [
-        210,
-        78
-      ],
-      "flags": {},
-      "order": 19,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 24
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [Start]",
-      "properties": {
-        "tag": "Start"
-      }
-    },
-    {
       "id": 23,
       "type": "langgraph/port_in",
       "pos": [
@@ -367,97 +336,6 @@
       }
     },
     {
-      "id": 25,
-      "type": "github/ImageTagExtractor",
-      "pos": [
-        1230,
-        907.175
-      ],
-      "size": [
-        210,
-        123
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 36
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            40
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "ImageTagExtractor",
-      "properties": {
-        "name": "ImageTagExtractor",
-        "type": "standard",
-        "repo_name": "StackAdapt/go-segment",
-        "github_run_id": "{{github_run_id}}"
-      }
-    },
-    {
-      "id": 22,
-      "type": "k8s/PodErrorLogFetcher",
-      "pos": [
-        1528.3999938964844,
-        871.175
-      ],
-      "size": [
-        210,
-        195
-      ],
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 40
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            45
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "PodErrorLogFetcher",
-      "properties": {
-        "name": "PodErrorLogFetcher",
-        "type": "standard",
-        "service_name": "{{service_name}}",
-        "namespace": "sa-core-integrations",
-        "k8s_cluster": "k8s-sa-dev",
-        "image_tag": "{{image_tag}}",
-        "label_selector": "component_service"
-      }
-    },
-    {
       "id": 21,
       "type": "slack/SlackReplyListener",
       "pos": [
@@ -545,51 +423,6 @@
         "slack_message": "Deployment verification completed for: {{service_name}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
         "thread_ts": ""
-      }
-    },
-    {
-      "id": 19,
-      "type": "slack/SlackDMNotifier",
-      "pos": [
-        3268.3999938964844,
-        898.675
-      ],
-      "size": [
-        210,
-        171
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 55
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            24
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SlackDMNotifier",
-      "properties": {
-        "name": "SlackDMNotifier",
-        "type": "standard",
-        "slack_message": "Retrying Deployment",
-        "slack_user_id": "{{SLACK_USER_ID}}",
-        "thread_ts": "{{thread_sent_ts}}"
       }
     },
     {
@@ -832,6 +665,216 @@
         "slack_user_id": "{{SLACK_USER_ID}}",
         "thread_ts": ""
       }
+    },
+    {
+      "id": 19,
+      "type": "slack/SlackDMNotifier",
+      "pos": [
+        3268.3999938964844,
+        898.675
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 55
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            59
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackDMNotifier",
+      "properties": {
+        "name": "SlackDMNotifier",
+        "type": "standard",
+        "slack_message": "Retrying Deployment",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": "{{thread_sent_ts}}"
+      }
+    },
+    {
+      "id": 31,
+      "type": "common/WithState",
+      "pos": [
+        3558.3999938964844,
+        933.175
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 59
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            60
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"image_tag\":\"@delete\"}"
+      }
+    },
+    {
+      "id": 16,
+      "type": "langgraph/port_in",
+      "pos": [
+        3848.3999938964844,
+        945.175
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 60
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [Start]",
+      "properties": {
+        "tag": "Start"
+      }
+    },
+    {
+      "id": 22,
+      "type": "k8s/PodErrorLogFetcher",
+      "pos": [
+        1528.3999938964844,
+        871.175
+      ],
+      "size": [
+        210,
+        195
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 40
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            45
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "PodErrorLogFetcher",
+      "properties": {
+        "name": "PodErrorLogFetcher",
+        "type": "standard",
+        "service_name": "{{service_name}}",
+        "namespace": "sa-core-integrations",
+        "k8s_cluster": "k8s-sa-dev",
+        "image_tag": "{{image_tag}}",
+        "label_selector": "component_service"
+      }
+    },
+    {
+      "id": 25,
+      "type": "github/ImageTagExtractor",
+      "pos": [
+        1230,
+        907.175
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 36
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            40
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageTagExtractor",
+      "properties": {
+        "name": "ImageTagExtractor",
+        "type": "standard",
+        "repo_name": "StackAdapt/go-segment",
+        "github_run_id": "{{github_run_id}}"
+      }
     }
   ],
   "links": [
@@ -896,14 +939,6 @@
       18,
       0,
       15,
-      0,
-      "state"
-    ],
-    [
-      24,
-      19,
-      0,
-      16,
       0,
       "state"
     ],
@@ -986,6 +1021,22 @@
       30,
       0,
       "state"
+    ],
+    [
+      59,
+      19,
+      0,
+      31,
+      0,
+      "state"
+    ],
+    [
+      60,
+      31,
+      0,
+      16,
+      0,
+      "state"
     ]
   ],
   "groups": [],
@@ -1018,12 +1069,12 @@
       "origin": "builtin",
       "source_url": null
     },
-    "k8s": {
-      "origin": "builtin",
-      "source_url": null
-    },
     "common": {
       "origin": "core",
+      "source_url": null
+    },
+    "k8s": {
+      "origin": "builtin",
       "source_url": null
     }
   }
