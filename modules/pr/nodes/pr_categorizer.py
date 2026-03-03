@@ -49,19 +49,21 @@ query($owner: String!, $repo: String!, $pr: Int!) {
 
 
 class PRCategorizer(BaseNode):
-    """Categorises open PRs into three buckets by review state.
+    """Categorises open PRs into four buckets by review state.
 
     Buckets:
-        - prs_ready_to_merge: approved (LGTM) AND no unresolved threads
-        - prs_pending_change: has unresolved review threads (needs attention)
-        - prs_pending_review: I haven't approved AND no unresolved threads
+        - prs_pending_change:      has unresolved review threads (needs attention)
+        - prs_ready_to_merge:      has a formal GitHub approval
+        - prs_pending_review:      no self-LGTM yet (still being worked on)
+        - prs_pending_peer_review: self-LGTM'd but awaiting formal approval
 
     Expects ``open_prs`` in state (produced by FetchAllPRs).
 
     Outputs:
-        prs_ready_to_merge:  list of {url, title, number}
-        prs_pending_change:  list of {url, title, number, unresolved_count, comments}
-        prs_pending_review:  list of {url, title, number}
+        prs_ready_to_merge:       list of {url, title, number}
+        prs_pending_change:       list of {url, title, number, unresolved_count, comments}
+        prs_pending_review:       list of {url, title, number}
+        prs_pending_peer_review:  list of {url, title, number}
     """
 
     def __init__(
@@ -85,11 +87,9 @@ class PRCategorizer(BaseNode):
             capture_output=True, text=True, timeout=30,
         )
         if result.returncode != 0:
-            logger.warning(
-                "Failed to fetch PR status for %s/%s#%d: %s",
-                owner, repo, pr_number, result.stderr,
+            raise RuntimeError(
+                f"Failed to fetch PR status for {owner}/{repo}#{pr_number}: {result.stderr}"
             )
-            return {"comments": [], "is_approved": False}
 
         data = json.loads(result.stdout)
         pr_data = data["data"]["repository"]["pullRequest"]
@@ -163,6 +163,7 @@ class PRCategorizer(BaseNode):
         prs_ready_to_merge: List[Dict] = []
         prs_pending_change: List[Dict] = []
         prs_pending_review: List[Dict] = []
+        prs_pending_peer_review: List[Dict] = []
 
         for pr in open_prs:
             owner, repo, pr_number = self._parse_pr_url(pr["url"])
@@ -193,12 +194,18 @@ class PRCategorizer(BaseNode):
             elif is_approved:
                 prs_ready_to_merge.append(base)
                 logger.info("  PR #%d (%s): ready to merge", pr["number"], pr["title"])
-            elif not i_approved:
+            elif i_approved:
+                # Self-LGTM'd but no formal GitHub approval yet
+                prs_pending_peer_review.append(base)
+                logger.info("  PR #%d (%s): pending peer review (LGTM'd by me, awaiting approval)", pr["number"], pr["title"])
+            else:
+                # No self-LGTM yet
                 prs_pending_review.append(base)
-                logger.info("  PR #%d (%s): pending review (no LGTM from me)", pr["number"], pr["title"])
+                logger.info("  PR #%d (%s): pending review (no self-LGTM yet)", pr["number"], pr["title"])
 
         return {
             "prs_ready_to_merge": prs_ready_to_merge,
             "prs_pending_change": prs_pending_change,
             "prs_pending_review": prs_pending_review,
+            "prs_pending_peer_review": prs_pending_peer_review,
         }

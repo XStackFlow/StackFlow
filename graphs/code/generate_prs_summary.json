@@ -105,11 +105,11 @@
       "type": "pr/PRCategorizer",
       "pos": [
         650,
-        159
+        150.5
       ],
       "size": [
         210,
-        133
+        150
       ],
       "flags": {},
       "order": 2,
@@ -228,7 +228,7 @@
       "properties": {
         "name": "FormatTemplate",
         "type": "standard",
-        "template": "*\ud83d\udd0d PR Status \u2014 {{ open_prs|length }} open PR{{ 's' if open_prs|length != 1 else '' }}*\n{% if prs_ready_to_merge %}\n\n*\u2705 Ready to Merge ({{ prs_ready_to_merge|length }})*\n    {% for pr in prs_ready_to_merge %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}>\n    {% endfor %}\n{% endif %}\n{% if prs_pending_change %}\n\n*\ud83d\udd34 Pending Change ({{ prs_pending_change|length }})*\n    {% for pr in prs_pending_change %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}> \u2014 {{ pr.unresolved_count }} unresolved thread{{ 's' if pr.unresolved_count != 1 else '' }}\n        {% for c in pr.comments[:3] %}\n            {% if c.path %}\n>`{{ c.path }}` \u2014 {{ c.body[:150]|replace('\\n', ' ') }}\n            {% else %}\n>{{ c.body[:150]|replace('\\n', ' ') }}\n            {% endif %}\n        {% endfor %}\n        {% if pr.comments|length > 3 %}\n>_\u2026and {{ pr.comments|length - 3 }} more_\n        {% endif %}\n    {% endfor %}\n{% endif %}\n{% if prs_pending_review %}\n\n*\ud83d\udc40 Pending Review ({{ prs_pending_review|length }})*\n    {% for pr in prs_pending_review %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}>\n    {% endfor %}\n{% endif %}\n{% if not prs_ready_to_merge and not prs_pending_change and not prs_pending_review %}\n\n\u2705 All caught up \u2014 no open PRs need attention.\n{% endif %}",
+        "template": "*\ud83d\udd0d PR Status \u2014 {{ open_prs|length }} open PR{{ 's' if open_prs|length != 1 else '' }}*\n{% if prs_ready_to_merge %}\n\n*\u2705 Ready to Merge ({{ prs_ready_to_merge|length }})*\n    {% for pr in prs_ready_to_merge %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}>\n    {% endfor %}\n{% endif %}\n{% if prs_pending_change %}\n\n*\ud83d\udd34 Pending Change ({{ prs_pending_change|length }})*\n    {% for pr in prs_pending_change %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}> \u2014 {{ pr.unresolved_count }} unresolved thread{{ 's' if pr.unresolved_count != 1 else '' }}\n        {% for c in pr.comments[:3] %}\n            {% if c.path %}\n>`{{ c.path }}` \u2014 {{ c.body[:150]|replace('\\n', ' ') }}\n            {% else %}\n>{{ c.body[:150]|replace('\\n', ' ') }}\n            {% endif %}\n        {% endfor %}\n        {% if pr.comments|length > 3 %}\n>_\u2026and {{ pr.comments|length - 3 }} more_\n        {% endif %}\n    {% endfor %}\n{% endif %}\n{% if prs_pending_peer_review %}\n\n*\ud83d\udc40 Pending Peer Review ({{ prs_pending_peer_review|length }})*\n    {% for pr in prs_pending_peer_review %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}>\n    {% endfor %}\n{% endif %}\n{% if prs_pending_review %}\n\n*\u270f\ufe0f In Progress ({{ prs_pending_review|length }})*\n    {% for pr in prs_pending_review %}\n{{ loop.index }}. `{{ pr.repo_name }}`: <{{ pr.url }}|{{ pr.title }}>\n    {% endfor %}\n{% endif %}\n{% if not prs_ready_to_merge and not prs_pending_change and not prs_pending_peer_review and not prs_pending_review %}\n\n\u2705 All caught up \u2014 no open PRs need attention.\n{% endif %}",
         "output_key": "slack_message"
       }
     }
@@ -280,5 +280,12 @@
   "extra": {
     "initial_state": "{}"
   },
-  "version": 0.4
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      60,
+      228.94444274902344
+    ],
+    "scale": 1
+  }
 }

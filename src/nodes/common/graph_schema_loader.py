@@ -24,21 +24,15 @@ class GraphSchemaLoader(BaseNode):
     def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         graph_name = state.get("graph_name")
         if not graph_name:
-            logger.warning("GraphSchemaLoader: No graph_name in state")
-            return {}
+            raise ValueError("GraphSchemaLoader: No graph_name in state")
 
         graph_path = GRAPH_SAVE_PATH / f"{graph_name}.json"
-        initial_state_str = "{}"
+        if not graph_path.exists():
+            raise ValueError(f"GraphSchemaLoader: Graph file not found: {graph_path}")
 
-        if graph_path.exists():
-            try:
-                with open(graph_path, "r", encoding="utf-8") as f:
-                    graph_json = json.load(f)
-                    initial_state_str = graph_json.get("extra", {}).get("initial_state", "{}")
-            except Exception as e:
-                logger.error("GraphSchemaLoader: Failed to read graph %s: %s", graph_name, e)
-        else:
-            logger.warning("GraphSchemaLoader: Graph file not found: %s", graph_path)
+        with open(graph_path, "r", encoding="utf-8") as f:
+            graph_json = json.load(f)
+            initial_state_str = graph_json.get("extra", {}).get("initial_state", "{}")
 
         return {
             "example_input": initial_state_str,

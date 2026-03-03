@@ -88,6 +88,40 @@
             color: #f59e0b;
         }
 
+        #restart-required-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: rgba(30,25,10,0.92);
+            border-bottom: 2px solid rgba(245,158,11,0.5);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 200;
+            backdrop-filter: blur(12px);
+        }
+        #restart-required-banner span {
+            font-size: 14px;
+            color: #fbbf24;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+        #restart-required-banner button {
+            background: rgba(245,158,11,0.25);
+            color: #fbbf24;
+            border: 1px solid rgba(245,158,11,0.5);
+            border-radius: 5px;
+            padding: 6px 18px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        #restart-required-banner button:hover { background: rgba(245,158,11,0.45); }
         #breadcrumb-bar {
             position: absolute;
             top: 48px;
@@ -163,6 +197,10 @@
             <button id="restart-server" style="background: #444; border-color: #666;">🔌 Restart Server</button>
         </div>
     </div>
+    <div id="restart-required-banner" style="display:none;">
+        <span>⚠ Server restart required — modules were changed.</span>
+        <button id="restart-required-btn">Restart Now</button>
+    </div>
     <div id="breadcrumb-bar">
         <div id="breadcrumbs"
             style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #aaa; overflow-x: auto; white-space: nowrap;">
@@ -201,9 +239,9 @@
             <div class="debug-controls-header">
                 <span>Tools</span>
             </div>
-            <div style="padding: 6px 8px; display: flex; flex-direction: column; gap: 6px;">
-                <button id="debug-mode" title="Debug mode OFF" style="background: #1e3a2e; border-color: #22c55e; color: #22c55e; font-weight: 600; font-size: 12px; padding: 5px 10px; text-align: left;">🐛 Debug Mode: OFF</button>
-                <button id="open-package-manager" style="background: #1e293b; border-color: #334155; color: #94a3b8; font-size: 12px; padding: 5px 10px; text-align: left;">📦 Package Manager</button>
+            <div style="padding: 6px 8px; display: flex; flex-direction: row; gap: 6px;">
+                <button id="debug-mode" title="Debug mode OFF" style="flex: 1; background: #1e3a2e; border-color: #22c55e; color: #22c55e; font-weight: 600; font-size: 12px; padding: 5px 10px; text-align: left;">🐛 Debug Mode: OFF</button>
+                <button id="open-package-manager" style="flex: 1; background: #1e293b; border-color: #334155; color: #94a3b8; font-size: 12px; padding: 5px 10px; text-align: left;">📦 Package Manager</button>
             </div>
         </div>
 
@@ -1583,6 +1621,34 @@
             font-size: 10px;
             color: #555;
         }
+        .pm-card-version-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pm-card-version-label {
+            font-size: 9px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pm-card-sha {
+            font-size: 10px;
+            font-family: monospace;
+            color: #888;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 1px 5px;
+            border-radius: 3px;
+            cursor: default;
+            flex-shrink: 0;
+        }
+        .pm-card-sha-new {
+            color: #4ade80;
+            background: #0f2a1a;
+            border-color: #2a5a3a;
+        }
         .pm-card-badge {
             font-size: 9px;
             padding: 2px 6px;
@@ -1743,6 +1809,16 @@
             background: #252525;
             padding: 2px 6px;
             border-radius: 3px;
+        }
+        .mod-modal-sha {
+            font-size: 10px;
+            font-family: monospace;
+            color: #aaa;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: default;
         }
         .mod-modal-close {
             background: none;
@@ -1917,12 +1993,47 @@
             border: 1px solid rgba(239,68,68,0.3);
         }
         .mod-btn-danger:hover { background: rgba(239,68,68,0.25); }
+        .mod-btn-update {
+            background: rgba(74,222,128,0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74,222,128,0.25);
+        }
+        .mod-btn-update:hover { background: rgba(74,222,128,0.2); }
         .mod-btn-cancel {
             background: #252525;
             color: #888;
             border: 1px solid #333;
         }
         .mod-btn-cancel:hover { background: #2a2a2a; color: #ccc; }
+        .pm-restart-banner {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 6px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .pm-restart-banner span {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #f59e0b;
+        }
+        .pm-restart-banner button {
+            background: rgba(245,158,11,0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 5px;
+            padding: 6px 18px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .pm-restart-banner button:hover { background: rgba(245,158,11,0.35); }
+        .pm-restart-banner button:disabled { opacity: 0.6; cursor: default; }
         .mod-success-msg {
             background: rgba(16,185,129,0.1);
             border-left: 3px solid #10b981;
@@ -2062,6 +2173,180 @@
             font-size: 9px;
             margin-top: 4px;
             padding: 0 2px;
+        }
+
+        /* ── Missing Modules Dialog ────────────────────────────────── */
+        .missing-modules-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modFadeIn 0.15s ease;
+        }
+        .missing-modules-dialog {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            width: 420px;
+            max-width: 92vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .missing-modules-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .missing-modules-icon {
+            font-size: 28px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .missing-modules-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f5f5f5;
+        }
+        .missing-modules-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .missing-modules-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            flex-shrink: 0;
+        }
+        .missing-modules-close:hover { color: #ccc; }
+
+        .missing-modules-list {
+            padding: 10px 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .missing-modules-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 8px;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .missing-modules-row:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        .missing-modules-row + .missing-modules-row {
+            border-top: 1px solid #222;
+        }
+        .missing-modules-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .missing-modules-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .missing-modules-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e5e5e5;
+        }
+        .missing-modules-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .missing-modules-url {
+            font-size: 11px;
+            color: #60a5fa;
+            text-decoration: none;
+            display: block;
+            margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .missing-modules-url:hover { text-decoration: underline; color: #93bbfd; }
+        .missing-modules-chip {
+            font-size: 10px;
+            padding: 1px 6px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 3px;
+            color: #aaa;
+            font-family: monospace;
+        }
+        .missing-modules-install {
+            padding: 5px 14px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .missing-modules-install:hover { background: #2563eb; }
+        .missing-modules-install:disabled { opacity: 0.6; cursor: default; }
+        .missing-modules-install.installed {
+            background: #059669;
+            cursor: default;
+        }
+        .missing-modules-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .missing-modules-dismiss {
+            padding: 5px 16px;
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .missing-modules-dismiss:hover { color: #ccc; border-color: #666; }
+        .missing-modules-badge-error {
+            font-size: 10px;
+            padding: 3px 10px;
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .missing-modules-badge-unknown {
+            font-size: 10px;
+            padding: 3px 10px;
+            background: rgba(161,161,170,0.12);
+            color: #a1a1aa;
+            border: 1px solid rgba(161,161,170,0.25);
+            border-radius: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
     </style>
     <script type="module" src="/main.js"></script>

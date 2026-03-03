@@ -94,6 +94,10 @@ def render_template(template: Any, state: Dict[str, Any]) -> Any:
         # 4. Check in state
         else:
             search_path = path[6:] if path.startswith("state.") else path
+            top_key = search_path.split(".")[0]
+            if top_key not in state:
+                logger.warning("Template variable '{{%s}}' not found in state or environment. Resolving to empty string.", path)
+                return ""
             val = get_value_by_path(state, search_path)
 
         if val is not None:
@@ -102,7 +106,6 @@ def render_template(template: Any, state: Dict[str, Any]) -> Any:
                 val_str = val_str.replace(transformation[1], transformation[2])
             return val_str
 
-        logger.warning("Template variable '{{%s}}' not found in state or environment. Resolving to empty string.", path)
         return ""
 
     return re.sub(r"\{\{(.*?)\}\}", replace, template)

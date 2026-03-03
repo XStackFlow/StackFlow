@@ -14,6 +14,301 @@ import { reloadLogs, updateActiveSessions } from './execution.js';
 const API_BASE = "http://localhost:8000";
 
 /**
+ * Per-type origin metadata populated by fetchNodes().
+ * Keys are full LiteGraph type strings (e.g. "github/ImageTagExtractor").
+ * Values: { origin: "core"|"builtin"|"external", source_url: string|null, module_id: string }
+ */
+export const nodeTypeMetadata = {};
+
+/**
+ * Show the global "restart required" banner.
+ * Persists across page refreshes via localStorage — only cleared by
+ * clicking "Restart Now" (which restarts the server then reloads).
+ */
+const _RESTART_KEY = "stackflow_restart_required";
+let _restartRequired = localStorage.getItem(_RESTART_KEY) === "1";
+
+export function showRestartRequired() {
+    if (_restartRequired) return; // already showing
+    _restartRequired = true;
+    localStorage.setItem(_RESTART_KEY, "1");
+    const banner = document.getElementById("restart-required-banner");
+    if (banner) banner.style.display = "flex";
+}
+
+function _clearRestartRequired() {
+    _restartRequired = false;
+    localStorage.removeItem(_RESTART_KEY);
+    const banner = document.getElementById("restart-required-banner");
+    if (banner) banner.style.display = "none";
+}
+
+// Wire up the global restart banner button + restore persisted state
+document.addEventListener("DOMContentLoaded", () => {
+    // Restore banner visibility from localStorage
+    if (_restartRequired) {
+        const banner = document.getElementById("restart-required-banner");
+        if (banner) banner.style.display = "flex";
+    }
+
+    const btn = document.getElementById("restart-required-btn");
+    if (btn) {
+        btn.addEventListener("click", async () => {
+            btn.disabled = true;
+            btn.textContent = "Restarting…";
+            try {
+                await fetch(`${API_BASE}/restart`, { method: "POST" });
+                btn.textContent = "Reloading…";
+                _clearRestartRequired();
+                setTimeout(() => location.reload(), 3000);
+            } catch {
+                _clearRestartRequired();
+                setTimeout(() => location.reload(), 5000);
+            }
+        });
+    }
+});
+
+export function isRestartRequired() { return _restartRequired; }
+
+/**
+ * Show a dialog suggesting modules to install when a graph has missing node types.
+ * Cross-references missing types against the /modules endpoint AND the graph's
+ * embedded _module_deps manifest (which stores origin + source_url for each module).
+ *
+ * @param {Set<string>} missingTypes - e.g. {"github/ImageTagExtractor", "slack/SlackDMNotifier"}
+ * @param {Object|null} moduleDeps - the graph's _module_deps object, if present
+ */
+async function suggestMissingModules(missingTypes, moduleDeps) {
+    if (!missingTypes || missingTypes.size === 0) return;
+
+    // Map missing type → {moduleId, nodeName}
+    const needed = new Map(); // moduleId → Set<nodeName>
+    for (const fullType of missingTypes) {
+        const slash = fullType.indexOf("/");
+        if (slash < 0) continue;
+        const moduleId = fullType.slice(0, slash);
+        const nodeName = fullType.slice(slash + 1);
+        if (!needed.has(moduleId)) needed.set(moduleId, new Set());
+        needed.get(moduleId).add(nodeName);
+    }
+    if (needed.size === 0) return;
+
+    // Fetch all modules to cross-reference
+    let allModules;
+    try {
+        const res = await fetch(`${API_BASE}/modules`);
+        if (!res.ok) return;
+        const data = await res.json();
+        allModules = data.modules || [];
+    } catch { return; }
+
+    // Categorise missing modules:
+    // - installable: known module in registry, not installed → "Install" button
+    // - broken: known module in registry, installed but nodes still missing → error badge
+    // - installableFromUrl: NOT in registry, but _module_deps has a source_url → "Install from GitHub" button
+    // - unknown: not in registry, no source_url → grey unknown badge
+    const installable = [];       // {module, missingNodes}
+    const broken = [];            // {module, missingNodes}
+    const installableFromUrl = []; // {moduleId, sourceUrl, missingNodes}
+    const unknown = [];           // {moduleId, missingNodes}
+
+    for (const [moduleId, nodeNames] of needed) {
+        const mod = allModules.find(m => m.id === moduleId);
+        if (!mod) {
+            // Not in registry — check if graph has the source URL
+            const dep = moduleDeps?.[moduleId];
+            if (dep?.source_url) {
+                installableFromUrl.push({ moduleId, sourceUrl: dep.source_url, missingNodes: [...nodeNames] });
+            } else {
+                unknown.push({ moduleId, missingNodes: [...nodeNames] });
+            }
+            continue;
+        }
+        const matched = [...nodeNames].filter(n => (mod.nodes || []).includes(n));
+        const nodeList = matched.length > 0 ? matched : [...nodeNames];
+        if (!mod.installed) {
+            installable.push({ module: mod, missingNodes: nodeList });
+        } else {
+            // Installed but nodes still missing → load error or registration failure
+            broken.push({ module: mod, missingNodes: nodeList });
+        }
+    }
+
+    const totalIssues = installable.length + broken.length + installableFromUrl.length + unknown.length;
+    if (totalIssues === 0) return;
+
+    // ── Build the dialog ─────────────────────────────────────────────
+    const overlay = document.createElement("div");
+    overlay.className = "missing-modules-overlay";
+
+    const dialog = document.createElement("div");
+    dialog.className = "missing-modules-dialog";
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "missing-modules-header";
+
+    const canInstall = installable.length > 0 || installableFromUrl.length > 0;
+    const subtitle = canInstall
+        ? "This graph requires modules that are not installed."
+        : "This graph has nodes that could not be loaded.";
+
+    header.innerHTML = `<span class="missing-modules-icon">📦</span>
+        <div>
+            <div class="missing-modules-title">Missing Nodes</div>
+            <div class="missing-modules-subtitle">${subtitle}</div>
+        </div>`;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "missing-modules-close";
+    closeBtn.textContent = "✕";
+    closeBtn.addEventListener("click", () => overlay.remove());
+    header.appendChild(closeBtn);
+
+    // Module list
+    const list = document.createElement("div");
+    list.className = "missing-modules-list";
+
+    // Helper to create a row
+    function addRow({ color, name, nodes, url, actionEl }) {
+        const row = document.createElement("div");
+        row.className = "missing-modules-row";
+
+        const colorDot = document.createElement("span");
+        colorDot.className = "missing-modules-dot";
+        colorDot.style.background = color || "#666";
+
+        const info = document.createElement("div");
+        info.className = "missing-modules-info";
+
+        const modName = document.createElement("div");
+        modName.className = "missing-modules-name";
+        modName.textContent = name;
+
+        info.appendChild(modName);
+
+        if (url) {
+            const urlEl = document.createElement("a");
+            urlEl.className = "missing-modules-url";
+            urlEl.href = url;
+            urlEl.target = "_blank";
+            urlEl.rel = "noopener";
+            urlEl.textContent = url.replace(/^https?:\/\//, "");
+            info.appendChild(urlEl);
+        }
+
+        const nodeChips = document.createElement("div");
+        nodeChips.className = "missing-modules-chips";
+        nodes.forEach(n => {
+            const chip = document.createElement("span");
+            chip.className = "missing-modules-chip";
+            chip.textContent = n;
+            nodeChips.appendChild(chip);
+        });
+
+        info.appendChild(nodeChips);
+        row.appendChild(colorDot);
+        row.appendChild(info);
+        if (actionEl) row.appendChild(actionEl);
+        list.appendChild(row);
+    }
+
+    // ── Installable modules (blue Install button) ──
+    for (const { module: mod, missingNodes } of installable) {
+        const installBtn = document.createElement("button");
+        installBtn.className = "missing-modules-install";
+        installBtn.textContent = "Install";
+        installBtn.addEventListener("click", async () => {
+            installBtn.disabled = true;
+            installBtn.textContent = "Installing…";
+            try {
+                const res = await fetch(`${API_BASE}/modules/${mod.id}/install`, { method: "POST" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+                installBtn.textContent = "✓ Installed";
+                installBtn.classList.add("installed");
+                if (data.needs_restart) showRestartRequired();
+            } catch (e) {
+                installBtn.textContent = "✗ Failed";
+                installBtn.title = e.message;
+                setTimeout(() => { installBtn.textContent = "Retry"; installBtn.disabled = false; }, 2000);
+            }
+        });
+        addRow({ color: mod.color, name: mod.name, nodes: missingNodes, url: mod.source_url, actionEl: installBtn });
+    }
+
+    // ── Broken modules (installed but nodes missing — show error badge) ──
+    for (const { module: mod, missingNodes } of broken) {
+        const badge = document.createElement("span");
+        badge.className = "missing-modules-badge-error";
+        badge.textContent = mod.load_error ? "load error" : "not loaded";
+        badge.title = mod.load_error || "Module is installed but these nodes were not registered";
+        addRow({ color: mod.color, name: mod.name, nodes: missingNodes, url: mod.source_url, actionEl: badge });
+    }
+
+    // ── External modules with source URL from graph manifest (Install from GitHub) ──
+    for (const { moduleId, sourceUrl, missingNodes } of installableFromUrl) {
+        const installBtn = document.createElement("button");
+        installBtn.className = "missing-modules-install";
+        installBtn.textContent = "Install";
+        installBtn.title = sourceUrl;
+        installBtn.addEventListener("click", async () => {
+            installBtn.disabled = true;
+            installBtn.textContent = "Cloning…";
+            try {
+                const res = await fetch(`${API_BASE}/modules/install-from-github`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: sourceUrl }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+                installBtn.textContent = "✓ Installed";
+                installBtn.classList.add("installed");
+                if (data.needs_restart) showRestartRequired();
+            } catch (e) {
+                installBtn.textContent = "✗ Failed";
+                installBtn.title = e.message;
+                setTimeout(() => { installBtn.textContent = "Retry"; installBtn.disabled = false; }, 2000);
+            }
+        });
+        addRow({ color: "#666", name: moduleId, nodes: missingNodes, url: sourceUrl, actionEl: installBtn });
+    }
+
+    // ── Unknown modules (no matching module in registry, no source URL) ──
+    for (const { moduleId, missingNodes } of unknown) {
+        const badge = document.createElement("span");
+        badge.className = "missing-modules-badge-unknown";
+        badge.textContent = "unknown";
+        badge.title = `No module "${moduleId}" found in the registry`;
+        addRow({ color: "#666", name: moduleId, nodes: missingNodes, actionEl: badge });
+    }
+
+    // Footer
+    const footer = document.createElement("div");
+    footer.className = "missing-modules-footer";
+    const dismissBtn = document.createElement("button");
+    dismissBtn.className = "missing-modules-dismiss";
+    dismissBtn.textContent = "Dismiss";
+    dismissBtn.addEventListener("click", () => overlay.remove());
+    footer.appendChild(dismissBtn);
+
+    dialog.appendChild(header);
+    dialog.appendChild(list);
+    dialog.appendChild(footer);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    // ESC to close
+    const onKey = (e) => {
+        if (e.key === "Escape") { overlay.remove(); document.removeEventListener("keydown", onKey); }
+    };
+    document.addEventListener("keydown", onKey);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+}
+
+/**
  * Fetches and registers dynamic nodes from the backend.
  */
 export async function fetchNodes(canvas, isDirty, retries = 10) {
@@ -443,7 +738,13 @@ export async function fetchNodes(canvas, isDirty, retries = 10) {
                     });
                 }
             }
-            LiteGraph.registerNodeType(`${nodeData.category}/${nodeData.name}`, CustomNode);
+            const fullType = `${nodeData.category}/${nodeData.name}`;
+            LiteGraph.registerNodeType(fullType, CustomNode);
+            nodeTypeMetadata[fullType] = {
+                origin: nodeData.origin || "builtin",
+                source_url: nodeData.source_url || null,
+                module_id: nodeData.module_id || null,
+            };
         });
         console.log(`[Init] Registered ${data.nodes.length} dynamic nodes.`);
     } catch (e) {
@@ -505,7 +806,7 @@ export async function fetchGraphList(graph, canvas, isDirty, loadGraphFn, retrie
         console.error("Failed to fetch graphs", e);
         if (retries > 0) {
             await new Promise(resolve => setTimeout(resolve, 1000));
-            return fetchGraphList(graph, canvas, isDirty, loadGraphFn, retries - 1);
+            return fetchGraphList(graph, canvas, isDirty, loadGraphFn, retries - 1, reloadCurrent);
         }
     }
 }
@@ -538,6 +839,25 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
 
             // Validate properties.name matches node type
             if (graph._nodes) {
+                // Collect missing node types (unregistered in LiteGraph)
+                const missingTypes = new Set();
+                graph._nodes.forEach(node => {
+                    if (node.type && !node.type.startsWith('langgraph/')) {
+                        if (!LiteGraph.registered_node_types[node.type]) {
+                            missingTypes.add(node.type);
+                        }
+                    }
+                });
+
+                if (missingTypes.size > 0) {
+                    const missingList = [...missingTypes].sort().join(", ");
+                    const warnMsg = `⚠️ Missing node types not in registry: ${missingList}`;
+                    console.warn(warnMsg);
+                    addLog(warnMsg, "warning");
+                    // Suggest installing missing modules (async, non-blocking)
+                    suggestMissingModules(missingTypes, data._module_deps || null);
+                }
+
                 graph._nodes.forEach(node => {
                     if (node.type && node.properties && node.properties.name) {
                         const typeParts = node.type.split('/');
@@ -799,7 +1119,7 @@ export async function openPackageManager(refreshNodes) {
             allModules = listData.modules || [];
             updateStats();
             renderGrid(filterModules(searchInput.value));
-            refreshNodes?.();
+            if (data.needs_restart) showRestartBanner();
         } catch (e) {
             ghMsg.style.color = "#ef4444";
             ghMsg.textContent = `✗ ${e.message}`;
@@ -812,7 +1132,40 @@ export async function openPackageManager(refreshNodes) {
     ghBtn.addEventListener("click", doGhInstall);
     ghInput.addEventListener("keydown", (e) => { if (e.key === "Enter") doGhInstall(); });
 
+    // ── Restart notice (mirrors the global banner state) ───────────
+    const pmRestartNotice = document.createElement("div");
+    pmRestartNotice.className = "pm-restart-banner";
+    pmRestartNotice.style.display = _restartRequired ? "flex" : "none";
+
+    const pmRestartSpan = document.createElement("span");
+    pmRestartSpan.textContent = "⚠ Server restart required for changes to take effect.";
+
+    const pmRestartBtn = document.createElement("button");
+    pmRestartBtn.textContent = "Restart Now";
+    pmRestartBtn.addEventListener("click", async () => {
+        pmRestartBtn.disabled = true;
+        pmRestartBtn.textContent = "Restarting…";
+        try {
+            await fetch(`${API_BASE}/restart`, { method: "POST" });
+            pmRestartBtn.textContent = "Reloading…";
+            _clearRestartRequired();
+            setTimeout(() => location.reload(), 3000);
+        } catch {
+            _clearRestartRequired();
+            setTimeout(() => location.reload(), 5000);
+        }
+    });
+
+    pmRestartNotice.appendChild(pmRestartSpan);
+    pmRestartNotice.appendChild(pmRestartBtn);
+
+    function showRestartBanner() {
+        showRestartRequired();  // show the global toolbar banner
+        pmRestartNotice.style.display = "flex";  // also show inside PM
+    }
+
     body.appendChild(stats);
+    body.appendChild(pmRestartNotice);
     body.appendChild(ghRow);
     body.appendChild(grid);
 
@@ -842,6 +1195,7 @@ export async function openPackageManager(refreshNodes) {
     showSkeleton();
 
     // ── Fetch & render ───────────────────────────────────────────────
+    const _updateCache = {};  // moduleId → {remote_sha, update_available}
     let allModules = [];
     try {
         const res = await fetch(`${API_BASE}/modules`);
@@ -872,20 +1226,15 @@ export async function openPackageManager(refreshNodes) {
             name.className = "pm-card-name";
             name.textContent = mod.name;
 
-            const version = document.createElement("span");
-            version.className = "pm-card-version";
-            version.textContent = `v${mod.version}`;
+            const originBadge = document.createElement("span");
+            originBadge.className = `pm-card-badge pm-card-badge-origin ${mod.origin === "external" ? "external" : "builtin"}`;
+            originBadge.textContent = mod.origin === "external" ? "external" : "built-in";
 
             const badge = document.createElement("span");
             badge.className = `pm-card-badge ${mod.installed ? "installed" : "not-installed"}`;
             badge.textContent = mod.installed ? "installed" : "not installed";
 
-            const originBadge = document.createElement("span");
-            originBadge.className = `pm-card-badge pm-card-badge-origin ${mod.origin === "external" ? "external" : "builtin"}`;
-            originBadge.textContent = mod.origin === "external" ? "external" : "built-in";
-
             top.appendChild(name);
-            top.appendChild(version);
             top.appendChild(originBadge);
 
             if (mod.installed && mod.load_error) {
@@ -904,6 +1253,38 @@ export async function openPackageManager(refreshNodes) {
 
             top.appendChild(badge);
 
+            // Version row — SHA for external, semver for built-in
+            const versionRow = document.createElement("div");
+            versionRow.className = "pm-card-version-row";
+            if (mod.git_sha) {
+                const localLabel = document.createElement("span");
+                localLabel.className = "pm-card-version-label";
+                localLabel.textContent = "installed";
+                const localSha = document.createElement("span");
+                localSha.className = "pm-card-sha";
+                localSha.title = mod.git_sha;
+                localSha.textContent = mod.git_sha.slice(0, 7);
+
+                const cached = _updateCache[mod.id];
+                const latestLabel = document.createElement("span");
+                latestLabel.className = "pm-card-version-label";
+                latestLabel.textContent = "latest";
+                const remoteSha = document.createElement("span");
+                remoteSha.className = cached?.update_available ? "pm-card-sha pm-card-sha-new" : "pm-card-sha";
+                remoteSha.textContent = cached?.remote_sha || "…";
+                remoteSha.dataset.latestSha = mod.id;
+
+                versionRow.appendChild(localLabel);
+                versionRow.appendChild(localSha);
+                versionRow.appendChild(latestLabel);
+                versionRow.appendChild(remoteSha);
+            } else {
+                const ver = document.createElement("span");
+                ver.className = "pm-card-version";
+                ver.textContent = `v${mod.version}`;
+                versionRow.appendChild(ver);
+            }
+
             const desc = document.createElement("div");
             desc.className = "pm-card-desc";
             desc.textContent = mod.description || "";
@@ -911,6 +1292,7 @@ export async function openPackageManager(refreshNodes) {
             // Node chips (max 3 in card view)
             const nodes = mod.nodes || [];
             card.appendChild(top);
+            card.appendChild(versionRow);
             card.appendChild(desc);
             if (nodes.length > 0) {
                 const chipsWrap = document.createElement("div");
@@ -953,9 +1335,7 @@ export async function openPackageManager(refreshNodes) {
                             updateStats();
                         })
                         .catch(() => {});
-                    // Re-fetch and register nodes in LiteGraph
-                    refreshNodes?.();
-                });
+                }, showRestartBanner);
             });
 
             footer.appendChild(nodeCount);
@@ -983,6 +1363,27 @@ export async function openPackageManager(refreshNodes) {
     updateStats();
     renderGrid(allModules);
 
+    // ── Async update check — writes to cache, patches DOM in-place ──
+    const hasExternal = allModules.some(m => m.origin === "external" && m.installed);
+    if (hasExternal) {
+        fetch(`${API_BASE}/modules/check-updates`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (!data?.updates) return;
+                for (const [id, info] of Object.entries(data.updates)) {
+                    if (info.error) continue;
+                    _updateCache[id] = info;
+                    // Patch the element in-place — no grid re-render
+                    const el = grid.querySelector(`[data-latest-sha="${id}"]`);
+                    if (el) {
+                        el.textContent = info.remote_sha || "?";
+                        el.className = info.update_available ? "pm-card-sha pm-card-sha-new" : "pm-card-sha";
+                    }
+                }
+            })
+            .catch(() => {}); // silent — update check is best-effort
+    }
+
     searchInput.addEventListener("input", () => renderGrid(filterModules(searchInput.value)));
     searchInput.focus();
 
@@ -997,7 +1398,7 @@ export async function openPackageManager(refreshNodes) {
 /**
  * Opens the module detail modal for a given module ID.
  */
-async function openModuleModal(moduleId, onDone) {
+async function openModuleModal(moduleId, onDone, onNeedsRestart) {
     let mod;
     try {
         const res = await fetch(`${API_BASE}/modules/${moduleId}`);
@@ -1020,9 +1421,12 @@ async function openModuleModal(moduleId, onDone) {
     const header = document.createElement("div");
     header.className = "mod-modal-header";
     header.style.borderTopColor = mod.color || "#666";
+    const versionChip = mod.git_sha
+        ? `<span class="mod-modal-sha" title="Installed commit: ${mod.git_sha}">${mod.git_sha.slice(0, 7)}</span>`
+        : `<span class="mod-modal-version">v${mod.version}</span>`;
     header.innerHTML = `
         <h3>${mod.name}</h3>
-        <span class="mod-modal-version">v${mod.version}</span>
+        ${versionChip}
     `;
     // Shared close — always refreshes the grid so badges update
     function closeModal() {
@@ -1525,6 +1929,8 @@ async function openModuleModal(moduleId, onDone) {
             try {
                 const res = await fetch(`${API_BASE}/modules/${mod.id}/uninstall`, { method: "POST" });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (data.needs_restart) onNeedsRestart?.();
             } catch (e) {
                 console.warn("Uninstall failed", e);
             }
@@ -1573,6 +1979,55 @@ async function openModuleModal(moduleId, onDone) {
             footer.appendChild(saveBtn);
         }
 
+        // Update button — only for externally installed modules (have a source URL)
+        if (mod.source_url) {
+            const updateBtn = document.createElement("button");
+            updateBtn.className = "mod-btn mod-btn-update";
+            updateBtn.textContent = "↑ Update";
+            updateBtn.addEventListener("click", async () => {
+                updateBtn.disabled = true;
+                updateBtn.textContent = "Checking…";
+                try {
+                    // Step 1: lightweight check via ls-remote (~1s)
+                    const checkRes = await fetch(`${API_BASE}/modules/${mod.id}/check-update`);
+                    const checkData = await checkRes.json();
+                    if (!checkRes.ok) throw new Error(checkData.detail || `HTTP ${checkRes.status}`);
+
+                    if (!checkData.update_available) {
+                        updateBtn.textContent = "✓ Up to date";
+                        setTimeout(() => { updateBtn.textContent = "↑ Update"; updateBtn.disabled = false; }, 2500);
+                        return;
+                    }
+
+                    // Step 2: update available — do the full clone + replace
+                    updateBtn.textContent = "Updating…";
+                    const res = await fetch(`${API_BASE}/modules/${mod.id}/update`, { method: "POST" });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+
+                    if (data.status === "up_to_date") {
+                        updateBtn.textContent = "✓ Up to date";
+                        setTimeout(() => { updateBtn.textContent = "↑ Update"; updateBtn.disabled = false; }, 2500);
+                    } else {
+                        // Updated — refresh SHA chip and show message
+                        const shaEl = header.querySelector(".mod-modal-sha");
+                        if (shaEl && data.to_sha) shaEl.textContent = data.to_sha;
+                        showSuccess(`Updated ${data.from_sha || "?"} → ${data.to_sha || "?"}`);
+                        updateBtn.textContent = "✓ Updated";
+                        onDone?.();
+                        if (data.needs_restart) onNeedsRestart?.();
+                        setTimeout(() => { updateBtn.textContent = "↑ Update"; updateBtn.disabled = false; }, 2500);
+                    }
+                } catch (e) {
+                    console.warn("Update failed", e);
+                    updateBtn.textContent = "✗ Failed";
+                    showSuccess(`Update failed: ${e.message}`);
+                    setTimeout(() => { updateBtn.textContent = "↑ Update"; updateBtn.disabled = false; }, 3000);
+                }
+            });
+            footer.appendChild(updateBtn);
+        }
+
         const closeFooterBtn = document.createElement("button");
         closeFooterBtn.className = "mod-btn mod-btn-cancel";
         closeFooterBtn.textContent = "Close";
@@ -1619,6 +2074,7 @@ async function openModuleModal(moduleId, onDone) {
                 footer.appendChild(doneBtn);
 
                 onDone?.();  // refresh grid immediately so install badge appears
+                if (data.needs_restart) onNeedsRestart?.();
             } catch (e) {
                 console.warn("Install failed", e);
                 installBtn.disabled = false;

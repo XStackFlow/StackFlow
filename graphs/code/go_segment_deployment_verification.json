@@ -1,13 +1,13 @@
 {
-  "last_node_id": 29,
-  "last_link_id": 56,
+  "last_node_id": 30,
+  "last_link_id": 58,
   "nodes": [
     {
       "id": 2,
       "type": "pr/PRFeedbackGetter",
       "pos": [
         360,
-        502.5000000000002
+        502.3916666666664
       ],
       "size": [
         210,
@@ -50,7 +50,7 @@
       "type": "langgraph/end",
       "pos": [
         3558.3999938964844,
-        202.5
+        725.1749999999997
       ],
       "size": [
         140,
@@ -79,7 +79,7 @@
       "type": "slack/SlackDMNotifier",
       "pos": [
         2108.3999938964844,
-        360.5000000000002
+        883.175
       ],
       "size": [
         210,
@@ -124,7 +124,7 @@
       "type": "langgraph/start",
       "pos": [
         140,
-        537.0000000000002
+        536.8916666666664
       ],
       "size": [
         140,
@@ -151,7 +151,7 @@
       "type": "langgraph/port_out",
       "pos": [
         360,
-        666.5000000000002
+        666.3916666666664
       ],
       "size": [
         210,
@@ -180,7 +180,7 @@
       "type": "langgraph/port_in",
       "pos": [
         3558.3999938964844,
-        422.5000000000002
+        945.175
       ],
       "size": [
         210,
@@ -211,7 +211,7 @@
       "type": "langgraph/port_in",
       "pos": [
         3268.3999938964844,
-        612.0000000000002
+        1134.675
       ],
       "size": [
         210,
@@ -242,7 +242,7 @@
       "type": "langgraph/port_out",
       "pos": [
         2108.3999938964844,
-        596.5000000000002
+        1119.175
       ],
       "size": [
         210,
@@ -271,7 +271,7 @@
       "type": "slack/SlackDMNotifier",
       "pos": [
         2398.3999938964844,
-        350.5000000000002
+        873.175
       ],
       "size": [
         210,
@@ -321,7 +321,7 @@
       "type": "git/BranchPreparer",
       "pos": [
         650,
-        480.5000000000002
+        480.3916666666664
       ],
       "size": [
         210,
@@ -371,7 +371,7 @@
       "type": "github/ImageTagExtractor",
       "pos": [
         1230,
-        384.5000000000002
+        907.175
       ],
       "size": [
         210,
@@ -411,199 +411,11 @@
       }
     },
     {
-      "id": 5,
-      "type": "github/GithubWorkflowErrorFetcher",
-      "pos": [
-        1230,
-        572.5000000000002
-      ],
-      "size": [
-        218.39999389648438,
-        171
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 8
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            41
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "GithubWorkflowErrorFetcher",
-      "properties": {
-        "name": "GithubWorkflowErrorFetcher",
-        "type": "standard",
-        "repo_name": "StackAdapt/go-segment",
-        "github_run_id": "{{github_run_id}}",
-        "polling_interval": 30,
-        "max_wait_seconds": 600
-      }
-    },
-    {
-      "id": 3,
-      "type": "github/RunGithubAction",
-      "pos": [
-        940,
-        466.5000000000002
-      ],
-      "size": [
-        210,
-        171
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 7
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            8,
-            36
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "RunGithubAction",
-      "properties": {
-        "name": "RunGithubAction",
-        "type": "standard",
-        "workflow": "sactl-k8s-release.yml",
-        "branch": "{{pr_feedback.headRefName}}",
-        "additional_fields": {
-          "service": "{{service_name}}",
-          "environment": "staging"
-        },
-        "repo_path": "{{repo_path}}"
-      }
-    },
-    {
-      "id": 10,
-      "type": "github/WorkflowResultFormatter",
-      "pos": [
-        1818.3999938964844,
-        374.5000000000002
-      ],
-      "size": [
-        210,
-        143
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 45
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 46
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            12
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WorkflowResultFormatter",
-      "properties": {
-        "name": "WorkflowResultFormatter",
-        "type": "standard",
-        "workflow_result": "{{workflow_result}}",
-        "pod_logs": "{{pod_logs}}",
-        "pod_logs_error": "{{pod_logs_error}}"
-      }
-    },
-    {
-      "id": 26,
-      "type": "common/StubNode",
-      "pos": [
-        1528.3999938964844,
-        608.5000000000002
-      ],
-      "size": [
-        140,
-        46
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 41
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            46
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "StubNode",
-      "properties": {
-        "name": "StubNode",
-        "type": "standard"
-      }
-    },
-    {
       "id": 22,
       "type": "k8s/PodErrorLogFetcher",
       "pos": [
         1528.3999938964844,
-        348.5000000000002
+        871.175
       ],
       "size": [
         210,
@@ -650,7 +462,7 @@
       "type": "slack/SlackReplyListener",
       "pos": [
         2688.3999938964844,
-        372.5000000000002
+        895.175
       ],
       "size": [
         210,
@@ -691,11 +503,238 @@
       }
     },
     {
+      "id": 18,
+      "type": "slack/SlackDMNotifier",
+      "pos": [
+        3268.3999938964844,
+        662.6749999999997
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 54
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackDMNotifier",
+      "properties": {
+        "name": "SlackDMNotifier",
+        "type": "standard",
+        "slack_message": "Deployment verification completed for: {{service_name}}",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": ""
+      }
+    },
+    {
+      "id": 19,
+      "type": "slack/SlackDMNotifier",
+      "pos": [
+        3268.3999938964844,
+        898.675
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 55
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            24
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackDMNotifier",
+      "properties": {
+        "name": "SlackDMNotifier",
+        "type": "standard",
+        "slack_message": "Retrying Deployment",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": "{{thread_sent_ts}}"
+      }
+    },
+    {
+      "id": 10,
+      "type": "github/WorkflowResultFormatter",
+      "pos": [
+        1818.3999938964844,
+        907.175
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 45
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WorkflowResultFormatter",
+      "properties": {
+        "name": "WorkflowResultFormatter",
+        "type": "standard",
+        "workflow_result": "{{workflow_result}}",
+        "pod_logs": "{{pod_logs}}",
+        "pod_logs_error": "{{pod_logs_error}}"
+      }
+    },
+    {
+      "id": 3,
+      "type": "github/RunGithubAction",
+      "pos": [
+        940,
+        454.3916666666664
+      ],
+      "size": [
+        210,
+        195
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 7
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            8,
+            36,
+            58
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "RunGithubAction",
+      "properties": {
+        "name": "RunGithubAction",
+        "type": "standard",
+        "workflow": "sactl-k8s-release.yml",
+        "branch": "{{pr_feedback.headRefName}}",
+        "additional_fields": "{\"service\":\"{{service_name}}\",\"environment\":\"staging\",\"type\":\"standard\"}",
+        "repo_path": "{{repo_path}}"
+      }
+    },
+    {
+      "id": 5,
+      "type": "github/GithubWorkflowErrorFetcher",
+      "pos": [
+        1230,
+        140
+      ],
+      "size": [
+        218.39999389648438,
+        171
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 8
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "title": "GithubWorkflowErrorFetcher",
+      "properties": {
+        "name": "GithubWorkflowErrorFetcher",
+        "type": "standard",
+        "repo_name": "StackAdapt/go-segment",
+        "github_run_id": "{{github_run_id}}",
+        "polling_interval": 30,
+        "max_wait_seconds": "3600"
+      }
+    },
+    {
       "id": 29,
       "type": "common/DynamicRouter",
       "pos": [
         2978.3999938964844,
-        350.5000000000002
+        873.175
       ],
       "size": [
         210,
@@ -746,30 +785,31 @@
       "properties": {
         "name": "DynamicRouter",
         "type": "router",
-        "input_key": "{{last_slack_reply}}",
+        "value": "{{last_slack_reply}}",
         "route_options": "[\"LGTM\",\"RETRY\"]",
-        "fuzzy": false
+        "fuzzy": false,
+        "input_key": "{{last_slack_reply}}"
       }
     },
     {
-      "id": 18,
+      "id": 30,
       "type": "slack/SlackDMNotifier",
       "pos": [
-        3268.3999938964844,
-        140
+        1230,
+        376
       ],
       "size": [
         210,
         171
       ],
       "flags": {},
-      "order": 15,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 54
+          "link": 58
         },
         {
           "name": "In",
@@ -781,64 +821,16 @@
         {
           "name": "Out",
           "type": "state",
-          "links": [
-            22
-          ],
-          "slot_index": 0
+          "links": null
         }
       ],
       "title": "SlackDMNotifier",
       "properties": {
         "name": "SlackDMNotifier",
         "type": "standard",
-        "slack_message": "Deployment verification completed for: {{service_name}}",
+        "slack_message": ":rocket:Staging deployment triggered!\nhttps://github.com/StackAdapt/go-segment/actions/runs/{{github_run_id}}",
         "slack_user_id": "{{SLACK_USER_ID}}",
         "thread_ts": ""
-      }
-    },
-    {
-      "id": 19,
-      "type": "slack/SlackDMNotifier",
-      "pos": [
-        3268.3999938964844,
-        376.0000000000002
-      ],
-      "size": [
-        210,
-        171
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 55
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            24
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SlackDMNotifier",
-      "properties": {
-        "name": "SlackDMNotifier",
-        "type": "standard",
-        "slack_message": "Retrying Deployment",
-        "slack_user_id": "{{SLACK_USER_ID}}",
-        "thread_ts": "{{thread_sent_ts}}"
       }
     }
   ],
@@ -948,27 +940,11 @@
       "state"
     ],
     [
-      41,
-      5,
-      0,
-      26,
-      0,
-      "state"
-    ],
-    [
       45,
       22,
       0,
       10,
       0,
-      "state"
-    ],
-    [
-      46,
-      26,
-      0,
-      10,
-      1,
       "state"
     ],
     [
@@ -1002,12 +978,20 @@
       23,
       0,
       "state"
+    ],
+    [
+      58,
+      3,
+      0,
+      30,
+      0,
+      "state"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
-    "initial_state": "{\n  \"pr_url\": \"https://github.com/StackAdapt/go-segment/pull/4870\",\n  \"service_name\": \"cdp-email-events-consumer\"\n}",
+    "initial_state": "{\n  \"pr_url\": \"https://github.com/StackAdapt/go-segment/pull/4867\",\n  \"service_name\": \"cdp-data-manager-consumer\"\n}",
     "viewport": {
       "scale": 0.5007607041947403,
       "offset": [
@@ -1016,12 +1000,5 @@
       ]
     }
   },
-  "version": 0.4,
-  "_viewport": {
-    "offset": [
-      -60,
-      459.24322509765625
-    ],
-    "scale": 0.608172316469219
-  }
+  "version": 0.4
 }

@@ -19,6 +19,7 @@ import {
     getDebugMode,
     setDebugMode,
 } from './execution.js';
+import { nodeTypeMetadata } from './graph_manager.js';
 
 const API_BASE = "http://localhost:8000";
 
@@ -175,6 +176,26 @@ export async function saveGraphToServer(graph, isDirty, fetchGraphListFn, update
                         offset: [...canvas.ds.offset],
                         scale: canvas.ds.scale,
                     };
+                }
+
+                // Persist module dependency manifest so missing modules can be
+                // identified (and installed) when this graph is loaded elsewhere.
+                // Format: { "module_id": { origin, source_url } }
+                if (data.nodes) {
+                    const deps = {};
+                    data.nodes.forEach(node => {
+                        if (!node.type || node.type.startsWith("langgraph/")) return;
+                        const meta = nodeTypeMetadata[node.type];
+                        if (!meta || !meta.module_id) return;
+                        if (deps[meta.module_id]) return; // already recorded
+                        deps[meta.module_id] = {
+                            origin: meta.origin || "builtin",
+                            source_url: meta.source_url || null,
+                        };
+                    });
+                    if (Object.keys(deps).length > 0) {
+                        data._module_deps = deps;
+                    }
                 }
 
                 const response = await fetch(`${API_BASE}/save_graph/${composedPath}`, {

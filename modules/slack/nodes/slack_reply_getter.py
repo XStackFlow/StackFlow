@@ -63,80 +63,69 @@ class SlackReplyGetter(BaseNode):
         check_interval = int(self._check_interval_seconds)
         
         while True:
-            try:
-                if is_thread:
-                    messages = get_slack_thread_replies(slack_user_id, thread_ts)
-                    # We need at least one reply (messages[0] is the parent)
-                    if len(messages) > 1:
-                        messages_to_check = [messages[-1]]
-                    else:
-                        messages_to_check = []
+            if is_thread:
+                messages = get_slack_thread_replies(slack_user_id, thread_ts)
+                # We need at least one reply (messages[0] is the parent)
+                if len(messages) > 1:
+                    messages_to_check = [messages[-1]]
                 else:
-                    # Fetch only the absolute latest message to check if the conversation 
-                    # currently ends with a message from the target user.
-                    messages = get_slack_history(slack_user_id, limit=1)
-                    messages_to_check = messages
+                    messages_to_check = []
+            else:
+                # Fetch only the absolute latest message to check if the conversation
+                # currently ends with a message from the target user.
+                messages = get_slack_history(slack_user_id, limit=1)
+                messages_to_check = messages
 
-                if messages_to_check:
-                    latest_msg = messages_to_check[0]
-                    latest_user = latest_msg.get("user")
-                    latest_text = latest_msg.get("text", "").strip()
-                    ts = latest_msg.get("ts")
-                    
-                    logger.debug("SlackReplyGetter: Latest message in %s is from %s at %s: '%s...'", 
-                                 "thread" if is_thread else "history", latest_user, ts, latest_text[:20])
+            if messages_to_check:
+                latest_msg = messages_to_check[0]
+                latest_user = latest_msg.get("user")
+                latest_text = latest_msg.get("text", "").strip()
+                ts = latest_msg.get("ts")
 
-                    if latest_user == slack_user_id_clean:
-                        logger.info("SlackReplyGetter: Found expected user reply: %s", latest_text)
-                        
-                        # Fetch context history for the LLM
-                        context_messages = get_slack_history(slack_user_id, limit=50)
+                logger.debug("SlackReplyGetter: Latest message in %s is from %s at %s: '%s...'",
+                             "thread" if is_thread else "history", latest_user, ts, latest_text[:20])
 
-                        last_action_ts = state.get("last_action_ts")
-                        if last_action_ts:
-                            logger.info("SlackReplyGetter: Filtering history since last_action_ts: %s", last_action_ts)
-                            context_messages = [m for m in context_messages if float(m["ts"]) > float(last_action_ts)]
+                if latest_user == slack_user_id_clean:
+                    logger.info("SlackReplyGetter: Found expected user reply: %s", latest_text)
 
-                        # Messages are returned latest first; reverse for chronological order
-                        history = []
-                        for msg in reversed(context_messages):
-                            t = msg.get("text", "").strip()
-                            if t:
-                                role = "User" if msg.get("user") == slack_user_id_clean else "Assistant"
-                                history.append({"role": role, "content": t})
+                    # Fetch context history for the LLM
+                    context_messages = get_slack_history(slack_user_id, limit=50)
 
-                        return {
-                            "last_slack_reply": latest_text,
-                            "last_reply_ts": ts,
-                            "slack_conversation_history": history,
-                        }
-                    else:
-                        reason = "bot" if (latest_msg.get("bot_id") or latest_msg.get("subtype") == "bot_message") else f"user {latest_user}"
-                        logger.debug("SlackReplyGetter: Latest message is from %s, not target %s. Waiting %d seconds...", 
-                                     reason, slack_user_id_clean, check_interval)
+                    last_action_ts = state.get("last_action_ts")
+                    if last_action_ts:
+                        logger.info("SlackReplyGetter: Filtering history since last_action_ts: %s", last_action_ts)
+                        context_messages = [m for m in context_messages if float(m["ts"]) > float(last_action_ts)]
+
+                    # Messages are returned latest first; reverse for chronological order
+                    history = []
+                    for msg in reversed(context_messages):
+                        t = msg.get("text", "").strip()
+                        if t:
+                            role = "User" if msg.get("user") == slack_user_id_clean else "Assistant"
+                            history.append({"role": role, "content": t})
+
+                    return {
+                        "last_slack_reply": latest_text,
+                        "last_reply_ts": ts,
+                        "slack_conversation_history": history,
+                    }
                 else:
-                    scope = f"thread {thread_ts}" if is_thread else "history"
-                    logger.debug("SlackReplyGetter: No messages found in %s. Waiting %d seconds...", scope, check_interval)
-                
-                # Check for timeout
-                elapsed = time.time() - start_time
-                if elapsed > timeout_seconds:
-                    logger.warning("SlackReplyGetter: Timed out waiting for reply")
-                    return {
-                        "last_slack_reply": ""
-                    }
-                
-                # Sleep and try again
-                time.sleep(check_interval)
-                
-            except Exception as e:
-                logger.error("SlackReplyGetter: Error during poll: %s", e)
-                time.sleep(check_interval)
-                
-                elapsed = time.time() - start_time
-                if elapsed > timeout_seconds:
-                    return {
-                        "last_slack_reply": ""
-                    }
+                    reason = "bot" if (latest_msg.get("bot_id") or latest_msg.get("subtype") == "bot_message") else f"user {latest_user}"
+                    logger.debug("SlackReplyGetter: Latest message is from %s, not target %s. Waiting %d seconds...",
+                                 reason, slack_user_id_clean, check_interval)
+            else:
+                scope = f"thread {thread_ts}" if is_thread else "history"
+                logger.debug("SlackReplyGetter: No messages found in %s. Waiting %d seconds...", scope, check_interval)
+
+            # Check for timeout
+            elapsed = time.time() - start_time
+            if elapsed > timeout_seconds:
+                logger.warning("SlackReplyGetter: Timed out waiting for reply")
+                return {
+                    "last_slack_reply": ""
+                }
+
+            # Sleep and try again
+            time.sleep(check_interval)
 
 

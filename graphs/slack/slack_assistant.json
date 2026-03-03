@@ -2214,7 +2214,14 @@
   ],
   "config": {},
   "extra": {
-    "initial_state": "{\n  \"input\": \"\"\n}"
+    "initial_state": "{}"
   },
-  "version": 0.4
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      0,
+      0
+    ],
+    "scale": 1
+  }
 }

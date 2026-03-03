@@ -81,12 +81,8 @@ class SubgraphNodeCompletionRouter(RouterNode):
             logger.error("SubgraphNodeCompletionRouter: Root graph file not found: %s", file_path)
             return self.NOT_COMPLETED
 
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                root_json = json.load(f)
-        except Exception as e:
-            logger.error("SubgraphNodeCompletionRouter: Failed to load root graph JSON: %s", e)
-            return self.NOT_COMPLETED
+        with open(file_path, "r", encoding="utf-8") as f:
+            root_json = json.load(f)
 
         # 3. Resolve IDs to logical strings
         # Subgraph node is in the root graph
@@ -115,58 +111,52 @@ class SubgraphNodeCompletionRouter(RouterNode):
                     logical_target_id = self._resolve_logical_id(self.target_node_id, sub_json)
 
         # 4. Connect to checkpointer and check status
-        try:
-            from src.graphs.graph_factory import build_langgraph_from_json, extract_interrupts
-            from src.utils.setup.node_registry import get_node_registry
+        from src.graphs.graph_factory import build_langgraph_from_json, extract_interrupts
+        from src.utils.setup.node_registry import get_node_registry
 
-            async with create_checkpointer() as cp:
-                # Build runnable to use its state management methods
-                registry = get_node_registry()
-                workflow = build_langgraph_from_json(root_json, registry, graph_id=root_graph_id)
-                interrupts = extract_interrupts(root_json)
-                graph_runnable = workflow.compile(checkpointer=cp, interrupt_before=interrupts)
+        async with create_checkpointer() as cp:
+            # Build runnable to use its state management methods
+            registry = get_node_registry()
+            workflow = build_langgraph_from_json(root_json, registry, graph_id=root_graph_id)
+            interrupts = extract_interrupts(root_json)
+            graph_runnable = workflow.compile(checkpointer=cp, interrupt_before=interrupts)
 
-                # Resolve the namespace using the logical subgraph ID
-                target_ns, residual_prefix, resolved_all = await resolve_checkpoint_ns(graph_runnable, thread_id, logical_sub_id)
-                
-                if logical_sub_id and not resolved_all:
-                    logger.info("SubgraphNodeCompletionRouter: Subgraph node '%s' not yet resolved", logical_sub_id)
-                    return self.NOT_COMPLETED
+            # Resolve the namespace using the logical subgraph ID
+            target_ns, residual_prefix, resolved_all = await resolve_checkpoint_ns(graph_runnable, thread_id, logical_sub_id)
 
-                # For inlined subgraphs, the residual_prefix contains the flattened
-                # path (e.g. "SUBGRAPH@test_graph_json_7"). We must prepend it to the
-                # target node name so we search for the fully-qualified ID
-                # (e.g. "SUBGRAPH@test_graph_json_7@@DelayNode_3") instead of bare "DelayNode_3".
-                qualified_target = f"{residual_prefix}@@{logical_target_id}" if residual_prefix else logical_target_id
-                logger.info("SubgraphNodeCompletionRouter: qualified_target='%s' (residual_prefix='%s', logical_target='%s')",
-                            qualified_target, residual_prefix, logical_target_id)
-
-                # Fetch current state for that namespace
-                config = {"configurable": {"thread_id": thread_id, "checkpoint_ns": target_ns}}
-                state_snapshot = await graph_runnable.aget_state(config)
-
-                next_nodes = list(state_snapshot.next)
-                logger.info("SubgraphNodeCompletionRouter: Checking completion for '%s'. Current next nodes: %s", 
-                            qualified_target, next_nodes)
-
-                # Check if it's currently pending/interrupted
-                if qualified_target in state_snapshot.next:
-                    logger.info("SubgraphNodeCompletionRouter: Node '%s' is waiting/interrupted", qualified_target)
-                    return self.NOT_COMPLETED
-
-                # Check history to see if it ever ran
-                async for history_snapshot in graph_runnable.aget_state_history(config, limit=50):
-                    metadata = history_snapshot.metadata or {}
-                    if metadata.get("source") == "loop" and metadata.get("step") is not None:
-                        for task in history_snapshot.tasks:
-                            if task.name == qualified_target:
-                                logger.info("SubgraphNodeCompletionRouter: Node '%s' found in history tasks, marked as completed", qualified_target)
-                                return self.COMPLETED
-
-                logger.info("SubgraphNodeCompletionRouter: Node '%s' not found in history or current status", logical_target_id)
+            if logical_sub_id and not resolved_all:
+                logger.info("SubgraphNodeCompletionRouter: Subgraph node '%s' not yet resolved", logical_sub_id)
                 return self.NOT_COMPLETED
 
-        except Exception as e:
-            import traceback
-            logger.error("SubgraphNodeCompletionRouter: Error checking completion: %s\n%s", e, traceback.format_exc())
+            # For inlined subgraphs, the residual_prefix contains the flattened
+            # path (e.g. "SUBGRAPH@test_graph_json_7"). We must prepend it to the
+            # target node name so we search for the fully-qualified ID
+            # (e.g. "SUBGRAPH@test_graph_json_7@@DelayNode_3") instead of bare "DelayNode_3".
+            qualified_target = f"{residual_prefix}@@{logical_target_id}" if residual_prefix else logical_target_id
+            logger.info("SubgraphNodeCompletionRouter: qualified_target='%s' (residual_prefix='%s', logical_target='%s')",
+                        qualified_target, residual_prefix, logical_target_id)
+
+            # Fetch current state for that namespace
+            config = {"configurable": {"thread_id": thread_id, "checkpoint_ns": target_ns}}
+            state_snapshot = await graph_runnable.aget_state(config)
+
+            next_nodes = list(state_snapshot.next)
+            logger.info("SubgraphNodeCompletionRouter: Checking completion for '%s'. Current next nodes: %s",
+                        qualified_target, next_nodes)
+
+            # Check if it's currently pending/interrupted
+            if qualified_target in state_snapshot.next:
+                logger.info("SubgraphNodeCompletionRouter: Node '%s' is waiting/interrupted", qualified_target)
+                return self.NOT_COMPLETED
+
+            # Check history to see if it ever ran
+            async for history_snapshot in graph_runnable.aget_state_history(config, limit=50):
+                metadata = history_snapshot.metadata or {}
+                if metadata.get("source") == "loop" and metadata.get("step") is not None:
+                    for task in history_snapshot.tasks:
+                        if task.name == qualified_target:
+                            logger.info("SubgraphNodeCompletionRouter: Node '%s' found in history tasks, marked as completed", qualified_target)
+                            return self.COMPLETED
+
+            logger.info("SubgraphNodeCompletionRouter: Node '%s' not found in history or current status", logical_target_id)
             return self.NOT_COMPLETED

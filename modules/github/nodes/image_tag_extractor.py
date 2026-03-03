@@ -42,8 +42,7 @@ class ImageTagExtractor(BaseNode):
         cmd = ["gh", "run", "view", str(run_id), "--repo", repo_name, "--json", "jobs"]
         jobs_res = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if jobs_res.returncode != 0:
-            logger.warning(f"Failed to fetch jobs for run {run_id}: {jobs_res.stderr.strip()}")
-            return {"image_tag": None}
+            raise RuntimeError(f"Failed to fetch jobs for run {run_id}: {jobs_res.stderr.strip()}")
 
         jobs = json.loads(jobs_res.stdout).get("jobs", [])
 

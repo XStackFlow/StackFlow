@@ -14,6 +14,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 MODULES_DIR = PROJECT_ROOT / "modules"
 INSTALLED_DIR = PROJECT_ROOT / "installed"
 
+__all__ = ["MODULES_DIR", "INSTALLED_DIR", "get_installed_modules", "get_module_package",
+           "get_manifest", "get_all_manifests", "run_module_startup_hooks", "run_module_route_registrations"]
+
 _SCAN_DIRS = [
     (MODULES_DIR, "modules"),
     (INSTALLED_DIR, "installed"),

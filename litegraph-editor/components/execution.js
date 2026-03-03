@@ -8,6 +8,7 @@ import { escapeHTML, getNodeLogicalId, getCleanPath } from './utils.js';
 import { addLog, pushLog, getLogContent } from './logging.js';
 import { getSessionId, setSessionId, getSessions, setSessions, updateSessionUI } from './session.js';
 import { openJSONEditor } from './json_editor.js';
+import { nodeTypeMetadata } from './graph_manager.js';
 
 const API_BASE = "http://localhost:8000";
 
@@ -458,6 +459,24 @@ export async function silentSaveGraph(graph, isDirty, graphName) {
                 if (node.boxcolor) delete node.boxcolor;
                 if (node.color) delete node.color;
             });
+        }
+
+        // Persist module dependency manifest
+        if (data.nodes) {
+            const deps = {};
+            data.nodes.forEach(node => {
+                if (!node.type || node.type.startsWith("langgraph/")) return;
+                const meta = nodeTypeMetadata[node.type];
+                if (!meta || !meta.module_id) return;
+                if (deps[meta.module_id]) return;
+                deps[meta.module_id] = {
+                    origin: meta.origin || "builtin",
+                    source_url: meta.source_url || null,
+                };
+            });
+            if (Object.keys(deps).length > 0) {
+                data._module_deps = deps;
+            }
         }
 
         const response = await fetch(`${API_BASE}/save_graph/${cleanName}`, {

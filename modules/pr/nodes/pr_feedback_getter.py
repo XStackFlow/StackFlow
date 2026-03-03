@@ -75,16 +75,16 @@ class PRFeedbackGetter(BaseNode):
         return match.group(1) if match else None
 
     def _fetch_logs(self, job_id: str, repo: str) -> str:
-        try:
-            result = subprocess.run(
-                ["gh", "run", "view", "--job", job_id, "--log", "--repo", repo],
-                capture_output=True, text=True, timeout=120,
-            )
-            if result.returncode != 0:
-                return f"Error fetching logs for job {job_id}: {result.stderr}"
-            return filter_error_logs(result.stdout)
-        except Exception as e:
-            return f"Exception fetching logs for job {job_id}: {str(e)}"
+        result = subprocess.run(
+            ["gh", "run", "view", "--job", job_id, "--log", "--repo", repo],
+            capture_output=True, text=True, timeout=120,
+        )
+        if result.returncode != 0:
+            if "is still in progress" in result.stderr:
+                logger.info("Job %s is still in progress, skipping log fetch", job_id)
+                return ""
+            raise RuntimeError(f"Failed to fetch logs for job {job_id}: {result.stderr}")
+        return filter_error_logs(result.stdout)
 
     def _fetch_issue_comments(self, owner: str, repo: str, pr_number: str) -> List[Dict[str, Any]]:
         """Fetch non-minimized top-level PR (issue) comments via GraphQL.
@@ -92,73 +92,62 @@ class PRFeedbackGetter(BaseNode):
         Uses GraphQL instead of the REST API so we can filter out minimized
         comments (GitHub's mechanism for marking comments as resolved/off-topic).
         """
-        try:
-            result = subprocess.run(
-                [
-                    "gh", "api", "graphql",
-                    "-f", f"query={_ISSUE_COMMENTS_QUERY}",
-                    "-f", f"owner={owner}",
-                    "-f", f"repo={repo}",
-                    "-F", f"pr={int(pr_number)}",
-                ],
-                capture_output=True, text=True, timeout=30,
-            )
-            if result.returncode != 0:
-                logger.warning("Failed to fetch issue comments: %s", result.stderr)
-                return []
+        result = subprocess.run(
+            [
+                "gh", "api", "graphql",
+                "-f", f"query={_ISSUE_COMMENTS_QUERY}",
+                "-f", f"owner={owner}",
+                "-f", f"repo={repo}",
+                "-F", f"pr={int(pr_number)}",
+            ],
+            capture_output=True, text=True, timeout=30,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"Failed to fetch issue comments: {result.stderr}")
 
-            nodes = json.loads(result.stdout)["data"]["repository"]["pullRequest"]["comments"]["nodes"]
-            comments = []
-            for c in nodes:
-                if c.get("isMinimized"):
-                    continue
+        nodes = json.loads(result.stdout)["data"]["repository"]["pullRequest"]["comments"]["nodes"]
+        comments = []
+        for c in nodes:
+            if c.get("isMinimized"):
+                continue
+            comments.append({
+                "id": c["databaseId"],
+                "author": c["author"],
+                "body": c["body"],
+                "createdAt": c["createdAt"],
+            })
+        return comments
+
+    def _fetch_unresolved_review_comments(self, owner: str, repo: str, pr_number: str) -> List[Dict[str, Any]]:
+        """Fetch only unresolved inline review thread comments via GraphQL."""
+        result = subprocess.run(
+            [
+                "gh", "api", "graphql",
+                "-f", f"query={_REVIEW_THREADS_QUERY}",
+                "-f", f"owner={owner}",
+                "-f", f"repo={repo}",
+                "-F", f"pr={int(pr_number)}",
+            ],
+            capture_output=True, text=True, timeout=30,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"Failed to fetch review threads: {result.stderr}")
+
+        threads = json.loads(result.stdout)["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
+        comments = []
+        for thread in threads:
+            if thread["isResolved"]:
+                continue
+            for c in thread["comments"]["nodes"]:
                 comments.append({
                     "id": c["databaseId"],
                     "author": c["author"],
                     "body": c["body"],
                     "createdAt": c["createdAt"],
+                    "path": c["path"],
+                    "line": c["originalLine"],
                 })
-            return comments
-        except Exception as e:
-            logger.warning("Exception fetching issue comments: %s", e)
-            return []
-
-    def _fetch_unresolved_review_comments(self, owner: str, repo: str, pr_number: str) -> List[Dict[str, Any]]:
-        """Fetch only unresolved inline review thread comments via GraphQL."""
-        try:
-            result = subprocess.run(
-                [
-                    "gh", "api", "graphql",
-                    "-f", f"query={_REVIEW_THREADS_QUERY}",
-                    "-f", f"owner={owner}",
-                    "-f", f"repo={repo}",
-                    "-F", f"pr={int(pr_number)}",
-                ],
-                capture_output=True, text=True, timeout=30,
-            )
-            if result.returncode != 0:
-                logger.warning("Failed to fetch review threads: %s", result.stderr)
-                return []
-
-            threads = json.loads(result.stdout)["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
-            comments = []
-            for thread in threads:
-                if thread["isResolved"]:
-                    continue
-                for c in thread["comments"]["nodes"]:
-                    comments.append({
-                        "id": c["databaseId"],
-                        "author": c["author"],
-                        "body": c["body"],
-                        "createdAt": c["createdAt"],
-                        "path": c["path"],
-                        "line": c["originalLine"],
-                        "side": c["diffSide"],
-                    })
-            return comments
-        except Exception as e:
-            logger.warning("Exception fetching review threads: %s", e)
-            return []
+        return comments
 
     def _fetch_feedback(self, pr_url: str) -> Dict[str, Any]:
         try:

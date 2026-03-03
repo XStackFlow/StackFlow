@@ -1,5 +1,5 @@
 {
-  "last_node_id": 42,
+  "last_node_id": 43,
   "last_link_id": 78,
   "nodes": [
     {
@@ -1055,5 +1055,11 @@
       49.922706604003906
     ],
     "scale": 0.6209213230591554
+  },
+  "_module_deps": {
+    "common": {
+      "origin": "core",
+      "source_url": null
+    }
   }
 }

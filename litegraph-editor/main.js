@@ -194,7 +194,7 @@ graph.configure = function (data) {
 // ==========================================================================
 // 9. Canvas Resizing
 // ==========================================================================
-const UI_ZOOM = 0.75; // Must match body { zoom } in index.html
+const UI_ZOOM = 0.9; // Must match body { zoom } in index.html
 
 function resize() {
     // Expand canvas to fill the zoomed body (body CSS size = viewport / zoom)

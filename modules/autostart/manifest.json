@@ -1,0 +1,12 @@
+{
+  "id": "autostart",
+  "name": "Auto-Start",
+  "version": "1.0.0",
+  "description": "Automatically start graphs when the StackFlow server starts",
+  "nodes": [],
+  "color": "#0EA5E9",
+  "setup": {
+    "env_vars": ["AUTO_START_GRAPHS"],
+    "steps": []
+  }
+}

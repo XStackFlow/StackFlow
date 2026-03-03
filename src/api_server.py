@@ -7,6 +7,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -89,7 +90,7 @@ config = load_config()
 langfuse = setup_langfuse(config)
 
 # Import the node registry helper
-from src.utils.setup.node_registry import get_node_registry, invalidate_node_registry, get_load_errors
+from src.utils.setup.node_registry import get_node_registry, invalidate_node_registry, get_load_errors, get_node_metadata
 
 # ──────────────────────────────────────────────────────────────────────
 # LANGGRAPH BUG FIX: Stale channel versions cause permanent interrupt deadlock
@@ -151,6 +152,43 @@ async def lifespan(app: FastAPI):
     async with create_checkpointer() as checkpointer:
         app.state.checkpointer = checkpointer
         logger.info("Checkpointer ready (postgres)")
+
+        # Auto-start graphs configured via AUTO_START_GRAPHS env var.
+        # Format: comma-separated "graph_id:session_id" entries.
+        # Example: AUTO_START_GRAPHS=slack/slack_assistant:slack
+        auto_start_env = os.getenv("AUTO_START_GRAPHS", "").strip()
+        if auto_start_env:
+            for entry in auto_start_env.split(","):
+                entry = entry.strip()
+                if not entry:
+                    continue
+                graph_id, _, session_id = entry.partition(":")
+                if not session_id:
+                    session_id = "default"
+                thread_id = f"{graph_id}_{session_id}"
+                graph_file = GRAPH_SAVE_PATH / f"{graph_id}.json"
+                if not graph_file.exists():
+                    logger.error("AUTO_START_GRAPHS: graph file not found for '%s'", graph_id)
+                    continue
+                with open(graph_file, "r", encoding="utf-8") as f:
+                    graph_json = json.load(f)
+                initial_params = {}
+                extra = graph_json.get("extra", {})
+                if "initial_state" in extra:
+                    try:
+                        initial_params = json.loads(extra["initial_state"])
+                    except Exception:
+                        pass
+                active_tasks[thread_id] = {
+                    "status": "running",
+                    "task": None,
+                    "active_nodes": set(),
+                    "node_timers": {},
+                    "debug_mode": False,
+                }
+                task = asyncio.ensure_future(run_graph_task(initial_params, thread_id, graph_json))
+                active_tasks[thread_id]["task"] = task
+                logger.info("Auto-started graph '%s' with thread_id '%s'", graph_id, thread_id)
 
         yield  # Wait for the application to shut down
 
@@ -1009,10 +1047,11 @@ def _extract_output_keys(cls) -> list[str]:
 async def list_available_nodes():
     """List all available worker nodes for the LiteGraph editor."""
     registry = get_node_registry()
+    node_metadata = get_node_metadata()
     available = []
     from src.nodes.abstract import RouterNode
     import inspect
-    
+
     for name, obj in registry.items():
         # Determine category from module path
         # modules.aws.nodes.foo  -> "aws"
@@ -1131,6 +1170,7 @@ async def list_available_nodes():
 
         output_keys = _extract_output_keys(obj)
 
+        meta = node_metadata.get(name, {})
         available.append({
             "name": name,
             "category": category,
@@ -1138,6 +1178,9 @@ async def list_available_nodes():
             "route_options": options,
             "properties": properties,
             "output_keys": output_keys,
+            "origin": meta.get("origin"),
+            "source_url": meta.get("source_url"),
+            "module_id": meta.get("module_id"),
         })
                 
     return {"nodes": available}
@@ -1145,6 +1188,54 @@ async def list_available_nodes():
 
 
 
+
+
+@app.get("/modules/check-updates")
+async def check_all_module_updates():
+    """Batch check all external modules for available updates.
+
+    Returns {module_id: {"update_available": bool, "local_sha": ..., "remote_sha": ...}}
+    Runs ls-remote concurrently for all external modules (~1s total).
+    """
+    from src.utils.setup.module_registry import INSTALLED_DIR
+
+    if not INSTALLED_DIR.exists():
+        return {"updates": {}}
+
+    # Gather all external modules with source URLs
+    external_modules = {}
+    for d in INSTALLED_DIR.iterdir():
+        if not d.is_dir():
+            continue
+        url_file = d / ".source_url"
+        sha_file = d / ".git_sha"
+        if url_file.exists():
+            external_modules[d.name] = {
+                "raw_url": url_file.read_text().strip(),
+                "local_sha": sha_file.read_text().strip() if sha_file.exists() else None,
+            }
+
+    if not external_modules:
+        return {"updates": {}}
+
+    loop = asyncio.get_event_loop()
+
+    async def _check_one(module_id: str, info: dict):
+        try:
+            clone_url, _, branch = _parse_github_url(info["raw_url"])
+            remote_sha = await loop.run_in_executor(None, _get_remote_sha, clone_url, branch)
+            local_sha = info["local_sha"]
+            return module_id, {
+                "update_available": bool(local_sha and remote_sha and local_sha != remote_sha),
+                "local_sha": local_sha[:7] if local_sha else None,
+                "remote_sha": remote_sha[:7] if remote_sha else None,
+            }
+        except Exception as e:
+            logger.debug("check-update for '%s' failed: %s", module_id, e)
+            return module_id, {"update_available": False, "error": str(e)}
+
+    results = await asyncio.gather(*[_check_one(mid, info) for mid, info in external_modules.items()])
+    return {"updates": dict(results)}
 
 
 @app.get("/modules/{module_id}")
@@ -1199,6 +1290,35 @@ async def get_module_detail(module_id: str):
 
     has_configurations = bool(setup.get("configurations", {}).get("types"))
 
+    # For external modules, read source URL and git SHA
+    source_url = None
+    git_sha = None
+    try:
+        from src.utils.setup.module_registry import get_module_package, INSTALLED_DIR
+        pkg = get_module_package(module_id)
+        if pkg == "installed":
+            module_dir = INSTALLED_DIR / module_id
+            url_file = module_dir / ".source_url"
+            if url_file.exists():
+                source_url = url_file.read_text().strip()
+            sha_file = module_dir / ".git_sha"
+            if sha_file.exists():
+                git_sha = sha_file.read_text().strip()
+            # Backfill: read installed SHA from local .git history (not remote)
+            if not git_sha and (module_dir / ".git").exists():
+                try:
+                    r = subprocess.run(
+                        ["git", "rev-parse", "HEAD"],
+                        capture_output=True, text=True, cwd=module_dir, timeout=5,
+                    )
+                    if r.returncode == 0 and r.stdout.strip():
+                        git_sha = r.stdout.strip()
+                        (module_dir / ".git_sha").write_text(git_sha + "\n")
+                except Exception:
+                    pass
+    except KeyError:
+        pass
+
     return {
         "id": manifest["id"],
         "name": manifest.get("name", module_id),
@@ -1209,6 +1329,8 @@ async def get_module_detail(module_id: str):
         "installed": installed,
         "load_error": get_load_errors().get(module_id),
         "has_configurations": has_configurations,
+        "source_url": source_url,
+        "git_sha": git_sha,
         "setup": {
             "env_vars": env_vars,
             "steps": steps,
@@ -1249,6 +1371,7 @@ async def install_module_endpoint(module_id: str, body: InstallModuleRequest):
         result = {"success": True, "manual_steps": manual_steps}
 
     invalidate_node_registry()
+    result["needs_restart"] = True
     return result
 
 
@@ -1399,24 +1522,19 @@ async def install_module_from_github(body: GithubInstallRequest):
     """Clone a module from a GitHub URL and install it."""
     raw_url = body.url.strip().rstrip("/").removesuffix(".git")
 
-    # Parse: https://github.com/user/repo/tree/branch/optional/subpath
-    tree_match = re.match(
-        r"(https://github\.com/[^/]+/[^/]+)/tree/[^/]+(?:/(.+))?",
-        raw_url,
-    )
-    if tree_match:
-        clone_url = tree_match.group(1)
-        subpath = tree_match.group(2) or ""
-    elif re.match(r"https://github\.com/[^/]+/[^/]+$", raw_url):
-        clone_url = raw_url
-        subpath = ""
-    else:
+    try:
+        clone_url, subpath, branch = _parse_github_url(raw_url)
+    except HTTPException:
         raise HTTPException(status_code=400, detail="Invalid GitHub URL. Expected https://github.com/user/repo or .../tree/branch/path")
 
     tmpdir = tempfile.mkdtemp()
     try:
+        clone_cmd = ["git", "clone", "--depth=1"]
+        if branch:
+            clone_cmd += ["-b", branch]
+        clone_cmd += [clone_url, tmpdir]
         result = subprocess.run(
-            ["git", "clone", "--depth=1", clone_url, tmpdir],
+            clone_cmd,
             capture_output=True,
             text=True,
             timeout=60,
@@ -1426,6 +1544,13 @@ async def install_module_from_github(body: GithubInstallRequest):
                 status_code=400,
                 detail=f"git clone failed: {(result.stderr or result.stdout).strip()[:300]}",
             )
+
+        # Capture the commit SHA of the cloned HEAD
+        sha_result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, cwd=tmpdir, timeout=10,
+        )
+        git_sha = sha_result.stdout.strip() if sha_result.returncode == 0 else ""
 
         module_src = Path(tmpdir) / subpath if subpath else Path(tmpdir)
         manifest_path = module_src / "manifest.json"
@@ -1456,8 +1581,10 @@ async def install_module_from_github(body: GithubInstallRequest):
             shutil.rmtree(dest)
         shutil.copytree(str(module_src), str(dest))
 
-        # Save the source URL for display in the UI
+        # Save the source URL and commit SHA for display/update in the UI
         (dest / ".source_url").write_text(raw_url + "\n")
+        if git_sha:
+            (dest / ".git_sha").write_text(git_sha + "\n")
 
     except HTTPException:
         raise
@@ -1470,27 +1597,18 @@ async def install_module_from_github(body: GithubInstallRequest):
 
     invalidate_node_registry()
 
-    # Run startup hook for the new module
-    try:
-        from src.utils.setup.module_registry import get_module_package
-        pkg = get_module_package(module_id)
-        mod = importlib.import_module(f"{pkg}.{module_id}")
-        if callable(getattr(mod, "on_startup", None)):
-            mod.on_startup()
-    except Exception as e:
-        logger.warning("Module '%s' on_startup failed after install: %s", module_id, e)
+    # Best-effort post-install hooks — full reliability requires server restart
+    for hook_name in ("on_startup", "register_routes"):
+        try:
+            from src.utils.setup.module_registry import get_module_package
+            pkg = get_module_package(module_id)
+            mod = importlib.import_module(f"{pkg}.{module_id}")
+            hook = getattr(mod, hook_name, None)
+            if callable(hook):
+                hook(app) if hook_name == "register_routes" else hook()
+        except Exception as e:
+            logger.warning("Module '%s' %s failed after install: %s", module_id, hook_name, e)
 
-    # Register routes for the new module
-    try:
-        from src.utils.setup.module_registry import get_module_package
-        pkg = get_module_package(module_id)
-        mod = importlib.import_module(f"{pkg}.{module_id}")
-        if callable(getattr(mod, "register_routes", None)):
-            mod.register_routes(app)
-    except Exception as e:
-        logger.warning("Module '%s' register_routes failed after install: %s", module_id, e)
-
-    # Sync prompts for the new module
     try:
         from src.utils.setup.langfuse_helper import get_langfuse_client, register_prompts
         register_prompts(get_langfuse_client())
@@ -1502,6 +1620,7 @@ async def install_module_from_github(body: GithubInstallRequest):
         "name": manifest.get("name", module_id),
         "version": manifest.get("version", ""),
         "installed": True,
+        "needs_restart": True,
     }
 
 
@@ -1514,7 +1633,204 @@ async def uninstall_module_endpoint(module_id: str):
         raise HTTPException(status_code=400, detail=f"Module '{module_id}' is a built-in module and cannot be uninstalled.")
     shutil.rmtree(module_dir)
     invalidate_node_registry()
-    return {"success": True}
+
+    # Sync prompts so stale prompts from the removed module get archived
+    try:
+        from src.utils.setup.langfuse_helper import get_langfuse_client, register_prompts
+        register_prompts(get_langfuse_client())
+    except Exception as e:
+        logger.warning("Prompt sync failed after uninstalling '%s': %s", module_id, e)
+
+    return {"success": True, "needs_restart": True}
+
+
+def _parse_github_url(raw_url: str):
+    """Parse a GitHub URL into (clone_url, subpath, branch).
+
+    Returns (clone_url, subpath, branch) where branch may be None for default.
+    Raises HTTPException on invalid URLs.
+    """
+    tree_match = re.match(
+        r"(https://github\.com/[^/]+/[^/]+)/tree/([^/]+)(?:/(.+))?",
+        raw_url,
+    )
+    if tree_match:
+        return tree_match.group(1), tree_match.group(3) or "", tree_match.group(2)
+    elif re.match(r"https://github\.com/[^/]+/[^/]+$", raw_url):
+        return raw_url, "", None
+    else:
+        raise HTTPException(status_code=400, detail="Stored source URL is not a valid GitHub URL")
+
+
+def _get_remote_sha(clone_url: str, branch: Optional[str] = None) -> str:
+    """Use `git ls-remote` to get the HEAD SHA of a remote repo without cloning.
+
+    This is significantly faster than a full clone — typically <1 second vs 10-30s.
+    """
+    ref = f"refs/heads/{branch}" if branch else "HEAD"
+    result = subprocess.run(
+        ["git", "ls-remote", clone_url, ref],
+        capture_output=True, text=True, timeout=15,
+    )
+    if result.returncode != 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"git ls-remote failed: {(result.stderr or result.stdout).strip()[:200]}",
+        )
+    # Output format: "<sha>\t<ref>\n"
+    line = result.stdout.strip().split("\n")[0] if result.stdout.strip() else ""
+    if not line:
+        raise HTTPException(status_code=400, detail="Could not resolve remote HEAD — empty ls-remote output")
+    return line.split("\t")[0]
+
+
+@app.get("/modules/{module_id}/check-update")
+async def check_module_update(module_id: str):
+    """Lightweight update check using git ls-remote (no clone needed).
+
+    Returns:
+      {"update_available": false, "local_sha": "abc1234", "remote_sha": "abc1234"}
+      {"update_available": true,  "local_sha": "abc1234", "remote_sha": "def5678"}
+    """
+    from src.utils.setup.module_registry import INSTALLED_DIR
+
+    module_dir = INSTALLED_DIR / module_id
+    if not module_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Module '{module_id}' not found")
+
+    source_url_file = module_dir / ".source_url"
+    if not source_url_file.exists():
+        raise HTTPException(status_code=400, detail="Not an external module (no source URL)")
+
+    raw_url = source_url_file.read_text().strip()
+    sha_file = module_dir / ".git_sha"
+    local_sha = sha_file.read_text().strip() if sha_file.exists() else None
+
+    clone_url, _, branch = _parse_github_url(raw_url)
+
+    loop = asyncio.get_event_loop()
+    remote_sha = await loop.run_in_executor(None, _get_remote_sha, clone_url, branch)
+
+    return {
+        "update_available": bool(local_sha and remote_sha and local_sha != remote_sha),
+        "local_sha": local_sha[:7] if local_sha else None,
+        "remote_sha": remote_sha[:7] if remote_sha else None,
+    }
+
+
+@app.post("/modules/{module_id}/update")
+async def update_module_from_github(module_id: str):
+    """Re-clone an externally installed module and update its files.
+
+    Preserves the module's .env file across the update. Returns:
+      {"status": "up_to_date", "sha": "abc1234"}  — already at latest commit
+      {"status": "updated", "from_sha": "abc1234", "to_sha": "def5678"}  — updated
+    """
+    from src.utils.setup.module_registry import INSTALLED_DIR, get_module_package
+
+    module_dir = INSTALLED_DIR / module_id
+    if not module_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Module '{module_id}' not found in installed/")
+
+    source_url_file = module_dir / ".source_url"
+    if not source_url_file.exists():
+        raise HTTPException(status_code=400, detail=f"Module '{module_id}' has no source URL — not an external module")
+
+    raw_url = source_url_file.read_text().strip()
+
+    # Read current SHA
+    sha_file = module_dir / ".git_sha"
+    old_sha = sha_file.read_text().strip() if sha_file.exists() else None
+
+    clone_url, subpath, _ = _parse_github_url(raw_url)
+
+    tmpdir = tempfile.mkdtemp()
+    new_sha = ""
+    manifest = {}
+    try:
+        result = subprocess.run(
+            ["git", "clone", "--depth=1", clone_url, tmpdir],
+            capture_output=True, text=True, timeout=60,
+        )
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"git clone failed: {(result.stderr or result.stdout).strip()[:300]}",
+            )
+
+        sha_result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, cwd=tmpdir, timeout=10,
+        )
+        new_sha = sha_result.stdout.strip() if sha_result.returncode == 0 else ""
+
+        # Already up to date?
+        if new_sha and old_sha and new_sha == old_sha:
+            return {"status": "up_to_date", "sha": new_sha[:7]}
+
+        module_src = Path(tmpdir) / subpath if subpath else Path(tmpdir)
+        manifest_path = module_src / "manifest.json"
+        if not manifest_path.exists():
+            raise HTTPException(status_code=400, detail="No manifest.json found in updated repo")
+
+        with open(manifest_path) as f:
+            manifest = json.load(f)
+
+        # Preserve .env file across the update
+        env_backup = None
+        env_file = module_dir / ".env"
+        if env_file.exists():
+            env_backup = env_file.read_text()
+
+        # Replace module directory
+        shutil.rmtree(module_dir)
+        shutil.copytree(str(module_src), str(module_dir))
+
+        # Restore preserved files
+        (module_dir / ".source_url").write_text(raw_url + "\n")
+        if new_sha:
+            (module_dir / ".git_sha").write_text(new_sha + "\n")
+        if env_backup is not None:
+            (module_dir / ".env").write_text(env_backup)
+
+    except HTTPException:
+        raise
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=400, detail="git clone timed out after 60s.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    invalidate_node_registry()
+
+    # Evict stale Python modules so hooks run the new code
+    stale_prefix = f"installed.{module_id}"
+    for key in [k for k in sys.modules if k == stale_prefix or k.startswith(stale_prefix + ".")]:
+        del sys.modules[key]
+
+    # Best-effort post-update hooks — full reliability requires server restart
+    try:
+        pkg = get_module_package(module_id)
+        updated_mod = importlib.import_module(f"{pkg}.{module_id}")
+        if callable(getattr(updated_mod, "on_startup", None)):
+            updated_mod.on_startup()
+    except Exception as e:
+        logger.warning("Module '%s' on_startup failed after update: %s", module_id, e)
+
+    try:
+        from src.utils.setup.langfuse_helper import get_langfuse_client, register_prompts
+        register_prompts(get_langfuse_client())
+    except Exception as e:
+        logger.warning("Prompt sync failed after updating '%s': %s", module_id, e)
+
+    return {
+        "status": "updated",
+        "from_sha": old_sha[:7] if old_sha else None,
+        "to_sha": new_sha[:7] if new_sha else None,
+        "name": manifest.get("name", module_id),
+        "needs_restart": True,
+    }
 
 
 async def _module_has_warnings(module_id: str, manifest: dict, is_installed: bool) -> bool:
@@ -1582,14 +1898,32 @@ async def list_modules():
         except KeyError:
             pkg = "modules"
             origin = "builtin"
-        # Read source URL for external modules
+        # Read source URL and git SHA for external modules
         source_url = None
+        git_sha = None
         if origin == "external":
             for d, p in _iter_module_dirs():
                 if d.name == module_id:
                     url_file = d / ".source_url"
                     if url_file.exists():
                         source_url = url_file.read_text().strip()
+                    sha_file = d / ".git_sha"
+                    if sha_file.exists():
+                        git_sha = sha_file.read_text().strip()
+                    # Backfill: read the installed SHA from the local .git history
+                    # (never query the remote — that would overwrite the installed SHA
+                    # with the current remote HEAD, breaking update detection)
+                    if not git_sha and (d / ".git").exists():
+                        try:
+                            r = subprocess.run(
+                                ["git", "rev-parse", "HEAD"],
+                                capture_output=True, text=True, cwd=d, timeout=5,
+                            )
+                            if r.returncode == 0 and r.stdout.strip():
+                                git_sha = r.stdout.strip()
+                                (d / ".git_sha").write_text(git_sha + "\n")
+                        except Exception:
+                            pass
                     break
         return {
             "id": module_id,
@@ -1600,6 +1934,7 @@ async def list_modules():
             "color": manifest.get("color", "#666666"),
             "origin": origin,
             "source_url": source_url,
+            "git_sha": git_sha,
             "installed": is_installed,
             "has_warnings": await _module_has_warnings(module_id, manifest, is_installed),
             "load_error": load_errors.get(module_id),

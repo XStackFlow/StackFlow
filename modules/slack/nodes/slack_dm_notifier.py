@@ -52,20 +52,15 @@ class SlackDMNotifier(BaseNode):
         if thread_ts == "{{thread_sent_ts}}":
             thread_ts = None
 
-        try:
-            result = send_slack_message(slack_user_id, slack_message, thread_ts=thread_ts)
-            logger.info("Sent Slack DM to %s", slack_user_id)
+        result = send_slack_message(slack_user_id, slack_message, thread_ts=thread_ts)
+        logger.info("Sent Slack DM to %s", slack_user_id)
 
-            # Extract the timestamp (ts) to allow downstream nodes to thread
-            slack_ts = result.get("ts")
-            # The thread ID is either the existing one we replied to, or the ts of this new message
-            final_thread_ts = thread_ts if thread_ts else slack_ts
+        # Extract the timestamp (ts) to allow downstream nodes to thread
+        slack_ts = result.get("ts")
+        # The thread ID is either the existing one we replied to, or the ts of this new message
+        final_thread_ts = thread_ts if thread_ts else slack_ts
 
-            return {
-                "slack_sent_ts": slack_ts,
-                "thread_sent_ts": final_thread_ts
-            }
-        except Exception as e:
-            # Don't fail the workflow if Slack notification fails
-            logger.warning("Failed to send Slack DM: %s", e)
-            return {}
+        return {
+            "slack_sent_ts": slack_ts,
+            "thread_sent_ts": final_thread_ts
+        }

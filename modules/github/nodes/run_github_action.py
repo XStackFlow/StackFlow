@@ -5,6 +5,7 @@ from typing import Any, Dict
 from src.nodes.abstract.base_node import BaseNode
 from src.inputs.standard_inputs import Resolvable
 from src.utils.setup.logger import get_logger
+from src.inputs.standard_inputs import JSONString
 
 logger = get_logger(__name__)
 
@@ -16,7 +17,7 @@ class RunGithubAction(BaseNode):
         self,
         workflow: Resolvable[str] = "",
         branch: Resolvable[str] = "{{branch}}",
-        additional_fields: Resolvable[Dict[str, str]] = {},
+        additional_fields: Resolvable[JSONString] = {},
         repo_path: Resolvable[str] = "{{repo_path}}",
         **kwargs
     ):
@@ -48,6 +49,9 @@ class RunGithubAction(BaseNode):
         workflow = self._workflow
         branch = self._branch
         additional_fields = self._additional_fields or {}
+        if isinstance(additional_fields, str):
+            import json
+            additional_fields = json.loads(additional_fields) if additional_fields.strip() else {}
         repo_path = self._repo_path
 
         # 2. Validate Inputs
