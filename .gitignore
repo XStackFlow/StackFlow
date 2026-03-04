@@ -69,5 +69,3 @@ logs/
 
 **/node_modules/**
 **/memory/chroma_db/**
-
-CLAUDE.md
