@@ -1,16 +1,6 @@
 {
   "items": [
     {
-      "name": "cursor",
-      "type": "cursor_cli",
-      "options": {}
-    },
-    {
-      "name": "gemini",
-      "type": "gemini_cli",
-      "options": {}
-    },
-    {
       "name": "ollama-gpu",
       "type": "ollama",
       "options": {

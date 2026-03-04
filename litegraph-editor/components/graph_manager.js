@@ -1567,6 +1567,7 @@ async function openModuleModal(moduleId, onDone, onNeedsRestart) {
                     const h = step.install_hint;
                     if (h.macos) hint += `<div class="mod-step-hint">macOS: ${h.macos}</div>`;
                     if (h.linux) hint += `<div class="mod-step-hint">Linux: ${h.linux}</div>`;
+                    if (h.windows) hint += `<div class="mod-step-hint">Windows: ${h.windows}</div>`;
                 }
                 text.innerHTML = cmdLine + avail + hint;
 
@@ -1635,6 +1636,86 @@ async function openModuleModal(moduleId, onDone, onNeedsRestart) {
                 sec.appendChild(row);
             }
         });
+        body.appendChild(sec);
+    }
+
+    // Install notes
+    const installNotes = mod.setup?.install_notes;
+    if (installNotes) {
+        const sec = document.createElement("div");
+        sec.innerHTML = `<div class="mod-section-title">Install Notes</div>`;
+
+        if (installNotes.summary) {
+            const sum = document.createElement("div");
+            sum.style.cssText = "font-size:11px;color:#ccc;margin-bottom:8px;";
+            sum.textContent = installNotes.summary;
+            sec.appendChild(sum);
+        }
+
+        if (installNotes.common?.length) {
+            const lbl = document.createElement("div");
+            lbl.style.cssText = "font-size:10px;color:#888;margin-bottom:4px;";
+            lbl.textContent = "Common:";
+            sec.appendChild(lbl);
+            installNotes.common.forEach(cmd => {
+                const row = document.createElement("div");
+                row.className = "mod-manual-step-cmd";
+                const cmdSpan = document.createElement("span");
+                cmdSpan.textContent = `$ ${cmd}`;
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "mod-copy-btn";
+                copyBtn.textContent = "Copy";
+                copyBtn.addEventListener("click", () => {
+                    navigator.clipboard.writeText(cmd).catch(() => {});
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
+                });
+                row.appendChild(cmdSpan);
+                row.appendChild(copyBtn);
+                sec.appendChild(row);
+            });
+        }
+
+        // Render each sub-section (e.g. natten)
+        for (const [key, val] of Object.entries(installNotes)) {
+            if (key === "summary" || key === "common") continue;
+            if (typeof val !== "object") continue;
+
+            const sub = document.createElement("div");
+            sub.style.cssText = "margin-top:10px;";
+
+            const title = document.createElement("div");
+            title.style.cssText = "font-size:11px;font-weight:600;color:#ddd;margin-bottom:4px;";
+            title.textContent = key;
+            sub.appendChild(title);
+
+            if (val.description) {
+                const desc = document.createElement("div");
+                desc.style.cssText = "font-size:10px;color:#999;margin-bottom:6px;";
+                desc.textContent = val.description;
+                sub.appendChild(desc);
+            }
+
+            for (const platform of ["macos", "linux", "windows"]) {
+                const instructions = val[platform];
+                if (!instructions) continue;
+                const platLbl = document.createElement("div");
+                platLbl.style.cssText = "font-size:10px;color:#888;margin-top:4px;margin-bottom:2px;";
+                platLbl.textContent = platform === "macos" ? "macOS:" : platform === "linux" ? "Linux:" : "Windows:";
+                sub.appendChild(platLbl);
+
+                const lines = Array.isArray(instructions) ? instructions : [instructions];
+                lines.forEach(line => {
+                    const row = document.createElement("div");
+                    row.style.cssText = "font-size:10px;color:#bbb;font-family:monospace;white-space:pre-wrap;padding:3px 6px;background:#1a1a2e;border-radius:3px;margin-bottom:2px;";
+                    row.textContent = line;
+                    sub.appendChild(row);
+                });
+            }
+
+            sec.appendChild(sub);
+        }
+
         body.appendChild(sec);
     }
 

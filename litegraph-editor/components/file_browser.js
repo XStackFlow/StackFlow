@@ -5,6 +5,7 @@
 const API_BASE = "http://localhost:8000";
 
 let modal = null;
+let lastDir = "";
 
 function ensureModal() {
     if (modal) return modal;
@@ -106,12 +107,14 @@ export function openFileBrowser(currentValue, onSelect, extensions) {
     let parentDir = null;
     let selectedFile = null;
 
-    // If currentValue is a file path, start in its directory
+    // Determine start dir: use dir of currentValue if set, else fall back to lastDir
     if (currentValue && !currentValue.startsWith("{{")) {
         const sep = currentValue.includes("/") ? "/" : "\\";
         const parts = currentValue.split(sep);
         parts.pop();
-        currentDir = parts.join(sep) || "";
+        currentDir = parts.join(sep) || lastDir;
+    } else {
+        currentDir = lastDir;
     }
 
     function close() {
@@ -137,6 +140,7 @@ export function openFileBrowser(currentValue, onSelect, extensions) {
         try {
             const data = await fetchDir(dirPath, extensions || "");
             currentDir = data.path;
+            lastDir = data.path;  // persist for next open
             parentDir = data.parent;
             pathInput.value = data.path;
 

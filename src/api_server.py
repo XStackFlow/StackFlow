@@ -12,6 +12,7 @@ import os
 import re
 import shlex
 import shutil
+import stat
 import subprocess
 import tempfile
 import threading
@@ -319,38 +320,26 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                         interrupts = list(dict.fromkeys(all_ids + interrupts))
                     graph_runnable = workflow.compile(checkpointer=cp, interrupt_before=interrupts)
 
-                    # In Langfuse v3, we need to extract the OpenTelemetry context from the observation
-                    # and pass it to the CallbackHandler to ensure proper trace nesting
+                    # Attach Langfuse LangChain callback for trace nesting
                     from langfuse.langchain import CallbackHandler
                     from opentelemetry import trace
-                    
-                    # Get the current OpenTelemetry span from the observation
+
                     current_span = trace.get_current_span()
                     trace_context = None
-                    
                     if current_span and current_span.is_recording():
-                        # Extract trace_id and span_id from the current OpenTelemetry context
                         span_context = current_span.get_span_context()
                         if span_context.is_valid:
-                            # Convert OpenTelemetry IDs to Langfuse format (hex strings)
-                            trace_id = format(span_context.trace_id, '032x')
-                            parent_span_id = format(span_context.span_id, '016x')
                             trace_context = {
-                                "trace_id": trace_id,
-                                "parent_span_id": parent_span_id
+                                "trace_id": format(span_context.trace_id, '032x'),
+                                "parent_span_id": format(span_context.span_id, '016x'),
                             }
-                    
-                    # Enable update_trace so the root LangChain span updates the trace name
-                    langfuse_handler = CallbackHandler(
-                        trace_context=trace_context,
-                        update_trace=True
-                    )
+                    callbacks = [CallbackHandler(trace_context=trace_context, update_trace=True)]
 
                     config_checkpoint = {
                         "configurable": {"thread_id": thread_id},
                         "recursion_limit": int(config.get("RECURSION_LIMIT") or 25),
                         "max_concurrency": int(config.get("MAX_CONCURRENCY") or 5),
-                        "callbacks": [langfuse_handler],
+                        "callbacks": callbacks,
                     }
                     logger.info("Config Checkpoint: recursion_limit=%d, max_concurrency=%d", 
                                         config_checkpoint["recursion_limit"], config_checkpoint["max_concurrency"])
@@ -1394,6 +1383,7 @@ async def get_module_detail(module_id: str):
         "setup": {
             "env_vars": env_vars,
             "steps": steps,
+            **({"install_notes": setup["install_notes"]} if "install_notes" in setup else {}),
         },
     }
 
@@ -1431,6 +1421,20 @@ async def install_module_endpoint(module_id: str, body: InstallModuleRequest):
         result = {"success": True, "manual_steps": manual_steps}
 
     invalidate_node_registry()
+
+    # Install module Python dependencies if requirements.txt is present
+    req_file = module_base / "requirements.txt"
+    if req_file.exists():
+        logger.info("Installing Python dependencies for module '%s'…", module_id)
+        pip_result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", str(req_file)],
+            capture_output=True, text=True, timeout=300,
+        )
+        if pip_result.returncode != 0:
+            logger.warning("pip install for module '%s' failed:\n%s", module_id, pip_result.stderr)
+        else:
+            logger.info("pip install for module '%s' succeeded.", module_id)
+
     result["needs_restart"] = True
     return result
 
@@ -1638,7 +1642,10 @@ async def install_module_from_github(body: GithubInstallRequest):
         INSTALLED_DIR.mkdir(exist_ok=True)
         dest = INSTALLED_DIR / module_id
         if dest.exists():
-            shutil.rmtree(dest)
+            def _force_remove_readonly(func, path, exc_info):
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            shutil.rmtree(dest, onerror=_force_remove_readonly)
         shutil.copytree(str(module_src), str(dest))
 
         # Save the source URL and commit SHA for display/update in the UI
@@ -1656,6 +1663,19 @@ async def install_module_from_github(body: GithubInstallRequest):
         shutil.rmtree(tmpdir, ignore_errors=True)
 
     invalidate_node_registry()
+
+    # Install module Python dependencies if requirements.txt is present
+    req_file = dest / "requirements.txt"
+    if req_file.exists():
+        logger.info("Installing Python dependencies for module '%s'…", module_id)
+        pip_result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", str(req_file)],
+            capture_output=True, text=True, timeout=300,
+        )
+        if pip_result.returncode != 0:
+            logger.warning("pip install for module '%s' failed:\n%s", module_id, pip_result.stderr)
+        else:
+            logger.info("pip install for module '%s' succeeded.", module_id)
 
     # Best-effort post-install hooks — full reliability requires server restart
     for hook_name in ("on_startup", "register_routes"):
@@ -1691,7 +1711,10 @@ async def uninstall_module_endpoint(module_id: str):
     module_dir = INSTALLED_DIR / module_id
     if not module_dir.exists():
         raise HTTPException(status_code=400, detail=f"Module '{module_id}' is a built-in module and cannot be uninstalled.")
-    shutil.rmtree(module_dir)
+    def _force_remove_readonly(func, path, exc_info):
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    shutil.rmtree(module_dir, onerror=_force_remove_readonly)
     invalidate_node_registry()
 
     # Sync prompts so stale prompts from the removed module get archived
@@ -1842,8 +1865,11 @@ async def update_module_from_github(module_id: str):
         if env_file.exists():
             env_backup = env_file.read_text()
 
-        # Replace module directory
-        shutil.rmtree(module_dir)
+        # Replace module directory (onerror handles read-only .git pack files on Windows)
+        def _force_remove_readonly(func, path, exc_info):
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        shutil.rmtree(module_dir, onerror=_force_remove_readonly)
         shutil.copytree(str(module_src), str(module_dir))
 
         # Restore preserved files
@@ -2591,8 +2617,8 @@ if __name__ == "__main__":
         # psycopg async requires SelectorEventLoop, not the default ProactorEventLoop.
         # Bypass uvicorn.run() to ensure the correct event loop is used.
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_config=None)
-        server = uvicorn.Server(config)
+        uvicorn_config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_config=None)
+        server = uvicorn.Server(uvicorn_config)
         asyncio.run(server.serve())
     else:
         uvicorn.run(app, host="0.0.0.0", port=8000, log_config=None)

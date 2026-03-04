@@ -1,17 +1,17 @@
 {
-  "last_node_id": 2,
-  "last_link_id": 1,
+  "last_node_id": 3,
+  "last_link_id": 3,
   "nodes": [
     {
       "id": 1,
       "type": "langgraph/start",
       "pos": [
-        583,
-        307
+        140,
+        195
       ],
       "size": [
-        100,
-        40
+        140,
+        30
       ],
       "flags": {},
       "order": 0,
@@ -33,12 +33,12 @@
       "id": 2,
       "type": "musicvideo/MusicAnalyzer",
       "pos": [
-        763,
-        266
+        360,
+        140
       ],
       "size": [
-        260.3399967442617,
-        122.89022319054402
+        210,
+        140
       ],
       "flags": {},
       "order": 1,
@@ -59,14 +59,68 @@
         {
           "name": "Out",
           "type": "state",
-          "links": null
+          "links": [
+            3
+          ],
+          "slot_index": 0
         }
       ],
       "title": "MusicAnalyzer",
       "properties": {
         "name": "MusicAnalyzer",
         "type": "standard",
-        "music_file_path": ""
+        "music_file_path": "C:\\Users\\lxf25\\Downloads\\\u5929\u72fc\u661f.wav"
+      }
+    },
+    {
+      "id": 3,
+      "type": "musicvideo/StoryWriter",
+      "pos": [
+        358,
+        352
+      ],
+      "size": [
+        210,
+        272
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 3
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": null
+        }
+      ],
+      "title": "StoryWriter",
+      "properties": {
+        "name": "StoryWriter",
+        "type": "standard",
+        "model": "gemini|gemini-3-flash-preview",
+        "temperature": "0.7",
+        "prompt_name": "musicvideo/StoryWriter",
+        "recursion_limit": "100",
+        "tool_sets": [],
+        "required_keys": [
+          "story",
+          "character_bible",
+          "style_guide",
+          "scenes"
+        ],
+        "repo_path": "./"
       }
     }
   ],
@@ -78,6 +132,14 @@
       2,
       0,
       "state"
+    ],
+    [
+      3,
+      2,
+      0,
+      3,
+      0,
+      "state"
     ]
   ],
   "groups": [],
@@ -86,13 +148,6 @@
     "initial_state": "{\n  \"input\": \"\"\n}"
   },
   "version": 0.4,
-  "_viewport": {
-    "offset": [
-      1,
-      0
-    ],
-    "scale": 1
-  },
   "_module_deps": {
     "musicvideo": {
       "origin": "external",
