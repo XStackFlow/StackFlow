@@ -17,7 +17,8 @@ INSTALLED_DIR = PROJECT_ROOT / "installed"
 MODULES_JSON = PROJECT_ROOT / "modules.json"
 
 __all__ = ["MODULES_DIR", "INSTALLED_DIR", "get_installed_modules", "get_module_package",
-           "get_manifest", "get_all_manifests", "run_module_startup_hooks", "run_module_route_registrations"]
+           "get_manifest", "get_all_manifests", "run_module_startup_hooks", "run_module_route_registrations",
+           "get_module_graph_dirs", "resolve_module_graph_path"]
 
 _SCAN_DIRS = [
     (MODULES_DIR, "modules"),
@@ -130,6 +131,53 @@ def run_module_route_registrations(app) -> None:
                 mod.register_routes(app)
         except Exception as e:
             logger.error("Module '%s' route registration failed: %s", mid, e)
+
+
+def get_module_graph_dirs() -> list[tuple[str, Path]]:
+    """Return (module_id, graphs_dir) for each installed module that has a graphs/ subdirectory."""
+    result = []
+    active = set(get_installed_modules())
+    for d, _ in _iter_module_dirs():
+        if d.name in active:
+            graphs_dir = d / "graphs"
+            if graphs_dir.is_dir():
+                result.append((d.name, graphs_dir))
+    return result
+
+
+def resolve_module_graph_path(graph_id: str) -> Path | None:
+    """Resolve a module@@ graph_id to an absolute file path.
+
+    Args:
+        graph_id: e.g. "module@@stackadapt/deploy.json"
+
+    Returns:
+        Resolved Path if valid, None if module or file not found.
+    """
+    if not graph_id.startswith("module@@"):
+        return None
+    rest = graph_id[len("module@@"):]
+    slash = rest.find("/")
+    if slash == -1:
+        return None
+    module_id = rest[:slash]
+    rel_path = rest[slash + 1:]
+    if not rel_path:
+        return None
+
+    active = set(get_installed_modules())
+    if module_id not in active:
+        return None
+
+    for d, _ in _iter_module_dirs():
+        if d.name == module_id:
+            graphs_dir = d / "graphs"
+            file_path = (graphs_dir / rel_path).resolve()
+            # Security: prevent path traversal
+            if not str(file_path).startswith(str(graphs_dir.resolve())):
+                return None
+            return file_path
+    return None
 
 
 def get_all_manifests() -> dict[str, dict]:
