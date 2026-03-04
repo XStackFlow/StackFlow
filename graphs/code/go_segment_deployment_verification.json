@@ -337,7 +337,7 @@
     },
     {
       "id": 21,
-      "type": "slack/SlackReplyListener",
+      "type": "slack/SlackReplyGetter",
       "pos": [
         2688.3999938964844,
         895.175
@@ -371,12 +371,13 @@
           "slot_index": 0
         }
       ],
-      "title": "SlackReplyListener",
+      "title": "SlackReplyGetter",
       "properties": {
-        "name": "SlackReplyListener",
+        "name": "SlackReplyGetter",
         "type": "standard",
         "slack_user_id": "{{SLACK_USER_ID}}",
         "thread_ts": "{{thread_sent_ts}}",
+        "check_interval_seconds": 10,
         "timeout_minutes": 1440
       }
     },

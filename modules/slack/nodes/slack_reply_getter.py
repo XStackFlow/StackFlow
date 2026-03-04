@@ -1,18 +1,24 @@
-"""Slack Reply Getter - Fetches the latest reply from a Slack thread."""
+"""Slack Reply Getter - Polls for text replies and emoji reactions from a Slack thread."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 import os
 
 from src.nodes.abstract.base_node import BaseNode
 from src.inputs.standard_inputs import Resolvable
 from src.utils.setup.logger import get_logger
-from modules.slack.utils import get_slack_thread_replies, get_slack_history
+from modules.slack.utils import get_slack_thread_replies, get_slack_history, get_slack_reactions
+
 
 logger = get_logger(__name__)
 
 
 class SlackReplyGetter(BaseNode):
-    """Node that fetches the latest user reply from a Slack thread."""
+    """Node that polls for user replies or emoji reactions from Slack.
+
+    Supports both:
+    - Text message replies (in a thread or top-level DM/channel)
+    - Emoji reactions on the thread parent message (returned as ":emoji:" format)
+    """
 
     def __init__(
         self,
@@ -40,7 +46,7 @@ class SlackReplyGetter(BaseNode):
     def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """Execute the node logic with polling."""
         import time
-        
+
         slack_user_id = self._slack_user_id
         if not slack_user_id:
             logger.warning("SlackReplyGetter: slack_user_id not provided, skipping")
@@ -53,16 +59,23 @@ class SlackReplyGetter(BaseNode):
         is_thread = True
         if not thread_ts or thread_ts == "{{thread_sent_ts}}" or str(thread_ts).strip() == "" or str(thread_ts) == "None":
             is_thread = False
-            logger.info("SlackReplyGetter: thread_ts not provided or empty, polling latest messages from channel for %s", slack_user_id_clean)
+            logger.debug("SlackReplyGetter: thread_ts not provided or empty, polling latest messages from channel for %s", slack_user_id_clean)
         else:
-            logger.info("SlackReplyGetter: Starting poll for replies from %s in thread %s (timeout: %d min)", 
+            logger.debug("SlackReplyGetter: Starting poll for replies/reactions from %s in thread %s (timeout: %d min)",
                         slack_user_id_clean, thread_ts, int(self._timeout_minutes))
 
         start_time = time.time()
         timeout_seconds = int(self._timeout_minutes) * 60
         check_interval = int(self._check_interval_seconds)
-        
+
+        # Snapshot existing reactions so we only detect NEW ones
+        baseline_reactions: Set[Tuple[str, str]] = set()  # {(emoji_name, user_id), ...}
+        if is_thread:
+            baseline_reactions = self._snapshot_reactions(slack_user_id, thread_ts)
+            logger.debug("SlackReplyGetter: Baseline reactions snapshot: %d reaction(s)", len(baseline_reactions))
+
         while True:
+            # --- Check for text messages ---
             if is_thread:
                 messages = get_slack_thread_replies(slack_user_id, thread_ts)
                 # We need at least one reply (messages[0] is the parent)
@@ -87,35 +100,27 @@ class SlackReplyGetter(BaseNode):
 
                 if latest_user == slack_user_id_clean:
                     logger.info("SlackReplyGetter: Found expected user reply: %s", latest_text)
-
-                    # Fetch context history for the LLM
-                    context_messages = get_slack_history(slack_user_id, limit=50)
-
-                    last_action_ts = state.get("last_action_ts")
-                    if last_action_ts:
-                        logger.info("SlackReplyGetter: Filtering history since last_action_ts: %s", last_action_ts)
-                        context_messages = [m for m in context_messages if float(m["ts"]) > float(last_action_ts)]
-
-                    # Messages are returned latest first; reverse for chronological order
-                    history = []
-                    for msg in reversed(context_messages):
-                        t = msg.get("text", "").strip()
-                        if t:
-                            role = "User" if msg.get("user") == slack_user_id_clean else "Assistant"
-                            history.append({"role": role, "content": t})
-
                     return {
                         "last_slack_reply": latest_text,
                         "last_reply_ts": ts,
-                        "slack_conversation_history": history,
                     }
                 else:
                     reason = "bot" if (latest_msg.get("bot_id") or latest_msg.get("subtype") == "bot_message") else f"user {latest_user}"
-                    logger.debug("SlackReplyGetter: Latest message is from %s, not target %s. Waiting %d seconds...",
-                                 reason, slack_user_id_clean, check_interval)
-            else:
-                scope = f"thread {thread_ts}" if is_thread else "history"
-                logger.debug("SlackReplyGetter: No messages found in %s. Waiting %d seconds...", scope, check_interval)
+                    logger.debug("SlackReplyGetter: Latest message is from %s, not target %s. Waiting...",
+                                 reason, slack_user_id_clean)
+
+            # --- Check for new emoji reactions (thread mode only) ---
+            if is_thread:
+                new_reaction = self._check_new_reactions(
+                    slack_user_id, thread_ts, slack_user_id_clean, baseline_reactions
+                )
+                if new_reaction:
+                    emoji, reaction_user = new_reaction
+                    logger.info("SlackReplyGetter: Detected new reaction :%s: from %s", emoji, reaction_user)
+                    return {
+                        "last_slack_reply": f":{emoji}:",
+                        "last_reply_ts": thread_ts,
+                    }
 
             # Check for timeout
             elapsed = time.time() - start_time
@@ -128,4 +133,38 @@ class SlackReplyGetter(BaseNode):
             # Sleep and try again
             time.sleep(check_interval)
 
+    @staticmethod
+    def _snapshot_reactions(slack_user_id: str, thread_ts: str) -> Set[Tuple[str, str]]:
+        """Take a snapshot of current reactions as (emoji_name, user_id) pairs."""
+        snapshot: Set[Tuple[str, str]] = set()
+        try:
+            reactions = get_slack_reactions(slack_user_id, thread_ts)
+            for r in reactions:
+                emoji = r.get("name", "")
+                for uid in r.get("users", []):
+                    snapshot.add((emoji, uid))
+        except Exception as e:
+            logger.warning("SlackReplyGetter: Failed to snapshot reactions: %s", e)
+        return snapshot
 
+    @staticmethod
+    def _check_new_reactions(
+        slack_user_id: str,
+        thread_ts: str,
+        target_user_id: str,
+        baseline: Set[Tuple[str, str]],
+    ) -> Optional[Tuple[str, str]]:
+        """Check for new reactions from the target user since baseline.
+
+        Returns (emoji_name, user_id) if a new reaction is found, else None.
+        """
+        try:
+            reactions = get_slack_reactions(slack_user_id, thread_ts)
+            for r in reactions:
+                emoji = r.get("name", "")
+                for uid in r.get("users", []):
+                    if uid == target_user_id and (emoji, uid) not in baseline:
+                        return (emoji, uid)
+        except Exception as e:
+            logger.debug("SlackReplyGetter: Error checking reactions: %s", e)
+        return None

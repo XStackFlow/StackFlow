@@ -192,13 +192,6 @@ async def lifespan(app: FastAPI):
 
         yield  # Wait for the application to shut down
 
-        # Clean up Socket Mode connection so Slack stops routing events to this session
-        try:
-            from modules.slack.socket_manager import get_socket_manager
-            get_socket_manager().disconnect()
-        except Exception:
-            pass
-
 app = FastAPI(title="StackFlow Graph API", lifespan=lifespan)
 
 # Enable CORS for the LiteGraph editor

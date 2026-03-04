@@ -454,51 +454,6 @@
       }
     },
     {
-      "id": 48,
-      "type": "slack/SlackReplyListener",
-      "pos": [
-        2505.6000061035156,
-        1847.5000000000002
-      ],
-      "size": [
-        210,
-        147
-      ],
-      "flags": {},
-      "order": 34,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 69
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            84
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SlackReplyListener",
-      "properties": {
-        "name": "SlackReplyListener",
-        "type": "standard",
-        "slack_user_id": "{{SLACK_USER_ID}}",
-        "thread_ts": "{{thread_sent_ts}}",
-        "timeout_minutes": 1440
-      }
-    },
-    {
       "id": 26,
       "type": "slack/SlackDMNotifier",
       "pos": [
@@ -816,52 +771,6 @@
         "required_keys": "pending_next_step",
         "repo_path": "./",
         "interrupt_before": false
-      }
-    },
-    {
-      "id": 47,
-      "type": "slack/SlackReplyListener",
-      "pos": [
-        470,
-        1197
-      ],
-      "size": [
-        210,
-        147
-      ],
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 67
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            68,
-            90
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SlackReplyListener",
-      "properties": {
-        "name": "SlackReplyListener",
-        "type": "standard",
-        "slack_user_id": "{{SLACK_USER_ID}}",
-        "thread_ts": "",
-        "timeout_minutes": 1440
       }
     },
     {
@@ -1811,6 +1720,99 @@
       "title": "Portal Entrance [MainLoop]",
       "properties": {
         "tag": "MainLoop"
+      }
+    },
+    {
+      "id": 47,
+      "type": "slack/SlackReplyGetter",
+      "pos": [
+        470,
+        1185
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 67
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            68,
+            90
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackReplyGetter",
+      "properties": {
+        "name": "SlackReplyGetter",
+        "type": "standard",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": "",
+        "check_interval_seconds": "1",
+        "timeout_minutes": 1440
+      }
+    },
+    {
+      "id": 48,
+      "type": "slack/SlackReplyGetter",
+      "pos": [
+        2505.6000061035156,
+        1835.5000000000002
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 69
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            84
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SlackReplyGetter",
+      "properties": {
+        "name": "SlackReplyGetter",
+        "type": "standard",
+        "slack_user_id": "{{SLACK_USER_ID}}",
+        "thread_ts": "{{thread_sent_ts}}",
+        "check_interval_seconds": "1",
+        "timeout_minutes": 1440
       }
     }
   ],

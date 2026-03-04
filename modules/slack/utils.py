@@ -140,7 +140,7 @@ def get_slack_thread_replies(user_id: str, thread_ts: str) -> list[Dict[str, Any
             raise RuntimeError(f"Slack API error fetching replies: {error}")
             
         messages = result.get("messages", [])
-        logger.info("Fetched %d messages from Slack thread %s in %s", len(messages), thread_ts, channel_id)
+        logger.debug("Fetched %d messages from Slack thread %s in %s", len(messages), thread_ts, channel_id)
         return messages
     except requests.RequestException as e:
         logger.error("Failed to fetch Slack replies: %s", e)
@@ -187,7 +187,7 @@ def get_slack_history(user_id: str, limit: int = 10) -> list[Dict[str, Any]]:
             raise RuntimeError(f"Slack API error fetching history: {error}")
             
         messages = result.get("messages", [])
-        logger.info("Fetched %d messages from Slack history in %s", len(messages), channel_id)
+        logger.debug("Fetched %d messages from Slack history in %s", len(messages), channel_id)
         return messages
     except requests.RequestException as e:
         logger.error("Failed to fetch Slack history: %s", e)
@@ -304,4 +304,52 @@ def remove_slack_reaction(user_id: str, timestamp: str, emoji: str) -> Dict[str,
     except requests.RequestException as e:
         logger.error("Failed to remove Slack reaction: %s", e)
         raise RuntimeError(f"Failed to remove Slack reaction: {e}") from e
+
+
+def get_slack_reactions(user_id: str, timestamp: str) -> list[Dict[str, Any]]:
+    """Get all reactions on a Slack message.
+
+    Args:
+        user_id: Slack user ID, channel ID, or DM ID where the message exists
+        timestamp: The timestamp (ts) of the message to get reactions for
+
+    Returns:
+        List of reaction dicts, each with 'name' (emoji) and 'users' (list of user IDs).
+        Returns empty list if no reactions or on error.
+    """
+    slack_token = os.getenv("SLACK_BOT_TOKEN")
+    if not slack_token:
+        logger.warning("SLACK_BOT_TOKEN not set, cannot get reactions")
+        return []
+
+    channel_id = _resolve_channel_id(user_id)
+    headers = {
+        "Authorization": f"Bearer {slack_token}",
+    }
+
+    reactions_url = "https://slack.com/api/reactions.get"
+    params = {
+        "channel": channel_id,
+        "timestamp": timestamp,
+        "full": "true",
+    }
+
+    try:
+        response = requests.get(reactions_url, headers=headers, params=params, timeout=10)
+        response.raise_for_status()
+        result = response.json()
+
+        if not result.get("ok"):
+            error = result.get("error", "Unknown error")
+            # "no_item_specified" or similar means the message doesn't exist
+            logger.error("Slack API error getting reactions from %s (ts: %s): %s", channel_id, timestamp, error)
+            return []
+
+        message = result.get("message", {})
+        reactions = message.get("reactions", [])
+        logger.debug("Fetched %d reaction types on message %s in %s", len(reactions), timestamp, channel_id)
+        return reactions
+    except requests.RequestException as e:
+        logger.error("Failed to get Slack reactions: %s", e)
+        return []
 

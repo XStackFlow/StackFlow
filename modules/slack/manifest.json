@@ -7,7 +7,6 @@
     "SlackDMNotifier",
     "SlackChannelNotifier",
     "SlackReplyGetter",
-    "SlackReplyListener",
     "SlackMessageRouterDeploymentVerification",
     "SlackAssistantRouter",
     "GraphDetailsRouter",
@@ -20,7 +19,7 @@
   ],
   "color": "#4A154B",
   "setup": {
-    "env_vars": ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "SLACK_USER_ID"],
+    "env_vars": ["SLACK_BOT_TOKEN", "SLACK_USER_ID"],
     "steps": []
   }
 }

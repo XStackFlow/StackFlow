@@ -1,3 +1,2 @@
-# Slack module — bot messaging and Socket Mode
-slack_bolt==1.27.0
+# Slack module — bot messaging via REST API
 slack_sdk==3.40.1
