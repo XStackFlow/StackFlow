@@ -69,3 +69,4 @@ logs/
 
 **/node_modules/**
 **/memory/chroma_db/**
+output/**

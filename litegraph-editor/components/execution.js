@@ -197,6 +197,34 @@ export function updateStateWidget(data, graph) {
         breakpointsHtml +
         `</div>`;
 
+    // 1b. Module Review Button — shown when an active node has a `review_ui` property
+    // ReviewGate nodes block while waiting for user input (graph stays running).
+    // The button appears when the node is currently active (blue glow).
+    if (status === 'running' && graph._nodes && activeNodes.length > 0) {
+        const activeSet = new Set(activeNodes.map(n => n.toLowerCase().replace(/[^a-z0-9@_]/g, '')));
+        for (const node of graph._nodes) {
+            if (!node.properties.review_ui) continue;
+            const nodeLogical = getNodeLogicalId(node).toLowerCase().replace(/[^a-z0-9@_]/g, '');
+            if (!activeSet.has(nodeLogical)) continue;
+            // This node has a review_ui and is currently active (waiting for review)
+            const moduleId = (node.type.split('/')[0]) || 'unknown';
+            const reviewUiPath = node.properties.review_ui;
+            const qParams = new URLSearchParams({ thread_id: executionThreadId || '' });
+            for (const [k, v] of Object.entries(node.properties)) {
+                if (['name', 'type', 'review_ui'].includes(k)) continue;
+                if (v !== undefined && v !== null && v !== '') qParams.set(k, v);
+            }
+            const reviewPageUrl = `${API_BASE}/modules/${moduleId}/ui/${reviewUiPath}?${qParams}`;
+            const label = node.properties.stage || node.title || 'Review';
+            html += `<div style="margin-bottom: 6px; padding: 8px; background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 6px; text-align: center;">` +
+                `<a href="${reviewPageUrl}" target="_blank" style="color: #EC4899; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">` +
+                `<span style="font-size: 16px;">&#9998;</span> Open Review (${escapeHTML(label)})` +
+                `</a>` +
+                `</div>`;
+            break;
+        }
+    }
+
     // 2. Global State Section
     if (displayState && Object.keys(displayState).length > 0) {
         // Remove internal flag before displaying

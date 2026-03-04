@@ -2537,7 +2537,7 @@ async def seed_state(request: SeedStateRequest):
             try:
                 if not resolved_ns and not state_snapshot.values:
                      state_snapshot = await graph_runnable.aget_state({"configurable": {"thread_id": thread_id}})
-                
+
                 if state_snapshot.values and isinstance(state_snapshot.values, dict):
                     # Collect ALL keys from the checkpoint (both top-level and __root__)
                     all_keys = set()
@@ -2549,7 +2549,7 @@ async def seed_state(request: SeedStateRequest):
                         for k in root_data:
                             if not (isinstance(k, str) and k.startswith("__")):
                                 all_keys.add(k)
-                    
+
                     logger.info("Current keys in '%s': %s", resolved_ns or 'root', sorted(all_keys))
                     # Never tombstone thread_id or @@namespace keys
                     preserved_keys = {"thread_id"} | {k for k in all_keys if isinstance(k, str) and k.endswith("@@namespace")}
@@ -2587,6 +2587,41 @@ async def seed_state(request: SeedStateRequest):
         error_trace = traceback.format_exc()
         logger.error("Failed to mark completed for thread %s:\n%s", thread_id, error_trace)
         return {"status": "error", "message": str(e), "traceback": error_trace}
+
+
+# ── Module UI Serving ─────────────────────────────────────────────────────────
+# Modules can provide custom UI pages by placing files in a `ui/` directory.
+# Files are served at: /modules/{module_id}/ui/{path}
+# This allows pluggable modules to provide custom UIs (review pages, dashboards, etc.)
+
+@app.get("/modules/{module_id}/ui/{path:path}")
+async def serve_module_ui(module_id: str, path: str):
+    """Serve static UI files from a module's ui/ directory."""
+    from fastapi.responses import FileResponse
+    import mimetypes
+
+    # Default to index.html for directory-like requests
+    if not path or path.endswith("/"):
+        path = path + "index.html"
+
+    # Check installed/ first, then modules/
+    for base_dir in [PROJECT_ROOT / "installed", PROJECT_ROOT / "modules"]:
+        ui_dir = base_dir / module_id / "ui"
+        file_path = ui_dir / path
+        # Security: ensure resolved path is within the ui/ directory
+        try:
+            file_path = file_path.resolve()
+            ui_dir_resolved = ui_dir.resolve()
+            if not str(file_path).startswith(str(ui_dir_resolved)):
+                continue
+        except (OSError, ValueError):
+            continue
+        if file_path.is_file():
+            content_type, _ = mimetypes.guess_type(str(file_path))
+            return FileResponse(file_path, media_type=content_type)
+
+    raise HTTPException(status_code=404, detail=f"UI file not found: {module_id}/ui/{path}")
+
 
 @app.post("/restart")
 async def restart_server():

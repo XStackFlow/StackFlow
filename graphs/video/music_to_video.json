@@ -1,40 +1,175 @@
 {
-  "last_node_id": 3,
-  "last_link_id": 3,
+  "last_node_id": 9,
+  "last_link_id": 13,
   "nodes": [
     {
-      "id": 1,
-      "type": "langgraph/start",
+      "id": 4,
+      "type": "musicvideo/ReviewGate",
       "pos": [
-        140,
-        195
+        940,
+        224
       ],
       "size": [
-        140,
-        30
+        210,
+        123
       ],
       "flags": {},
-      "order": 0,
+      "order": 4,
       "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 3
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            4
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_Story",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "story",
+        "output_dir": "output/musicvideo",
+        "review_ui": "review.html"
+      }
+    },
+    {
+      "id": 5,
+      "type": "musicvideo/StoryboardPlanner",
+      "pos": [
+        1230,
+        142
+      ],
+      "size": [
+        210,
+        292
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 4
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 8
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "Out",
           "type": "state",
           "links": [
-            1
+            5
           ],
           "slot_index": 0
         }
       ],
-      "title": "START",
-      "properties": {}
+      "title": "StoryboardPlanner",
+      "properties": {
+        "name": "StoryboardPlanner",
+        "type": "standard",
+        "model": "google|gemini-3-flash-preview",
+        "temperature": "0.7",
+        "prompt_name": "musicvideo/storyboard_planner",
+        "recursion_limit": "100",
+        "tool_sets": [],
+        "required_keys": [
+          "shots",
+          "keyframes",
+          "generation_batches"
+        ],
+        "repo_path": "./"
+      }
+    },
+    {
+      "id": 6,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        1520,
+        226
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 5
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "accept",
+          "type": "state",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_Storyboard",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "storyboard",
+        "output_dir": "output/musicvideo",
+        "review_ui": "review.html"
+      }
     },
     {
       "id": 2,
       "type": "musicvideo/MusicAnalyzer",
       "pos": [
         360,
-        140
+        180
       ],
       "size": [
         210,
@@ -60,7 +195,7 @@
           "name": "Out",
           "type": "state",
           "links": [
-            3
+            2
           ],
           "slot_index": 0
         }
@@ -73,15 +208,43 @@
       }
     },
     {
-      "id": 3,
-      "type": "musicvideo/StoryWriter",
+      "id": 1,
+      "type": "langgraph/start",
       "pos": [
-        358,
-        352
+        140,
+        271
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            1,
+            13
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 7,
+      "type": "musicvideo/LyricsReader",
+      "pos": [
+        357,
+        393
       ],
       "size": [
         210,
-        272
+        123
       ],
       "flags": {},
       "order": 2,
@@ -90,7 +253,7 @@
         {
           "name": "In",
           "type": "state",
-          "link": 3
+          "link": 13
         },
         {
           "name": "In",
@@ -102,16 +265,72 @@
         {
           "name": "Out",
           "type": "state",
-          "links": null
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "LyricsReader",
+      "properties": {
+        "name": "LyricsReader",
+        "type": "standard",
+        "lyrics_file_path": "C:\\Users\\lxf25\\Downloads\\\u6211\u7684\u5929\u72fc\u661f.txt"
+      }
+    },
+    {
+      "id": 3,
+      "type": "musicvideo/StoryWriter",
+      "pos": [
+        650,
+        140
+      ],
+      "size": [
+        210,
+        312
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 7
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 2
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 10
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            3
+          ],
+          "slot_index": 0
         }
       ],
       "title": "StoryWriter",
       "properties": {
         "name": "StoryWriter",
         "type": "standard",
-        "model": "gemini|gemini-3-flash-preview",
+        "model": "google|gemini-3-flash-preview",
         "temperature": "0.7",
-        "prompt_name": "musicvideo/StoryWriter",
+        "prompt_name": "musicvideo/story_writer",
         "recursion_limit": "100",
         "tool_sets": [],
         "required_keys": [
@@ -134,10 +353,66 @@
       "state"
     ],
     [
-      3,
+      2,
       2,
       0,
       3,
+      1,
+      "state"
+    ],
+    [
+      3,
+      3,
+      0,
+      4,
+      0,
+      "state"
+    ],
+    [
+      4,
+      4,
+      1,
+      5,
+      0,
+      "state"
+    ],
+    [
+      5,
+      5,
+      0,
+      6,
+      0,
+      "state"
+    ],
+    [
+      7,
+      4,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      8,
+      6,
+      0,
+      5,
+      1,
+      "state"
+    ],
+    [
+      10,
+      7,
+      0,
+      3,
+      2,
+      "state"
+    ],
+    [
+      13,
+      1,
+      0,
+      7,
       0,
       "state"
     ]
@@ -151,7 +426,7 @@
   "_module_deps": {
     "musicvideo": {
       "origin": "external",
-      "source_url": "https://github.com/XStackFlow/StackFlow-musicvideo"
+      "source_url": null
     }
   }
 }
