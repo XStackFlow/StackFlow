@@ -1,6 +1,6 @@
 {
-  "last_node_id": 9,
-  "last_link_id": 13,
+  "last_node_id": 13,
+  "last_link_id": 22,
   "nodes": [
     {
       "id": 4,
@@ -56,64 +56,6 @@
       }
     },
     {
-      "id": 5,
-      "type": "musicvideo/StoryboardPlanner",
-      "pos": [
-        1230,
-        142
-      ],
-      "size": [
-        210,
-        292
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 4
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 8
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            5
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "StoryboardPlanner",
-      "properties": {
-        "name": "StoryboardPlanner",
-        "type": "standard",
-        "model": "google|gemini-3-flash-preview",
-        "temperature": "0.7",
-        "prompt_name": "musicvideo/storyboard_planner",
-        "recursion_limit": "100",
-        "tool_sets": [],
-        "required_keys": [
-          "shots",
-          "keyframes",
-          "generation_batches"
-        ],
-        "repo_path": "./"
-      }
-    },
-    {
       "id": 6,
       "type": "musicvideo/ReviewGate",
       "pos": [
@@ -151,7 +93,9 @@
         {
           "name": "accept",
           "type": "state",
-          "links": null,
+          "links": [
+            18
+          ],
           "slot_index": 1
         }
       ],
@@ -328,7 +272,7 @@
       "properties": {
         "name": "StoryWriter",
         "type": "standard",
-        "model": "google|gemini-3-flash-preview",
+        "model": "{{STORY_MODEL}}",
         "temperature": "0.7",
         "prompt_name": "musicvideo/story_writer",
         "recursion_limit": "100",
@@ -341,81 +285,266 @@
         ],
         "repo_path": "./"
       }
+    },
+    {
+      "id": 5,
+      "type": "musicvideo/StoryboardPlanner",
+      "pos": [
+        1230,
+        142
+      ],
+      "size": [
+        210,
+        292
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 4
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 8
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StoryboardPlanner",
+      "properties": {
+        "name": "StoryboardPlanner",
+        "type": "standard",
+        "model": "{{STORYBOARD_MODEL}}",
+        "temperature": "0.7",
+        "prompt_name": "musicvideo/storyboard_planner",
+        "recursion_limit": "100",
+        "tool_sets": [],
+        "required_keys": [
+          "shots",
+          "keyframes",
+          "generation_batches"
+        ],
+        "repo_path": "./"
+      }
+    },
+    {
+      "id": 12,
+      "type": "musicvideo/GridPromptFormatter",
+      "pos": [
+        1810,
+        180
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 18
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 22
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GridPromptFormatter",
+      "properties": {
+        "name": "GridPromptFormatter",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 10,
+      "type": "musicvideo/ImageGenerator",
+      "pos": [
+        2100,
+        180
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 19
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            20
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageGenerator",
+      "properties": {
+        "name": "ImageGenerator",
+        "type": "standard",
+        "model": "gemini-3-pro-image-preview",
+        "output_dir": "output/musicvideo"
+      }
+    },
+    {
+      "id": 13,
+      "type": "musicvideo/GridSlicer",
+      "pos": [
+        2390,
+        180
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 20
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GridSlicer",
+      "properties": {
+        "name": "GridSlicer",
+        "type": "standard",
+        "output_dir": "output/musicvideo"
+      }
+    },
+    {
+      "id": 11,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        2680,
+        224
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 21
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "accept",
+          "type": "state",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_Keyframes",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "keyframes",
+        "output_dir": "output/musicvideo",
+        "review_ui": "review.html"
+      }
     }
   ],
   "links": [
-    [
-      1,
-      1,
-      0,
-      2,
-      0,
-      "state"
-    ],
-    [
-      2,
-      2,
-      0,
-      3,
-      1,
-      "state"
-    ],
-    [
-      3,
-      3,
-      0,
-      4,
-      0,
-      "state"
-    ],
-    [
-      4,
-      4,
-      1,
-      5,
-      0,
-      "state"
-    ],
-    [
-      5,
-      5,
-      0,
-      6,
-      0,
-      "state"
-    ],
-    [
-      7,
-      4,
-      0,
-      3,
-      0,
-      "state"
-    ],
-    [
-      8,
-      6,
-      0,
-      5,
-      1,
-      "state"
-    ],
-    [
-      10,
-      7,
-      0,
-      3,
-      2,
-      "state"
-    ],
-    [
-      13,
-      1,
-      0,
-      7,
-      0,
-      "state"
-    ]
+    [1, 1, 0, 2, 0, "state"],
+    [2, 2, 0, 3, 1, "state"],
+    [3, 3, 0, 4, 0, "state"],
+    [4, 4, 1, 5, 0, "state"],
+    [5, 5, 0, 6, 0, "state"],
+    [7, 4, 0, 3, 0, "state"],
+    [8, 6, 0, 5, 1, "state"],
+    [10, 7, 0, 3, 2, "state"],
+    [13, 1, 0, 7, 0, "state"],
+    [18, 6, 1, 12, 0, "state"],
+    [19, 12, 0, 10, 0, "state"],
+    [20, 10, 0, 13, 0, "state"],
+    [21, 13, 0, 11, 0, "state"],
+    [22, 11, 0, 12, 1, "state"]
   ],
   "groups": [],
   "config": {},

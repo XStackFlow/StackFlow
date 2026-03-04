@@ -141,9 +141,14 @@ _patch_langgraph_resume()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Run initialization tasks on startup."""
-    # Build node registry
+    # Build node registry (evicts stale module caches and re-imports fresh)
     get_node_registry()
-    
+
+    # Register module routes AFTER node registry so endpoint closures capture
+    # the same module instances that nodes use at runtime.
+    from src.utils.setup.module_registry import run_module_route_registrations
+    run_module_route_registrations(app)
+
     # Run startup hooks for all installed modules (e.g. memory sync for llm)
     from src.utils.setup.module_registry import run_module_startup_hooks
     run_module_startup_hooks()
@@ -209,9 +214,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routes from installed modules (e.g. /llm/providers)
-from src.utils.setup.module_registry import run_module_route_registrations
-run_module_route_registrations(app)
+# Module route registration is done inside lifespan (after node registry builds)
+# to ensure module instances are consistent. See lifespan() below.
 
 # In-memory store for active graph executions
 # thread_id -> { "status": "running/interrupted/completed", "current_node": "name", "result": {} }
