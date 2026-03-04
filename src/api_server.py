@@ -1,4 +1,10 @@
 import asyncio
+import sys
+
+# Windows: psycopg async requires SelectorEventLoop, not the default ProactorEventLoop
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 from contextlib import asynccontextmanager
 import importlib
 import logging
@@ -7,7 +13,6 @@ import re
 import shlex
 import shutil
 import subprocess
-import sys
 import tempfile
 import threading
 import time
@@ -1125,6 +1130,9 @@ async def list_available_nodes():
                             # Check for 'template_type' marker
                             elif extra == "template_type":
                                 param_type = "template"
+                            # Check for 'file_type' marker
+                            elif extra == "file_type":
+                                param_type = "file"
                             # Look for a list of strings (enum options)
                             elif isinstance(extra, list):
                                 options = extra
@@ -1198,6 +1206,36 @@ async def list_available_nodes():
     return {"nodes": available}
 
 
+@app.get("/browse_files")
+async def browse_files(path: str = "", extensions: str = ""):
+    """Browse server filesystem for file selection widgets.
+
+    Args:
+        path: Directory to list. Defaults to the project root.
+        extensions: Comma-separated file extensions to filter (e.g. ".mp3,.wav,.flac").
+    """
+    from pathlib import Path as P
+    base = P(path) if path else P.cwd()
+    if not base.exists():
+        raise HTTPException(status_code=404, detail=f"Path not found: {base}")
+    if not base.is_dir():
+        raise HTTPException(status_code=400, detail=f"Not a directory: {base}")
+
+    ext_filter = {e.strip().lower() for e in extensions.split(",") if e.strip()} if extensions else set()
+
+    items = []
+    try:
+        for entry in sorted(base.iterdir(), key=lambda e: (not e.is_dir(), e.name.lower())):
+            if entry.name.startswith("."):
+                continue
+            if entry.is_dir():
+                items.append({"name": entry.name, "path": str(entry), "is_dir": True})
+            elif not ext_filter or entry.suffix.lower() in ext_filter:
+                items.append({"name": entry.name, "path": str(entry), "is_dir": False})
+    except PermissionError:
+        raise HTTPException(status_code=403, detail=f"Permission denied: {base}")
+
+    return {"path": str(base), "parent": str(base.parent) if base.parent != base else None, "items": items}
 
 
 
@@ -1267,8 +1305,18 @@ async def get_module_detail(module_id: str):
     env_vars_raw = setup.get("env_vars", [])
     env_vars = []
     for var in env_vars_raw:
-        is_set = bool(module_env.get(var) or os.environ.get(var))
-        env_vars.append({"name": var, "set": is_set})
+        # Support both plain strings ("VAR_NAME") and dicts ({"key": "VAR_NAME", ...})
+        var_name = var["key"] if isinstance(var, dict) else var
+        is_set = bool(module_env.get(var_name) or os.environ.get(var_name))
+        entry = {"name": var_name, "set": is_set}
+        if isinstance(var, dict):
+            if "label" in var:
+                entry["label"] = var["label"]
+            if var.get("secret"):
+                entry["secret"] = True
+            if "placeholder" in var:
+                entry["placeholder"] = var["placeholder"]
+        env_vars.append(entry)
 
     # Resolve steps with live availability check
     steps_raw = setup.get("steps", [])
@@ -2538,4 +2586,13 @@ async def restart_server():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_config=None)
+
+    if sys.platform == "win32":
+        # psycopg async requires SelectorEventLoop, not the default ProactorEventLoop.
+        # Bypass uvicorn.run() to ensure the correct event loop is used.
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_config=None)
+        server = uvicorn.Server(config)
+        asyncio.run(server.serve())
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=8000, log_config=None)

@@ -23,11 +23,17 @@ def get_langfuse_client():
 def _collect_prompt_dirs() -> list[tuple[Path, str]]:
     """Return (prompts_dir, module_id) pairs for each installed module that ships prompts."""
     dirs = []
-    from src.utils.setup.module_registry import _iter_module_dirs
-    for module_dir, _pkg in _iter_module_dirs():
-        prompts_dir = module_dir / "prompts"
-        if prompts_dir.exists():
-            dirs.append((prompts_dir, module_dir.name))
+    from src.utils.setup.module_registry import get_installed_modules, MODULES_DIR, INSTALLED_DIR
+    installed = set(get_installed_modules())
+    for base_dir in (MODULES_DIR, INSTALLED_DIR):
+        if not base_dir.exists():
+            continue
+        for module_dir in sorted(base_dir.iterdir()):
+            if module_dir.name not in installed:
+                continue
+            prompts_dir = module_dir / "prompts"
+            if prompts_dir.exists():
+                dirs.append((prompts_dir, module_dir.name))
     return dirs
 
 

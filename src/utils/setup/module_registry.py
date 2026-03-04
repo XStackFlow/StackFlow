@@ -1,10 +1,11 @@
 """Module registry for StackFlow package manager.
 
-Discovers modules by scanning for manifest.json files in two directories:
+Discovers available modules by scanning for manifest.json files in two directories:
   - modules/   built-in modules shipped with the repo (tracked by git)
-  - installed/ externally installed modules (gitignored)
+  - installed/ externally installed modules (gitignored, auto-detected)
 
-No external state file is needed — a module is available if its directory exists.
+modules.json tracks which built-in modules are enabled.
+Everything in installed/ with a manifest.json is always active.
 """
 
 import json
@@ -13,6 +14,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 MODULES_DIR = PROJECT_ROOT / "modules"
 INSTALLED_DIR = PROJECT_ROOT / "installed"
+MODULES_JSON = PROJECT_ROOT / "modules.json"
 
 __all__ = ["MODULES_DIR", "INSTALLED_DIR", "get_installed_modules", "get_module_package",
            "get_manifest", "get_all_manifests", "run_module_startup_hooks", "run_module_route_registrations"]
@@ -33,9 +35,34 @@ def _iter_module_dirs():
                 yield d, package
 
 
+def _read_modules_json() -> list[str]:
+    """Read the list of installed module IDs from modules.json."""
+    if not MODULES_JSON.exists():
+        return []
+    with open(MODULES_JSON) as f:
+        data = json.load(f)
+    return data.get("installed", [])
+
+
+def _write_modules_json(installed: list[str]) -> None:
+    """Write the list of installed module IDs to modules.json."""
+    with open(MODULES_JSON, "w") as f:
+        json.dump({"installed": sorted(set(installed))}, f, indent=2)
+        f.write("\n")
+
+
 def get_installed_modules() -> list[str]:
-    """Return sorted list of all module IDs across both scan directories."""
-    return sorted(d.name for d, _ in _iter_module_dirs())
+    """Return sorted list of active module IDs.
+
+    Built-in modules (modules/) are active only if listed in modules.json.
+    External modules (installed/) are always active if they have a manifest.json.
+    """
+    tracked = set(_read_modules_json())
+    result = set()
+    for d, package in _iter_module_dirs():
+        if package == "installed" or d.name in tracked:
+            result.add(d.name)
+    return sorted(result)
 
 
 def get_module_package(module_id: str) -> str:
@@ -47,13 +74,21 @@ def get_module_package(module_id: str) -> str:
 
 
 def install_module(name: str) -> None:
-    """No-op: module is considered installed as long as its directory exists."""
-    pass
+    """Add a built-in module to modules.json. External modules don't need this."""
+    # External modules in installed/ are auto-detected; only track built-ins
+    if (MODULES_DIR / name / "manifest.json").exists():
+        installed = _read_modules_json()
+        if name not in installed:
+            installed.append(name)
+            _write_modules_json(installed)
 
 
 def uninstall_module(name: str) -> None:
-    """No-op: remove the module directory to uninstall."""
-    pass
+    """Remove a built-in module from modules.json. External modules are removed by deleting their directory."""
+    installed = _read_modules_json()
+    if name in installed:
+        installed.remove(name)
+        _write_modules_json(installed)
 
 
 def get_manifest(name: str) -> dict:

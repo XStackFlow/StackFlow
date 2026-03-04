@@ -15,6 +15,7 @@ class Resolvable(Generic[T]):
 
 JSONString = Annotated[str, "json_type"]
 TemplateString = Annotated[str, "template_type"]
+FileInput = Annotated[str, "file_type"]
 
 def resolve_attributes(obj: Any, state: Dict[str, Any]):
     """Resolves template strings in all instance attributes of an object using the state.

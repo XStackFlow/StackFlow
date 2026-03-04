@@ -218,7 +218,10 @@ def cmd_install(name: str):
     req_file = PROJECT_ROOT / "modules" / name / "requirements.txt"
     if req_file.exists():
         print(f"\n  Installing Python dependencies…")
-        venv_pip = PROJECT_ROOT / "venv" / "bin" / "pip"
+        if sys.platform == "win32":
+            venv_pip = PROJECT_ROOT / "venv" / "Scripts" / "pip.exe"
+        else:
+            venv_pip = PROJECT_ROOT / "venv" / "bin" / "pip"
         result = subprocess.run(
             [str(venv_pip), "install", "--quiet", "-r", str(req_file)],
             cwd=str(PROJECT_ROOT),

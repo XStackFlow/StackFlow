@@ -14,14 +14,24 @@
 
 ## Get started
 
+### macOS
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/your-org/StackFlow/main/install.sh | bash
 stackflow start
 ```
 
+### Windows
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned   # one-time
+.\install.ps1
+stackflow start
+```
+
 Open **http://localhost:5173** and start building.
 
-The install script handles everything: Python, Node.js, Docker via Colima, PostgreSQL, Langfuse — no manual setup required.
+The install script handles everything: Python, Node.js, Docker, PostgreSQL, Langfuse — no manual setup required.
 
 ---
 
@@ -85,4 +95,5 @@ stackflow pm <command>       # package manager
 
 ## Requirements
 
-macOS with [Homebrew](https://brew.sh). Everything else — Python 3.11+, Node.js, Docker, Colima — is installed by `./install.sh`.
+- **macOS** — [Homebrew](https://brew.sh). Everything else (Python 3.11+, Node.js, Docker via Colima) is installed by `./install.sh`.
+- **Windows** — Windows 10/11 with [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/). Everything else (Python 3.11+, Node.js, Docker Desktop) is installed by `.\install.ps1`.

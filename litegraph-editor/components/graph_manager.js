@@ -7,6 +7,7 @@ import { LiteGraph } from 'litegraph.js';
 import { addLog } from './logging.js';
 import { setHistoryBlock, clearHistory } from './history.js';
 import { openJSONEditor } from './json_editor.js';
+import { openFileBrowser } from './file_browser.js';
 import { getSessionId } from './session.js';
 import { setAvailableGraphs, revalidateSubgraphNodes } from './nodes.js';
 import { reloadLogs, updateActiveSessions } from './execution.js';
@@ -538,6 +539,22 @@ export async function fetchNodes(canvas, isDirty, retries = 10) {
                                 openJSONEditor(this, w, pName, canvas, isDirty, null, "template");
                             });
                             return;
+                        } else if (pInfo.type === "file") {
+                            const w = this.addWidget("text", pName, this.properties[pName], (v) => {
+                                this.properties[pName] = v;
+                                isDirty.value = true;
+                            }, options);
+
+                            const self = this;
+                            this.addWidget("button", "Browse", "Select a file", () => {
+                                openFileBrowser(self.properties[pName] || "", (selectedPath) => {
+                                    self.properties[pName] = selectedPath;
+                                    w.value = selectedPath;
+                                    isDirty.value = true;
+                                    if (self.setDirtyCanvas) self.setDirtyCanvas(true, true);
+                                });
+                            });
+                            return;
                         }
 
                         // Add widget - property binding handles sync
@@ -965,11 +982,11 @@ export function updateBreadcrumbs(graph, canvas, isDirty) {
     }
 
     let rootFullName = "";
-    if (threadId) {
+    if (currentGraph) {
+        rootFullName = currentGraph;
+    } else if (threadId) {
         const rootName = threadId.split('_').slice(0, -1).join('_') || threadId;
         rootFullName = rootName.endsWith('.json') ? rootName : `${rootName}.json`;
-    } else if (currentGraph) {
-        rootFullName = currentGraph;
     }
 
     const createCrumb = (text, isLast, onClick) => {

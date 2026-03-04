@@ -1,0 +1,102 @@
+{
+  "last_node_id": 2,
+  "last_link_id": 1,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "langgraph/start",
+      "pos": [
+        583,
+        307
+      ],
+      "size": [
+        100,
+        40
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
+    },
+    {
+      "id": 2,
+      "type": "musicvideo/MusicAnalyzer",
+      "pos": [
+        763,
+        266
+      ],
+      "size": [
+        260.3399967442617,
+        122.89022319054402
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 1
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": null
+        }
+      ],
+      "title": "MusicAnalyzer",
+      "properties": {
+        "name": "MusicAnalyzer",
+        "type": "standard",
+        "music_file_path": ""
+      }
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "state"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "initial_state": "{\n  \"input\": \"\"\n}"
+  },
+  "version": 0.4,
+  "_viewport": {
+    "offset": [
+      1,
+      0
+    ],
+    "scale": 1
+  },
+  "_module_deps": {
+    "musicvideo": {
+      "origin": "external",
+      "source_url": "https://github.com/XStackFlow/StackFlow-musicvideo"
+    }
+  }
+}

@@ -3,6 +3,15 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ── Windows detection ──────────────────────────────────────────────────
+case "$(uname -s 2>/dev/null || echo Unknown)" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/stackflow.ps1" "$@"
+        exit $?
+        ;;
+esac
+
 cd "$SCRIPT_DIR"
 
 # ── Resolve compose command ───────────────────────────────

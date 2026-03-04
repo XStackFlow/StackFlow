@@ -8,6 +8,16 @@
 #   bash -c "$(curl -sSL <raw-url>)"          (from anywhere — clones the repo)
 set -euo pipefail
 
+# ── Windows detection ──────────────────────────────────────────────────
+case "$(uname -s 2>/dev/null || echo Unknown)" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        printf "\n  Detected Windows — launching PowerShell installer…\n\n"
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/install.ps1"
+        exit $?
+        ;;
+esac
+
 # ── Resolve docker compose command ───────────────────────────────────
 resolve_dc() {
     if docker compose version &>/dev/null; then
