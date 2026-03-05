@@ -235,7 +235,11 @@ export function openJSONEditor(node, widget, pName, canvas, isDirty, onSave = nu
             if (v === null)             return `<span class="jt-null">null</span>`;
             if (typeof v === 'boolean') return `<span class="jt-bool">${v}</span>`;
             if (typeof v === 'number')  return `<span class="jt-num">${v}</span>`;
-            return `<span class="jt-str">"${esc(v)}"</span>`;
+            const escaped = esc(v);
+            if (typeof v === 'string' && v.includes('\n')) {
+                return `<span class="jt-str" style="white-space:pre-wrap">"${escaped}"</span>`;
+            }
+            return `<span class="jt-str">"${escaped}"</span>`;
         }
 
         function buildTree(value) {

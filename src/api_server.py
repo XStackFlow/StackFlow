@@ -238,9 +238,31 @@ class SeedStateRequest(BaseModel):
     values: Dict[str, Any]
     as_node: str
 
+def _resolve_graph_file(graph_id: str) -> Path:
+    """Resolve a graph_id to an absolute file path, supporting module@@ prefixes."""
+    if graph_id.startswith("module@@"):
+        file_path = resolve_module_graph_path(graph_id)
+        if file_path is None:
+            raise HTTPException(status_code=404, detail="Module graph not found")
+        if not file_path.exists() and not graph_id.endswith(".json"):
+            file_path = resolve_module_graph_path(f"{graph_id}.json")
+            if file_path is None:
+                raise HTTPException(status_code=404, detail="Module graph not found")
+        return file_path
+
+    file_path = (GRAPH_SAVE_PATH / graph_id).resolve()
+    if not str(file_path).startswith(str(GRAPH_SAVE_PATH.resolve())):
+        raise HTTPException(status_code=400, detail="Invalid graph path")
+    if not file_path.exists() and not graph_id.endswith(".json"):
+        file_path = (GRAPH_SAVE_PATH / f"{graph_id}.json").resolve()
+    return file_path
+
+
 @app.post("/save_graph/{graph_id:path}")
 async def save_graph(graph_id: str, graph_data: Dict[str, Any]):
     """Save the LiteGraph JSON structure to disk. Supports subdirectory paths."""
+    if graph_id.startswith("module@@"):
+        raise HTTPException(status_code=403, detail="Cannot save to module graphs — they are read-only. Use 'Save As' to save a local copy instead.")
     file_path = (GRAPH_SAVE_PATH / graph_id).resolve()
     if not str(file_path).startswith(str(GRAPH_SAVE_PATH.resolve())):
         raise HTTPException(status_code=400, detail="Invalid graph path")
@@ -253,12 +275,8 @@ async def save_graph(graph_id: str, graph_data: Dict[str, Any]):
 
 @app.get("/get_graph/{graph_id:path}")
 async def get_graph(graph_id: str):
-    """Load a previously saved graph structure. Supports subdirectory paths."""
-    file_path = (GRAPH_SAVE_PATH / graph_id).resolve()
-    if not str(file_path).startswith(str(GRAPH_SAVE_PATH.resolve())):
-        raise HTTPException(status_code=400, detail="Invalid graph path")
-    if not file_path.exists() and not graph_id.endswith(".json"):
-        file_path = (GRAPH_SAVE_PATH / f"{graph_id}.json").resolve()
+    """Load a previously saved graph structure. Supports subdirectory paths and module@@ prefix."""
+    file_path = _resolve_graph_file(graph_id)
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Graph not found")
     with open(file_path, "r") as f:
@@ -267,6 +285,8 @@ async def get_graph(graph_id: str):
 @app.delete("/delete_graph/{graph_id:path}")
 async def delete_graph(graph_id: str):
     """Delete a graph file. Removes the parent folder if it becomes empty."""
+    if graph_id.startswith("module@@"):
+        raise HTTPException(status_code=403, detail="Cannot delete module graphs — they are read-only.")
     file_path = (GRAPH_SAVE_PATH / graph_id).resolve()
     if not str(file_path).startswith(str(GRAPH_SAVE_PATH.resolve())):
         raise HTTPException(status_code=400, detail="Invalid graph path")
@@ -518,7 +538,16 @@ async def execute_graph(request: ExecutionRequest):
     
     # 2. Load from disk (Source of Truth)
     # We always load from disk to ensure consistency.
-    file_path = GRAPH_SAVE_PATH / f"{effective_root_id}.json"
+    # Support module@@ prefix for graphs shipped by installed modules.
+    if effective_root_id.startswith("module@@"):
+        file_path = resolve_module_graph_path(effective_root_id)
+        if file_path is None or not file_path.exists():
+            # Try with .json suffix
+            file_path = resolve_module_graph_path(f"{effective_root_id}.json")
+        if file_path is None or not file_path.exists():
+            return {"status": "error", "message": f"Module graph '{effective_root_id}' not found."}
+    else:
+        file_path = GRAPH_SAVE_PATH / f"{effective_root_id}.json"
     if not file_path.exists():
          return {"status": "error", "message": f"Graph definition '{effective_root_id}' not found on disk."}
     
@@ -625,10 +654,13 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
         parts = thread_id.rsplit("_", 1)
         root_graph_id = parts[0] if len(parts) > 1 else thread_id
         
-        file_path = GRAPH_SAVE_PATH / f"{root_graph_id}.json"
-        if not file_path.exists():
+        if root_graph_id.startswith("module@@"):
+            file_path = resolve_module_graph_path(root_graph_id) or resolve_module_graph_path(f"{root_graph_id}.json")
+        else:
+            file_path = GRAPH_SAVE_PATH / f"{root_graph_id}.json"
+        if not file_path or not file_path.exists():
             return {"status": "not_found", "message": f"Graph definition for {root_graph_id} not found."}
-        
+
         with open(file_path, "r", encoding="utf-8") as f:
             graph_json = json.load(f)
         
@@ -2055,8 +2087,14 @@ async def update_variables(body: dict):
     return {"status": "ok", "count": len(variables)}
 
 
-def _build_graph_tree(base: Path, current: Path) -> list:
-    """Recursively build a folder/graph tree under `current`."""
+def _build_graph_tree(base: Path, current: Path, path_prefix: str = "") -> list:
+    """Recursively build a folder/graph tree under `current`.
+
+    Args:
+        base: Root directory for computing relative paths.
+        current: Directory currently being scanned.
+        path_prefix: Optional prefix prepended to all paths (e.g. "module@@stackadapt/").
+    """
     entries = []
     try:
         items = sorted(current.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
@@ -2065,9 +2103,9 @@ def _build_graph_tree(base: Path, current: Path) -> list:
     for item in items:
         if item.name.startswith("."):
             continue
-        rel = item.relative_to(base).as_posix()
+        rel = path_prefix + item.relative_to(base).as_posix()
         if item.is_dir():
-            children = _build_graph_tree(base, item)
+            children = _build_graph_tree(base, item, path_prefix)
             if children:  # omit empty folders
                 entries.append({"type": "folder", "name": item.name, "path": rel, "children": children})
         elif item.is_file() and item.suffix == ".json":
@@ -2078,9 +2116,21 @@ def _build_graph_tree(base: Path, current: Path) -> list:
 @app.get("/list_graphs")
 async def list_graphs():
     """List JSON graph files as a folder tree plus a flat list for the visual editor."""
-    if not GRAPH_SAVE_PATH.exists():
-        return {"tree": [], "graphs": []}
-    tree = _build_graph_tree(GRAPH_SAVE_PATH, GRAPH_SAVE_PATH)
+    tree = []
+    if GRAPH_SAVE_PATH.exists():
+        tree = _build_graph_tree(GRAPH_SAVE_PATH, GRAPH_SAVE_PATH)
+
+    # Include graphs from installed modules (read-only, under module@@<id>/ namespace)
+    for module_id, graphs_dir in get_module_graph_dirs():
+        prefix = f"module@@{module_id}/"
+        children = _build_graph_tree(graphs_dir, graphs_dir, path_prefix=prefix)
+        if children:
+            tree.append({
+                "type": "folder",
+                "name": f"module@@{module_id}",
+                "path": f"module@@{module_id}",
+                "children": children,
+            })
 
     def flatten(nodes: list) -> list:
         result = []
@@ -2173,10 +2223,13 @@ async def step_back(thread_id: str):
             parts = thread_id.split("_")
             graph_id = "_".join(parts[:-1]) if len(parts) > 1 else thread_id
             
-            file_path = GRAPH_SAVE_PATH / f"{graph_id}.json"
-            if not file_path.exists():
+            if graph_id.startswith("module@@"):
+                file_path = resolve_module_graph_path(graph_id) or resolve_module_graph_path(f"{graph_id}.json")
+            else:
+                file_path = GRAPH_SAVE_PATH / f"{graph_id}.json"
+            if not file_path or not file_path.exists():
                 return {"status": "error", "message": f"Graph definition for {graph_id} not found"}
-            
+
             with open(file_path, "r") as f:
                 graph_json = json.load(f)
 
@@ -2495,8 +2548,11 @@ async def seed_state(request: SeedStateRequest):
     
     try:
         # Load ROOT graph from disk (Source of Truth)
-        file_path = GRAPH_SAVE_PATH / f"{root_graph_id}.json"
-        if not file_path.exists():
+        if root_graph_id.startswith("module@@"):
+            file_path = resolve_module_graph_path(root_graph_id) or resolve_module_graph_path(f"{root_graph_id}.json")
+        else:
+            file_path = GRAPH_SAVE_PATH / f"{root_graph_id}.json"
+        if not file_path or not file_path.exists():
             return {"status": "error", "message": f"Graph definition '{root_graph_id}' not found on disk."}
 
         with open(file_path, "r", encoding="utf-8") as f:

@@ -147,17 +147,22 @@ export function initGraphExplorer(_graph, _canvas, _isDirty, { switchGraphFn, fe
                 nameEl.className = "ge-graph-name";
                 nameEl.textContent = node.name.replace(/\.json$/, "");
 
-                const trashBtn = document.createElement("button");
-                trashBtn.className = "ge-trash";
-                trashBtn.textContent = "🗑";
-                trashBtn.title = "Delete graph";
-                trashBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    confirmDelete(node);
-                });
+                const isModule = node.path.startsWith("module@@");
 
-                graphEl.appendChild(nameEl);
-                graphEl.appendChild(trashBtn);
+                if (!isModule) {
+                    const trashBtn = document.createElement("button");
+                    trashBtn.className = "ge-trash";
+                    trashBtn.textContent = "🗑";
+                    trashBtn.title = "Delete graph";
+                    trashBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        confirmDelete(node);
+                    });
+                    graphEl.appendChild(nameEl);
+                    graphEl.appendChild(trashBtn);
+                } else {
+                    graphEl.appendChild(nameEl);
+                }
                 container.appendChild(graphEl);
 
                 graphEl.addEventListener("click", () => {
@@ -165,10 +170,12 @@ export function initGraphExplorer(_graph, _canvas, _isDirty, { switchGraphFn, fe
                     close();
                 });
 
-                graphEl.addEventListener("contextmenu", (e) => {
-                    e.preventDefault();
-                    showContextMenu(e, node);
-                });
+                if (!isModule) {
+                    graphEl.addEventListener("contextmenu", (e) => {
+                        e.preventDefault();
+                        showContextMenu(e, node);
+                    });
+                }
             }
         });
         return rendered;

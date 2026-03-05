@@ -115,7 +115,8 @@ export async function saveGraphToServer(graph, isDirty, fetchGraphListFn, update
         }
 
         function updateMoveRow() {
-            if (!currentSavedPath) { moveRow.style.display = "none"; return; }
+            // Hide move option if there's no current path or if the source is a read-only module graph
+            if (!currentSavedPath || currentSavedPath.startsWith("module@@")) { moveRow.style.display = "none"; return; }
             const differs = getComposedPath() !== currentSavedPath;
             moveRow.style.display = differs ? "flex" : "none";
         }
@@ -205,7 +206,9 @@ export async function saveGraphToServer(graph, isDirty, fetchGraphListFn, update
                 });
 
                 if (!response.ok) {
-                    addLog("System: Failed to save graph.", "error");
+                    const errData = await response.json().catch(() => ({}));
+                    const detail = errData.detail || `HTTP ${response.status}`;
+                    addLog(`System: Failed to save graph — ${detail}`, "error");
                     resolve(false);
                     return;
                 }

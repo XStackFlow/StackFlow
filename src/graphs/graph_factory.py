@@ -12,6 +12,7 @@ import copy
 import inspect
 import asyncio
 from src.utils.setup.const import GRAPH_SAVE_PATH
+from src.utils.setup.module_registry import resolve_module_graph_path
 
 logger = get_logger(__name__)
 
@@ -109,9 +110,14 @@ def flatten_graph_json(graph_json: Dict[str, Any]) -> Dict[str, Any]:
         props = n.get("properties", {})
         if n.get("type") == "langgraph/subgraph" and props.get("inline") is True:
             sub_name = props.get("subgraph")
-            sub_file = GRAPH_SAVE_PATH / sub_name
-            if not sub_file.exists() and not sub_name.endswith(".json"):
-                sub_file = GRAPH_SAVE_PATH / f"{sub_name}.json"
+            if sub_name.startswith("module@@"):
+                sub_file = resolve_module_graph_path(sub_name) or resolve_module_graph_path(f"{sub_name}.json")
+                if sub_file is None:
+                    sub_file = Path("/dev/null")  # will trigger "not found" below
+            else:
+                sub_file = GRAPH_SAVE_PATH / sub_name
+                if not sub_file.exists() and not sub_name.endswith(".json"):
+                    sub_file = GRAPH_SAVE_PATH / f"{sub_name}.json"
             
             if not sub_file.exists():
                 logger.warning("Inlined subgraph file not found: %s", sub_name)
@@ -532,9 +538,14 @@ def _internal_build_langgraph(graph_json: Dict[str, Any], node_registry: Dict[st
                 node_fn = passthrough_node
             else:
                 try:
-                    subgraph_file = GRAPH_SAVE_PATH / subgraph_name
-                    if not subgraph_file.exists() and not subgraph_name.endswith(".json"):
-                        subgraph_file = GRAPH_SAVE_PATH / f"{subgraph_name}.json"
+                    if subgraph_name.startswith("module@@"):
+                        subgraph_file = resolve_module_graph_path(subgraph_name) or resolve_module_graph_path(f"{subgraph_name}.json")
+                        if subgraph_file is None:
+                            subgraph_file = Path("/dev/null")  # will trigger "not found" below
+                    else:
+                        subgraph_file = GRAPH_SAVE_PATH / subgraph_name
+                        if not subgraph_file.exists() and not subgraph_name.endswith(".json"):
+                            subgraph_file = GRAPH_SAVE_PATH / f"{subgraph_name}.json"
                     
                     if not subgraph_file.exists():
                         logger.warning("Subgraph file not found: %s", subgraph_file)
