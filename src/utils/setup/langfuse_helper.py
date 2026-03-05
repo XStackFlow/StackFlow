@@ -20,6 +20,31 @@ def get_langfuse_client():
     return _client
 
 
+def compile_prompt(prompt_name: str, state: dict) -> str:
+    """Fetch a Langfuse prompt by name and compile it with state variables.
+
+    State is passed directly to prompt.compile(), so template variables
+    like {{my_key}} are resolved from state["my_key"].
+    """
+    client = get_langfuse_client()
+    prompt_obj = client.get_prompt(prompt_name)
+
+    # Serialize list values into strings for prompt injection.
+    # Lists of {"role", "content"} dicts become "Role: content" lines;
+    # other lists become newline-joined string representations.
+    compiled_state = {}
+    for k, v in state.items():
+        if isinstance(v, list):
+            if v and all(isinstance(m, dict) and "role" in m and "content" in m for m in v):
+                compiled_state[k] = "\n".join(f"{m['role']}: {m['content']}" for m in v)
+            else:
+                compiled_state[k] = "\n".join(str(item) for item in v)
+        else:
+            compiled_state[k] = v
+
+    return prompt_obj.compile(**compiled_state)
+
+
 def _collect_prompt_dirs() -> list[tuple[Path, str]]:
     """Return (prompts_dir, module_id) pairs for each installed module that ships prompts."""
     dirs = []

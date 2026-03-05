@@ -1,5 +1,6 @@
 """FormatTemplate — renders a Jinja2 template against the current execution state."""
 
+import math
 from typing import Any, Dict
 
 from jinja2 import Environment
@@ -41,6 +42,11 @@ class FormatTemplate(BaseNode):
 
     def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         env = Environment(trim_blocks=True, lstrip_blocks=True)
+        env.globals["ceil"] = math.ceil
+        env.globals["sqrt"] = math.sqrt
+        env.globals["int"] = int
+        env.globals["min"] = min
+        env.globals["max"] = max
         tpl = env.from_string(self._template)
         result = tpl.render(**state)
 

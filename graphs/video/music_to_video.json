@@ -1,20 +1,544 @@
 {
-  "last_node_id": 13,
-  "last_link_id": 22,
+  "last_node_id": 73,
+  "last_link_id": 123,
   "nodes": [
     {
-      "id": 4,
-      "type": "musicvideo/ReviewGate",
+      "id": 24,
+      "type": "musicvideo/StoryboardValidator",
       "pos": [
-        940,
-        224
+        760,
+        2705.525
       ],
       "size": [
         210,
         123
       ],
       "flags": {},
-      "order": 4,
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 35
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            36
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StoryboardValidator",
+      "properties": {
+        "name": "StoryboardValidator",
+        "type": "standard",
+        "shots": "{{shots}}",
+        "keyframes": "{{keyframes}}"
+      }
+    },
+    {
+      "id": 18,
+      "type": "langgraph/port_out",
+      "pos": [
+        180,
+        2738.025
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            28
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [PlanStory]",
+      "properties": {
+        "tag": "PlanStory"
+      }
+    },
+    {
+      "id": 49,
+      "type": "langgraph/port_out",
+      "pos": [
+        1348.3999938964844,
+        1957.525
+      ],
+      "size": [
+        218.39999389648438,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            84
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [CharFeedback]",
+      "properties": {
+        "tag": "CharFeedback"
+      }
+    },
+    {
+      "id": 51,
+      "type": "common/WithState",
+      "pos": [
+        1953.5999908447266,
+        1707.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 89
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            90
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"regenerate_character\":\"@delete\",\"step_user_feedback\":\"@delete\",\"cur_feedback\":\"@delete\"}"
+      }
+    },
+    {
+      "id": 46,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1953.5999908447266,
+        1874.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 82
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            95
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"regenerate_character\":\"{{character_bible[cur_feedback.index]}}\"}"
+      }
+    },
+    {
+      "id": 57,
+      "type": "common/StubNode",
+      "pos": [
+        768.3999938964844,
+        2278.525
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 98
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            97,
+            99
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StubNode",
+      "properties": {
+        "name": "StubNode",
+        "type": "standard"
+      }
+    },
+    {
+      "id": 55,
+      "type": "common/WithStateMapper",
+      "pos": [
+        2285.5999908447266,
+        1874.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 95
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            96
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"regenerate_character\":{\"user_feedback\":\"{{cur_feedback.feedback}}\",\"replace_index\":\"{{cur_feedback.index}}\"}}"
+      }
+    },
+    {
+      "id": 40,
+      "type": "common/Collector",
+      "pos": [
+        1646.7999877929688,
+        2017.025
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 67
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            68
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Collector",
+      "properties": {
+        "name": "Collector",
+        "type": "standard",
+        "input_key": "generated_image",
+        "output_list_key": "character_images",
+        "replacement_index": "{{current_character.replace_index}}",
+        "replace": false
+      }
+    },
+    {
+      "id": 53,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1348.3999938964844,
+        1790.525
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 92
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            93
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"step_user_feedback\":\"{{user_feedback}}\"}"
+      }
+    },
+    {
+      "id": 39,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1058.3999938964844,
+        2340.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 99
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            65
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"character_description\":\"{{current_character.description}}\",\"character_name\":\"{{current_character.name}}\"}"
+      }
+    },
+    {
+      "id": 56,
+      "type": "common/FormatTemplate",
+      "pos": [
+        1058.3999938964844,
+        2149.025
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 97
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            100
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "FormatTemplate",
+      "properties": {
+        "name": "FormatTemplate",
+        "type": "standard",
+        "template": "{% if current_character.user_feedback %}\nADDITIONAL_REQUIREMENT:\n{{ current_character.user_feedback }}\n{% endif %}",
+        "output_key": "formatted_user_feedback"
+      }
+    },
+    {
+      "id": 42,
+      "type": "common/WithState",
+      "pos": [
+        768.3999938964844,
+        1634.7625
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 71
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            72
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"character_description\":\"@delete\",\"character_name\":\"@delete\",\"step_character_bible\":\"@delete\",\"current_character\":\"@delete\",\"formatted_user_feedback\":\"@delete\",\"generated_image\":\"@delete\",\"user_feedback\":\"@delete\"}"
+      }
+    },
+    {
+      "id": 15,
+      "type": "langgraph/port_in",
+      "pos": [
+        1050,
+        388.5
+      ],
+      "size": [
+        235.1999969482422,
+        78
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 27
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [WriteStory]",
+      "properties": {
+        "tag": "WriteStory"
+      }
+    },
+    {
+      "id": 4,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        760,
+        288.5
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -30,18 +554,18 @@
       ],
       "outputs": [
         {
-          "name": "regenerate",
+          "name": "accept",
           "type": "state",
           "links": [
-            7
+            57
           ],
           "slot_index": 0
         },
         {
-          "name": "accept",
+          "name": "regenerate",
           "type": "state",
           "links": [
-            4
+            27
           ],
           "slot_index": 1
         }
@@ -51,29 +575,99 @@
         "name": "ReviewGate",
         "type": "router",
         "stage": "story",
-        "output_dir": "output/musicvideo",
+        "output_dir": "musicvideo",
         "review_ui": "review.html"
       }
     },
     {
-      "id": 6,
-      "type": "musicvideo/ReviewGate",
+      "id": 16,
+      "type": "langgraph/port_out",
       "pos": [
-        1520,
-        226
+        180,
+        321
       ],
       "size": [
         210,
-        123
+        58
       ],
       "flags": {},
-      "order": 6,
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            26
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [WriteStory]",
+      "properties": {
+        "tag": "WriteStory"
+      }
+    },
+    {
+      "id": 59,
+      "type": "langgraph/port_in",
+      "pos": [
+        690,
+        727
+      ],
+      "size": [
+        235.1999969482422,
+        118
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 102
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": 103
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": 104
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [WriteStory]",
+      "properties": {
+        "tag": "WriteStory"
+      }
+    },
+    {
+      "id": 30,
+      "type": "musicvideo/CreativeInput",
+      "pos": [
+        400,
+        675
+      ],
+      "size": [
+        210,
+        222
+      ],
+      "flags": {},
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 5
+          "link": 43
         },
         {
           "name": "In",
@@ -83,44 +677,66 @@
       ],
       "outputs": [
         {
-          "name": "regenerate",
+          "name": "Out",
           "type": "state",
           "links": [
-            8
+            102
           ],
           "slot_index": 0
-        },
-        {
-          "name": "accept",
-          "type": "state",
-          "links": [
-            18
-          ],
-          "slot_index": 1
         }
       ],
-      "title": "ReviewGate_Storyboard",
+      "title": "CreativeInput",
       "properties": {
-        "name": "ReviewGate",
-        "type": "router",
-        "stage": "storyboard",
-        "output_dir": "output/musicvideo",
-        "review_ui": "review.html"
+        "name": "CreativeInput",
+        "type": "standard",
+        "user_prompt": "",
+        "reference_image_1": "",
+        "reference_image_2": "",
+        "reference_image_3": ""
       }
+    },
+    {
+      "id": 1,
+      "type": "langgraph/start",
+      "pos": [
+        180,
+        1000.5
+      ],
+      "size": [
+        140,
+        30
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            1,
+            13,
+            43
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "START",
+      "properties": {}
     },
     {
       "id": 2,
       "type": "musicvideo/MusicAnalyzer",
       "pos": [
-        360,
-        180
+        400,
+        962
       ],
       "size": [
         210,
         140
       ],
       "flags": {},
-      "order": 1,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -139,7 +755,7 @@
           "name": "Out",
           "type": "state",
           "links": [
-            2
+            103
           ],
           "slot_index": 0
         }
@@ -152,46 +768,18 @@
       }
     },
     {
-      "id": 1,
-      "type": "langgraph/start",
-      "pos": [
-        140,
-        271
-      ],
-      "size": [
-        140,
-        30
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            1,
-            13
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "START",
-      "properties": {}
-    },
-    {
       "id": 7,
       "type": "musicvideo/LyricsReader",
       "pos": [
-        357,
-        393
+        400,
+        1167
       ],
       "size": [
         210,
         123
       ],
       "flags": {},
-      "order": 2,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -210,7 +798,7 @@
           "name": "Out",
           "type": "state",
           "links": [
-            10
+            104
           ],
           "slot_index": 0
         }
@@ -223,34 +811,469 @@
       }
     },
     {
-      "id": 3,
-      "type": "musicvideo/StoryWriter",
+      "id": 58,
+      "type": "langgraph/port_in",
       "pos": [
-        650,
-        140
+        1365.1999969482422,
+        233.5
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 101
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateChar]",
+      "properties": {
+        "tag": "GenerateChar"
+      }
+    },
+    {
+      "id": 48,
+      "type": "langgraph/port_in",
+      "pos": [
+        2907.5999908447266,
+        1886.025
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 83
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [CharFeedback]",
+      "properties": {
+        "tag": "CharFeedback"
+      }
+    },
+    {
+      "id": 45,
+      "type": "common/Stepper",
+      "pos": [
+        1646.7999877929688,
+        1770.025
       ],
       "size": [
         210,
-        312
+        143
       ],
       "flags": {},
-      "order": 3,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 7
+          "link": 93
         },
         {
           "name": "In",
           "type": "state",
-          "link": 2
+          "link": 84
         },
         {
           "name": "In",
           "type": "state",
-          "link": 10
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            89
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            82
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "step_user_feedback",
+        "output_key": "cur_feedback",
+        "input_list": "{{step_character_bible}}"
+      }
+    },
+    {
+      "id": 38,
+      "type": "common/Stepper",
+      "pos": [
+        478.3999938964844,
+        1932.1437500000002
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 60
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            71
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            98
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "step_character_bible",
+        "output_key": "current_character",
+        "input_list": "{{step_character_bible}}"
+      }
+    },
+    {
+      "id": 35,
+      "type": "langgraph/port_out",
+      "pos": [
+        180,
+        1964.6437500000002
+      ],
+      "size": [
+        218.39999389648438,
+        58
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            60
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [GenerateChar]",
+      "properties": {
+        "tag": "GenerateChar"
+      }
+    },
+    {
+      "id": 28,
+      "type": "langgraph/port_in",
+      "pos": [
+        2285.5999908447266,
+        1719.025
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 90
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateChar]",
+      "properties": {
+        "tag": "GenerateChar"
+      }
+    },
+    {
+      "id": 34,
+      "type": "langgraph/port_in",
+      "pos": [
+        1953.5999908447266,
+        2041.025
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 68
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateChar]",
+      "properties": {
+        "tag": "GenerateChar"
+      }
+    },
+    {
+      "id": 17,
+      "type": "langgraph/port_in",
+      "pos": [
+        1340,
+        2805.525
+      ],
+      "size": [
+        226.8000030517578,
+        78
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 29,
+          "slot_index": 0
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [PlanStory]",
+      "properties": {
+        "tag": "PlanStory"
+      }
+    },
+    {
+      "id": 6,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        1050,
+        2705.525
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 36
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            108
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            29
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ReviewGate_Storyboard",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "storyboard",
+        "output_dir": "musicvideo",
+        "review_ui": "review.html"
+      }
+    },
+    {
+      "id": 36,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1050,
+        221.5
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 57
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            101
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"step_character_bible\":\"{{character_bible}}\"}"
+      }
+    },
+    {
+      "id": 26,
+      "type": "musicvideo/ImageGenerator",
+      "pos": [
+        1348.3999938964844,
+        2080.525
+      ],
+      "size": [
+        210,
+        263
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 100
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 65
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            67
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageGenerator_Char",
+      "properties": {
+        "name": "ImageGenerator",
+        "type": "standard",
+        "model": "google|gemini-3.1-flash-image-preview",
+        "prompt": "musicvideo/CharacterReference",
+        "reference_images": "{{reference_images}}",
+        "image_size": "2K",
+        "aspect_ratio": "16:9",
+        "output_dir": "musicvideo/characters"
+      }
+    },
+    {
+      "id": 3,
+      "type": "musicvideo/StoryWriter",
+      "pos": [
+        470,
+        214
+      ],
+      "size": [
+        210,
+        272
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 26
         },
         {
           "name": "In",
@@ -274,7 +1297,7 @@
         "type": "standard",
         "model": "{{STORY_MODEL}}",
         "temperature": "0.7",
-        "prompt_name": "musicvideo/story_writer",
+        "prompt_name": "musicvideo/StoryWriter",
         "recursion_limit": "100",
         "tool_sets": [],
         "required_keys": [
@@ -290,26 +1313,21 @@
       "id": 5,
       "type": "musicvideo/StoryboardPlanner",
       "pos": [
-        1230,
-        142
+        470,
+        2631.025
       ],
       "size": [
         210,
-        292
+        272
       ],
       "flags": {},
-      "order": 5,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 4
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 8
+          "link": 28
         },
         {
           "name": "In",
@@ -322,7 +1340,7 @@
           "name": "Out",
           "type": "state",
           "links": [
-            5
+            35
           ],
           "slot_index": 0
         }
@@ -332,42 +1350,37 @@
         "name": "StoryboardPlanner",
         "type": "standard",
         "model": "{{STORYBOARD_MODEL}}",
-        "temperature": "0.7",
-        "prompt_name": "musicvideo/storyboard_planner",
+        "temperature": "0.3",
+        "prompt_name": "musicvideo/StoryboardPlanner",
         "recursion_limit": "100",
         "tool_sets": [],
         "required_keys": [
           "shots",
-          "keyframes",
-          "generation_batches"
+          "keyframes"
         ],
         "repo_path": "./"
       }
     },
     {
-      "id": 12,
-      "type": "musicvideo/GridPromptFormatter",
+      "id": 62,
+      "type": "common/WithStateMapper",
       "pos": [
-        1810,
-        180
+        1340,
+        2638.525
       ],
       "size": [
         210,
-        123
+        102
       ],
       "flags": {},
-      "order": 7,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 18
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 22
+          "link": 108,
+          "slot_index": 0
         },
         {
           "name": "In",
@@ -380,36 +1393,87 @@
           "name": "Out",
           "type": "state",
           "links": [
-            19
+            107
           ],
           "slot_index": 0
         }
       ],
-      "title": "GridPromptFormatter",
+      "title": "WithStateMapper",
       "properties": {
-        "name": "GridPromptFormatter",
-        "type": "standard"
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"step_keyframes\":\"{{keyframes}}\"}"
       }
     },
     {
-      "id": 10,
-      "type": "musicvideo/ImageGenerator",
+      "id": 63,
+      "type": "common/BatchedStepper",
       "pos": [
-        2100,
-        180
+        520.3999938964844,
+        3140.025
       ],
       "size": [
         210,
-        123
+        147
       ],
       "flags": {},
-      "order": 8,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 19
+          "link": 112
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            114
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "done",
+          "type": "state",
+          "links": null
+        }
+      ],
+      "title": "BatchedStepper",
+      "properties": {
+        "name": "BatchedStepper",
+        "type": "router",
+        "input_list_key": "step_keyframes",
+        "output_list_key": "cur_keyframes",
+        "size": "25"
+      }
+    },
+    {
+      "id": 65,
+      "type": "common/FormatTemplate",
+      "pos": [
+        810.3999938964844,
+        3150.525
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 114
         },
         {
           "name": "In",
@@ -422,38 +1486,178 @@
           "name": "Out",
           "type": "state",
           "links": [
-            20
+            115
           ],
           "slot_index": 0
         }
       ],
-      "title": "ImageGenerator",
+      "title": "FormatTemplate",
+      "properties": {
+        "name": "FormatTemplate",
+        "type": "standard",
+        "template": "{% set n = cur_keyframes|length %}\n{% set cols = ceil(sqrt(n))|int %}\n{% set rows = ceil(n / cols)|int %}\n{% set orientation = \"VERTICAL (portrait, 9:16)\" %}\nGenerate a single {{ orientation }} image containing a {{ cols }}x{{ rows }} grid of animation keyframes for a music video.\n\nIMAGE ORIENTATION: {{ orientation }}.\n\nCHARACTER BIBLE:\n{% for char in character_bible %}\n{{ char.name }}: {{ char.description }}\n{% endfor %}\n\nSTYLE GUIDE:\n{{ style_guide }}\n\nGRID LAYOUT:\n{{ cols }} columns x {{ rows }} rows. Panels must be flush edge-to-edge with NO gaps, borders, margins, or spacing between them.\nEach panel occupies exactly 1/{{ cols }} of the width and 1/{{ rows }} of the height.\nEach panel is a {{ orientation }} frame.\nAll panels must share the same art style, color palette, and character designs for visual consistency.\n\nPANELS:\n{% for kf in cur_keyframes %}\n    {% set r = loop.index0 // cols + 1 %}\n    {% set c = loop.index0 % cols + 1 %}\nPanel ({{ r }},{{ c }}) \u2014 Keyframe {{ kf.idx }}: {{ kf.image_prompt }}\n{% endfor %}\n\nIMPORTANT:\nGenerate exactly one {{ orientation }} image with all {{ n }} panels arranged in a {{ cols }}x{{ rows }} grid with NO borders or gaps.\nMaintain consistent character appearances and art style across all panels.",
+        "output_key": "grid_prompt"
+      }
+    },
+    {
+      "id": 61,
+      "type": "langgraph/port_in",
+      "pos": [
+        1646.8000030517578,
+        2650.525
+      ],
+      "size": [
+        294,
+        78
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 107,
+          "slot_index": 0
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 66,
+      "type": "musicvideo/ImageGenerator",
+      "pos": [
+        1100.3999938964844,
+        3092.025
+      ],
+      "size": [
+        210,
+        243
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 115
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            117
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageGenerator_Grid",
       "properties": {
         "name": "ImageGenerator",
         "type": "standard",
-        "model": "gemini-3-pro-image-preview",
-        "output_dir": "output/musicvideo"
+        "model": "google|gemini-3.1-flash-image-preview",
+        "prompt": "musicvideo/GridImage",
+        "reference_images": "{{reference_images}}",
+        "image_size": "4K",
+        "aspect_ratio": "9:16",
+        "output_dir": "musicvideo/grids"
       }
     },
     {
-      "id": 13,
-      "type": "musicvideo/GridSlicer",
+      "id": 20,
+      "type": "langgraph/port_out",
       "pos": [
-        2390,
-        180
+        180,
+        3184.525
+      ],
+      "size": [
+        260.3999938964844,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            112
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 69,
+      "type": "langgraph/port_in",
+      "pos": [
+        1680.3999938964844,
+        3174.525
+      ],
+      "size": [
+        294,
+        78
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 118
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 68,
+      "type": "common/Collector",
+      "pos": [
+        1390.3999938964844,
+        3150.525
       ],
       "size": [
         210,
-        123
+        126
       ],
       "flags": {},
-      "order": 9,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 20
+          "link": 117
         },
         {
           "name": "In",
@@ -466,37 +1670,40 @@
           "name": "Out",
           "type": "state",
           "links": [
-            21
+            118
           ],
           "slot_index": 0
         }
       ],
-      "title": "GridSlicer",
+      "title": "Collector",
       "properties": {
-        "name": "GridSlicer",
+        "name": "Collector",
         "type": "standard",
-        "output_dir": "output/musicvideo"
+        "input_key": "generated_image",
+        "output_list_key": "generated_frames",
+        "replacement_index": "",
+        "replace": false
       }
     },
     {
-      "id": 11,
-      "type": "musicvideo/ReviewGate",
+      "id": 47,
+      "type": "common/Collector",
       "pos": [
-        2680,
-        224
+        2617.5999908447266,
+        1862.025
       ],
       "size": [
         210,
-        123
+        126
       ],
       "flags": {},
-      "order": 10,
+      "order": 43,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 21
+          "link": 96
         },
         {
           "name": "In",
@@ -505,56 +1712,576 @@
         }
       ],
       "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            83
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Collector",
+      "properties": {
+        "name": "Collector",
+        "type": "standard",
+        "input_key": "regenerate_character",
+        "output_list_key": "step_character_bible",
+        "replacement_index": "",
+        "replace": false
+      }
+    },
+    {
+      "id": 60,
+      "type": "langgraph/port_in",
+      "pos": [
+        1646.7999877929688,
+        1491
+      ],
+      "size": [
+        226.8000030517578,
+        78
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 122
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [PlanStory]",
+      "properties": {
+        "tag": "PlanStory"
+      }
+    },
+    {
+      "id": 27,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        1058.3999938964844,
+        1624.2625
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 72
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            121
+          ],
+          "slot_index": 0
+        },
         {
           "name": "regenerate",
           "type": "state",
           "links": [
-            22
+            92
           ],
-          "slot_index": 0
-        },
-        {
-          "name": "accept",
-          "type": "state",
-          "links": null,
           "slot_index": 1
         }
       ],
-      "title": "ReviewGate_Keyframes",
+      "title": "ReviewGate_Characters",
       "properties": {
         "name": "ReviewGate",
         "type": "router",
-        "stage": "keyframes",
-        "output_dir": "output/musicvideo",
+        "stage": "characters",
+        "output_dir": "musicvideo",
         "review_ui": "review.html"
+      }
+    },
+    {
+      "id": 72,
+      "type": "common/BatchCollector",
+      "pos": [
+        1348.3999938964844,
+        1479
+      ],
+      "size": {
+        "0": 210,
+        "1": 102
+      },
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 121
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            122
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "BatchCollector",
+      "properties": {
+        "name": "BatchCollector",
+        "type": "standard",
+        "input_list_key": "character_images",
+        "output_list_key": "reference_images"
       }
     }
   ],
   "links": [
-    [1, 1, 0, 2, 0, "state"],
-    [2, 2, 0, 3, 1, "state"],
-    [3, 3, 0, 4, 0, "state"],
-    [4, 4, 1, 5, 0, "state"],
-    [5, 5, 0, 6, 0, "state"],
-    [7, 4, 0, 3, 0, "state"],
-    [8, 6, 0, 5, 1, "state"],
-    [10, 7, 0, 3, 2, "state"],
-    [13, 1, 0, 7, 0, "state"],
-    [18, 6, 1, 12, 0, "state"],
-    [19, 12, 0, 10, 0, "state"],
-    [20, 10, 0, 13, 0, "state"],
-    [21, 13, 0, 11, 0, "state"],
-    [22, 11, 0, 12, 1, "state"]
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "state"
+    ],
+    [
+      3,
+      3,
+      0,
+      4,
+      0,
+      "state"
+    ],
+    [
+      13,
+      1,
+      0,
+      7,
+      0,
+      "state"
+    ],
+    [
+      26,
+      16,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      27,
+      4,
+      1,
+      15,
+      0,
+      "state"
+    ],
+    [
+      28,
+      18,
+      0,
+      5,
+      0,
+      "state"
+    ],
+    [
+      29,
+      6,
+      1,
+      17,
+      0,
+      "state"
+    ],
+    [
+      35,
+      5,
+      0,
+      24,
+      0,
+      "state"
+    ],
+    [
+      36,
+      24,
+      0,
+      6,
+      0,
+      "state"
+    ],
+    [
+      43,
+      1,
+      0,
+      30,
+      0,
+      "state"
+    ],
+    [
+      57,
+      4,
+      0,
+      36,
+      0,
+      "state"
+    ],
+    [
+      60,
+      35,
+      0,
+      38,
+      0,
+      "state"
+    ],
+    [
+      65,
+      39,
+      0,
+      26,
+      1,
+      "state"
+    ],
+    [
+      67,
+      26,
+      0,
+      40,
+      0,
+      "state"
+    ],
+    [
+      68,
+      40,
+      0,
+      34,
+      0,
+      "state"
+    ],
+    [
+      71,
+      38,
+      0,
+      42,
+      0,
+      "state"
+    ],
+    [
+      72,
+      42,
+      0,
+      27,
+      0,
+      "state"
+    ],
+    [
+      82,
+      45,
+      1,
+      46,
+      0,
+      "state"
+    ],
+    [
+      83,
+      47,
+      0,
+      48,
+      0,
+      "state"
+    ],
+    [
+      84,
+      49,
+      0,
+      45,
+      1,
+      "state"
+    ],
+    [
+      89,
+      45,
+      0,
+      51,
+      0,
+      "state"
+    ],
+    [
+      90,
+      51,
+      0,
+      28,
+      0,
+      "state"
+    ],
+    [
+      92,
+      27,
+      1,
+      53,
+      0,
+      "state"
+    ],
+    [
+      93,
+      53,
+      0,
+      45,
+      0,
+      "state"
+    ],
+    [
+      95,
+      46,
+      0,
+      55,
+      0,
+      "state"
+    ],
+    [
+      96,
+      55,
+      0,
+      47,
+      0,
+      "state"
+    ],
+    [
+      97,
+      57,
+      0,
+      56,
+      0,
+      "state"
+    ],
+    [
+      98,
+      38,
+      1,
+      57,
+      0,
+      "state"
+    ],
+    [
+      99,
+      57,
+      0,
+      39,
+      0,
+      "state"
+    ],
+    [
+      100,
+      56,
+      0,
+      26,
+      0,
+      "state"
+    ],
+    [
+      101,
+      36,
+      0,
+      58,
+      0,
+      "state"
+    ],
+    [
+      102,
+      30,
+      0,
+      59,
+      0,
+      "state"
+    ],
+    [
+      103,
+      2,
+      0,
+      59,
+      1,
+      "state"
+    ],
+    [
+      104,
+      7,
+      0,
+      59,
+      2,
+      "state"
+    ],
+    [
+      107,
+      62,
+      0,
+      61,
+      0,
+      "state"
+    ],
+    [
+      108,
+      6,
+      0,
+      62,
+      0,
+      "state"
+    ],
+    [
+      112,
+      20,
+      0,
+      63,
+      0,
+      "state"
+    ],
+    [
+      114,
+      63,
+      0,
+      65,
+      0,
+      "state"
+    ],
+    [
+      115,
+      65,
+      0,
+      66,
+      0,
+      "state"
+    ],
+    [
+      117,
+      66,
+      0,
+      68,
+      0,
+      "state"
+    ],
+    [
+      118,
+      68,
+      0,
+      69,
+      0,
+      "state"
+    ],
+    [
+      121,
+      27,
+      0,
+      72,
+      0,
+      "state"
+    ],
+    [
+      122,
+      72,
+      0,
+      60,
+      0,
+      "state"
+    ]
   ],
-  "groups": [],
+  "groups": [
+    {
+      "title": "WriteStory",
+      "bounding": [
+        140,
+        140,
+        1517,
+        396
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    },
+    {
+      "title": "Start Input",
+      "bounding": [
+        140,
+        601,
+        825,
+        739
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    },
+    {
+      "title": "GenerateChar",
+      "bounding": [
+        140,
+        1405,
+        3060,
+        1087
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    },
+    {
+      "title": "PlanStory",
+      "bounding": [
+        140,
+        2557,
+        1841,
+        396
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    },
+    {
+      "title": "GenerateKeyFrames",
+      "bounding": [
+        140,
+        3018,
+        1874,
+        367
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    }
+  ],
   "config": {},
   "extra": {
-    "initial_state": "{\n  \"input\": \"\"\n}"
+    "initial_state": "{}"
   },
   "version": 0.4,
+  "_viewport": {
+    "offset": [
+      363.1606140136719,
+      -2632.193359375
+    ],
+    "scale": 0.848154775763946
+  },
   "_module_deps": {
     "musicvideo": {
       "origin": "external",
+      "source_url": null
+    },
+    "common": {
+      "origin": "core",
       "source_url": null
     }
   }

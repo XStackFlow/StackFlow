@@ -31,10 +31,10 @@ import json
 
 from src.graphs.graph_factory import build_langgraph_from_json, extract_edges, extract_interrupts, extract_all_node_ids
 from src.utils.exceptions import ConfigurationError
-from src.utils.setup.const import GRAPH_SAVE_PATH, PROJECT_ROOT
+from src.utils.setup.const import GRAPH_SAVE_PATH, PROJECT_ROOT, OUTPUT_DIR
 from src.utils.setup.env_utils import read_env_file, write_env_var
 from src.utils.setup.logger import get_logger, get_thread_logs, get_persistent_session_logs
-from src.utils.setup.db import create_checkpointer
+from src.utils.setup.db import create_checkpointer, get_checkpointer
 from src.utils.ns_resolver import resolve_checkpoint_ns
 
 logger = get_logger(__name__)
@@ -310,9 +310,7 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                     shutil.rmtree(agent_log_dir)
                     logger.info("Cleared previous agent logs: %s", agent_log_dir)
                 
-                checkpointer = getattr(app.state, 'checkpointer', None)
-                
-                # Use a helper to run the graph with either the shared or a local checkpointer
+                # Use a helper to run the graph with a checkpointer
                 async def run_with_cp(cp):
                     # Use the node registry initialized on demand
                     registry = get_node_registry()
@@ -431,20 +429,27 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                         return list(dict.fromkeys(all_ids + base))
                     return base
 
-                if not checkpointer:
-                    async with create_checkpointer() as cp:
-                        await run_with_cp(cp)
-                        # Check if graph is truly done or just interrupted
-                        post_state = await (build_langgraph_from_json(graph_json, get_node_registry(), graph_id=graph_name)
-                                            .compile(checkpointer=cp, interrupt_before=_get_interrupts())
-                                            .aget_state({"configurable": {"thread_id": thread_id}}))
-                        is_interrupted = bool(post_state.next)
-                else:
-                    await run_with_cp(checkpointer)
-                    post_state = await (build_langgraph_from_json(graph_json, get_node_registry(), graph_id=graph_name)
-                                        .compile(checkpointer=checkpointer, interrupt_before=_get_interrupts())
-                                        .aget_state({"configurable": {"thread_id": thread_id}}))
-                    is_interrupted = bool(post_state.next)
+                import psycopg
+                DB_RETRY_LIMIT = 3
+                for _db_attempt in range(DB_RETRY_LIMIT):
+                    try:
+                        async with get_checkpointer(app) as cp:
+                            await run_with_cp(cp)
+                            # Check if graph is truly done or just interrupted
+                            post_state = await (build_langgraph_from_json(graph_json, get_node_registry(), graph_id=graph_name)
+                                                .compile(checkpointer=cp, interrupt_before=_get_interrupts())
+                                                .aget_state({"configurable": {"thread_id": thread_id}}))
+                            is_interrupted = bool(post_state.next)
+                        break  # success
+                    except (psycopg.OperationalError, psycopg.InterfaceError) as db_err:
+                        if _db_attempt < DB_RETRY_LIMIT - 1:
+                            logger.warning(
+                                "Postgres connection lost during execution (attempt %d/%d): %s — reconnecting and resuming from checkpoint",
+                                _db_attempt + 1, DB_RETRY_LIMIT, db_err,
+                            )
+                            await asyncio.sleep(2 ** _db_attempt)  # 1s, 2s
+                        else:
+                            raise
 
                 if is_interrupted:
                     logger.info("Graph execution paused at interrupt for thread %s (next: %s)", thread_id, post_state.next)
@@ -626,8 +631,6 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
         
         with open(file_path, "r", encoding="utf-8") as f:
             graph_json = json.load(f)
-        
-        checkpointer = getattr(app.state, 'checkpointer', None)
         
         async def run_get_status(cp):
             workflow = build_langgraph_from_json(graph_json, get_node_registry(), graph_id=root_graph_id)
@@ -938,12 +941,8 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
                 "active_nodes": [], "node_elapsed": {}
             }
 
-        # Execution context manager
-        if not checkpointer:
-            async with create_checkpointer() as cp:
-                return await run_get_status(cp)
-        else:
-            return await run_get_status(checkpointer)
+        async with get_checkpointer(app) as cp:
+            return await run_get_status(cp)
 
     except Exception as e:
         logger.error("Error fetching status for %s: %s", thread_id, e)
@@ -1309,6 +1308,8 @@ async def get_module_detail(module_id: str):
                 entry["secret"] = True
             if "placeholder" in var:
                 entry["placeholder"] = var["placeholder"]
+            if var.get("optional"):
+                entry["optional"] = True
         env_vars.append(entry)
 
     # Resolve steps with live availability check
@@ -1388,6 +1389,7 @@ async def get_module_detail(module_id: str):
             "env_vars": env_vars,
             "steps": steps,
             **({"install_notes": setup["install_notes"]} if "install_notes" in setup else {}),
+            **({"auth_notes": setup["auth_notes"]} if "auth_notes" in setup else {}),
         },
     }
 
@@ -2135,9 +2137,9 @@ async def reset_thread(thread_id: str):
                     task.cancel()
                 del active_tasks[thread_id]
 
-            async with create_checkpointer() as checkpointer:
+            async with get_checkpointer(app) as checkpointer:
                 await checkpointer.adelete_thread(thread_id)
-                
+
             # Clear caches
             # Clear logs: both in-memory and on-disk
             from src.utils.setup.logger import GLOBAL_LOG_BUFFER
@@ -2193,7 +2195,7 @@ async def step_back(thread_id: str):
                 if src_uid not in predecessor_map[tgt_uid]:
                     predecessor_map[tgt_uid].append(src_uid)
 
-            async with create_checkpointer() as checkpointer:
+            async with get_checkpointer(app) as checkpointer:
                 workflow = build_langgraph_from_json(graph_json, get_node_registry(), graph_id=graph_id)
                 interrupts = extract_interrupts(graph_json)
                 graph_runnable = workflow.compile(checkpointer=checkpointer, interrupt_before=interrupts)
@@ -2501,8 +2503,6 @@ async def seed_state(request: SeedStateRequest):
             root_json = json.load(f)
         logger.info("Loaded graph '%s' from disk for seed_state", root_graph_id)
 
-        checkpointer = getattr(app.state, 'checkpointer', None)
-        
         async def run_seed_state(cp):
             workflow = build_langgraph_from_json(root_json, get_node_registry(), graph_id=root_graph_id)
             interrupts = extract_interrupts(root_json)
@@ -2580,11 +2580,8 @@ async def seed_state(request: SeedStateRequest):
 
             return {"status": "success", "message": f"Marked '{effective_as_node}' as completed. Execution will resume from its downstream nodes."}
 
-        if not checkpointer:
-            async with create_checkpointer() as cp:
-                return await run_seed_state(cp)
-        else:
-            return await run_seed_state(checkpointer)
+        async with get_checkpointer(app) as cp:
+            return await run_seed_state(cp)
 
     except Exception as e:
         import traceback
@@ -2594,6 +2591,28 @@ async def seed_state(request: SeedStateRequest):
 
 
 # ── Module UI Serving ─────────────────────────────────────────────────────────
+# Serve files from the output/ directory so UI pages can display generated images/videos.
+# Files are served at: /output/{path}
+
+@app.get("/output/{path:path}")
+async def serve_output_file(path: str):
+    """Serve files from the output directory (images, videos, etc.)."""
+    from fastapi.responses import FileResponse
+    import mimetypes
+
+    file_path = (OUTPUT_DIR / path).resolve()
+    output_dir_resolved = OUTPUT_DIR.resolve()
+
+    # Security: ensure resolved path is within the output directory
+    if not str(file_path).startswith(str(output_dir_resolved)):
+        raise HTTPException(status_code=403, detail="Access denied")
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail=f"File not found: {path}")
+
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    return FileResponse(file_path, media_type=content_type)
+
+
 # Modules can provide custom UI pages by placing files in a `ui/` directory.
 # Files are served at: /modules/{module_id}/ui/{path}
 # This allows pluggable modules to provide custom UIs (review pages, dashboards, etc.)

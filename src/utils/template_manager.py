@@ -10,14 +10,66 @@ from src.utils.setup.variables_registry import get_variable as _get_global_varia
 logger = get_logger(__name__)
 
 
-def get_value_by_path(data: Any, path: str) -> Any:
-    """Resolves a dot-notated path in a dictionary (e.g., "pr_feedback.headRefName")."""
-    keys = path.split('.')
+def get_value_by_path(data: Any, path: str, root: Any = None) -> Any:
+    """Resolves a dot-notated path with optional bracket indexing.
+
+    Supports:
+    - "a.b.c"          → data["a"]["b"]["c"]
+    - "a[0]"           → data["a"][0]
+    - "a[b.index]"     → data["a"][ root["b"]["index"] ]  (dynamic index from state)
+
+    Args:
+        data:  The root object to traverse (usually state).
+        path:  Dot/bracket path string.
+        root:  The top-level state used to resolve dynamic bracket expressions.
+               Defaults to *data* when not supplied.
+    """
+    if root is None:
+        root = data
+
+    # Tokenize: split on '.' but also extract bracket groups
+    # e.g. "character_bible[cur_feedback.index].name"
+    #  → ["character_bible", "[cur_feedback.index]", "name"]
+    tokens = re.findall(r'\[([^\]]*)\]|([^.\[\]]+)', path)
+
     current = data
-    for key in keys:
-        if isinstance(current, dict):
-            current = current.get(key)
-        else:
+    for bracket_expr, dot_key in tokens:
+        if dot_key:
+            # Regular dict key
+            if isinstance(current, dict):
+                current = current.get(dot_key)
+            else:
+                return None
+        elif bracket_expr is not None:
+            # Bracket access — resolve index
+            expr = bracket_expr.strip()
+            # Try literal int first
+            try:
+                idx = int(expr)
+            except ValueError:
+                # Dynamic: resolve the expression as a path in root state
+                idx = get_value_by_path(root, expr, root)
+                if idx is None:
+                    return None
+                try:
+                    idx = int(idx)
+                except (ValueError, TypeError):
+                    # Not an int — try as dict key
+                    if isinstance(current, dict):
+                        current = current.get(str(idx))
+                        continue
+                    return None
+            # Index into list or dict
+            if isinstance(current, list):
+                if 0 <= idx < len(current):
+                    current = current[idx]
+                else:
+                    return None
+            elif isinstance(current, dict):
+                current = current.get(str(idx))
+            else:
+                return None
+        if current is None:
             return None
     return current
 
@@ -94,7 +146,7 @@ def render_template(template: Any, state: Dict[str, Any]) -> Any:
         # 4. Check in state
         else:
             search_path = path[6:] if path.startswith("state.") else path
-            top_key = search_path.split(".")[0]
+            top_key = re.split(r'[.\[]', search_path)[0]
             if top_key not in state:
                 logger.warning("Template variable '{{%s}}' not found in state or environment. Resolving to empty string.", path)
                 return ""

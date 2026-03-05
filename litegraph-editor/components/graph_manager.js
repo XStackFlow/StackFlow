@@ -1527,7 +1527,7 @@ async function openModuleModal(moduleId, onDone, onNeedsRestart) {
             const input = document.createElement("input");
             input.type = "text";
             input.className = "mod-env-input";
-            input.placeholder = ev.set ? "already set — leave blank to keep" : "required";
+            input.placeholder = ev.set ? "already set — leave blank to keep" : (ev.optional ? "optional" : "required");
             envInputs[ev.name] = input;
 
             const status = document.createElement("span");
@@ -1540,6 +1540,15 @@ async function openModuleModal(moduleId, onDone, onNeedsRestart) {
             sec.appendChild(row);
         });
         body.appendChild(sec);
+    }
+
+    // Auth notes
+    const authNotes = mod.setup?.auth_notes;
+    if (authNotes) {
+        const note = document.createElement("div");
+        note.style.cssText = "font-size:11px;color:#94a3b8;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:6px 8px;margin:4px 0 8px 0;";
+        note.textContent = authNotes;
+        body.appendChild(note);
     }
 
     // Setup steps

@@ -43,12 +43,21 @@ _FERNET_PREFIX = "fernet:"
 
 # ── Path helpers ────────────────────────────────────────────────────────────
 
+def _module_dir(module_id: str) -> Path:
+    """Resolve the actual directory for a module (modules/ or installed/)."""
+    from src.utils.setup.module_registry import INSTALLED_DIR
+    installed_path = INSTALLED_DIR / module_id
+    if installed_path.exists():
+        return installed_path
+    return MODULES_DIR / module_id
+
+
 def _configs_file(module_id: str) -> Path:
-    return MODULES_DIR / module_id / "configurations.json"
+    return _module_dir(module_id) / "configurations.json"
 
 
 def _secret_key_file(module_id: str) -> Path:
-    return MODULES_DIR / module_id / ".config_secret_key"
+    return _module_dir(module_id) / ".config_secret_key"
 
 
 # ── Manifest helpers ────────────────────────────────────────────────────────

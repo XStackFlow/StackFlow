@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, Tuple, Optional, List
 from modules.llm.llm_repo_executor import LLMRepoExecutor
-from src.utils.setup.langfuse_helper import get_langfuse_client
+from src.utils.setup.langfuse_helper import compile_prompt
 from src.utils.setup.logger import get_logger
 from src.inputs.standard_inputs import Resolvable
 from modules.llm.inputs import Model, Prompt, ToolSets
@@ -105,23 +105,7 @@ class LLMRepoAgent(LLMRepoExecutor):
 
     def get_content(self, state: Dict[str, Any]) -> str:
         """Fetch and compile the prompt from Langfuse."""
-        client = get_langfuse_client()
-        prompt_obj = client.get_prompt(self._prompt_name)
-
-        # Serialize list values into strings for prompt injection.
-        # Lists of {"role", "content"} dicts become "Role: content" lines;
-        # other lists become newline-joined string representations.
-        compiled_state = {}
-        for k, v in state.items():
-            if isinstance(v, list):
-                if v and all(isinstance(m, dict) and "role" in m and "content" in m for m in v):
-                    compiled_state[k] = "\n".join(f"{m['role']}: {m['content']}" for m in v)
-                else:
-                    compiled_state[k] = "\n".join(str(item) for item in v)
-            else:
-                compiled_state[k] = v
-
-        return prompt_obj.compile(**compiled_state)
+        return compile_prompt(self._prompt_name, state)
 
     def next_state(self, state: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
         """Update state by returning the LLM JSON result delta."""

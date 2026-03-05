@@ -225,6 +225,47 @@ export function updateStateWidget(data, graph) {
         }
     }
 
+    // 1c. "Open" links for completed ReviewGate stages (view previous results)
+    if (graph._nodes && executionThreadId) {
+        // Determine which node already has the active (pink) review button
+        let activeReviewLogical = null;
+        if (status === 'running' && activeNodes.length > 0) {
+            const activeSet = new Set(activeNodes.map(n => n.toLowerCase().replace(/[^a-z0-9@_]/g, '')));
+            for (const node of graph._nodes) {
+                if (!node.properties.review_ui) continue;
+                const nodeLogical = getNodeLogicalId(node).toLowerCase().replace(/[^a-z0-9@_]/g, '');
+                if (activeSet.has(nodeLogical)) { activeReviewLogical = nodeLogical; break; }
+            }
+        }
+
+        const reviewLinks = [];
+        for (const node of graph._nodes) {
+            if (!node.properties.review_ui) continue;
+            const nodeLogical = getNodeLogicalId(node).toLowerCase().replace(/[^a-z0-9@_]/g, '');
+            if (nodeLogical === activeReviewLogical) continue; // already shown as active
+
+            const moduleId = (node.type.split('/')[0]) || 'unknown';
+            const reviewUiPath = node.properties.review_ui;
+            const qParams = new URLSearchParams({ thread_id: executionThreadId || '' });
+            for (const [k, v] of Object.entries(node.properties)) {
+                if (['name', 'type', 'review_ui'].includes(k)) continue;
+                if (v !== undefined && v !== null && v !== '') qParams.set(k, v);
+            }
+            const reviewPageUrl = `${API_BASE}/modules/${moduleId}/ui/${reviewUiPath}?${qParams}`;
+            const label = node.properties.stage || node.title || 'Review';
+            reviewLinks.push({ label, url: reviewPageUrl });
+        }
+
+        if (reviewLinks.length > 0) {
+            const links = reviewLinks.map(rl =>
+                `<a href="${rl.url}" target="_blank" style="color: #aaa; font-size: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);"` +
+                ` onmouseover="this.style.color='#EC4899';this.style.borderColor='rgba(236,72,153,0.3)'" onmouseout="this.style.color='#aaa';this.style.borderColor='rgba(255,255,255,0.08)'"` +
+                `>&#128065; ${escapeHTML(rl.label)}</a>`
+            ).join('');
+            html += `<div style="margin-bottom: 4px; padding: 4px 6px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">${links}</div>`;
+        }
+    }
+
     // 2. Global State Section
     if (displayState && Object.keys(displayState).length > 0) {
         // Remove internal flag before displaying

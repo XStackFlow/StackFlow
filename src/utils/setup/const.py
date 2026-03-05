@@ -6,6 +6,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 # Custom graph storage directory
 GRAPH_SAVE_PATH = PROJECT_ROOT / "graphs"
 
+# Default output directory for all module artifacts
+OUTPUT_DIR = PROJECT_ROOT / "output"
+
 # Session logs directory
 SESSION_LOGS_DIR = PROJECT_ROOT / "logs" / "sessions"
 
