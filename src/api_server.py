@@ -2637,8 +2637,18 @@ async def seed_state(request: SeedStateRequest):
 
             return {"status": "success", "message": f"Marked '{effective_as_node}' as completed. Execution will resume from its downstream nodes."}
 
-        async with get_checkpointer(app) as cp:
-            return await run_seed_state(cp)
+        # Retry on connection errors — get_checkpointer auto-reconnects
+        import psycopg
+        last_err = None
+        for _attempt in range(3):
+            try:
+                async with get_checkpointer(app) as cp:
+                    return await run_seed_state(cp)
+            except (psycopg.OperationalError, psycopg.InterfaceError, OSError) as e:
+                last_err = e
+                logger.warning("mark_completed DB error (attempt %d/3): %s — retrying", _attempt + 1, e)
+                await asyncio.sleep(1)
+        raise last_err
 
     except Exception as e:
         import traceback

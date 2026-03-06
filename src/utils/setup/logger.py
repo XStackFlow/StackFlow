@@ -190,7 +190,7 @@ def get_persistent_session_logs(thread_id: str, limit: int = 100):
     file_size = log_file.stat().st_size
     logs_deque = deque(maxlen=limit)
     
-    with open(log_file, "r", encoding="utf-8") as f:
+    with open(log_file, "r", encoding="utf-8", errors="replace") as f:
         if file_size > 512 * 1024:
             f.seek(0, os.SEEK_END)
             f.seek(max(0, f.tell() - 512 * 1024))
