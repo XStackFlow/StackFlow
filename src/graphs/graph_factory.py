@@ -476,8 +476,10 @@ def _internal_build_langgraph(graph_json: Dict[str, Any], node_registry: Dict[st
     # Define standard retry policy for RetriableError
     standard_retry_policy = RetryPolicy(
         retry_on=RetriableError,
-        max_attempts=3,
-        backoff_factor=2.0
+        initial_interval=10.0,
+        backoff_factor=2.0,
+        max_interval=120.0,
+        max_attempts=5,
     )
 
     # 3. Add Nodes (Worker Bodies)

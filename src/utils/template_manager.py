@@ -109,6 +109,16 @@ def render_template(template: Any, state: Dict[str, Any]) -> Any:
             # Skip transformations or special variables for raw mapping for now
             # (only support simple paths like "{{deployment_status}}" or "{{state.job}}")
             if not re.search(r"\.(replace|strip|lower|upper)\(", path) and path != "timestamp":
+                # Handle len() wrapper — e.g. {{len(cur_keyframes)}}
+                len_match = re.fullmatch(r"len\((.+)\)", path)
+                if len_match:
+                    inner_path = len_match.group(1).strip()
+                    inner_path = inner_path[6:] if inner_path.startswith("state.") else inner_path
+                    val = get_value_by_path(state, inner_path)
+                    if val is not None and hasattr(val, '__len__'):
+                        return len(val)
+                    return 0
+
                 # Check global variables first
                 gval = _get_global_variable(path)
                 if gval is not None:
@@ -124,6 +134,16 @@ def render_template(template: Any, state: Dict[str, Any]) -> Any:
 
     def replace(match):
         path = match.group(1).strip()
+
+        # Handle len() wrapper — e.g. {{len(cur_keyframes)}}
+        len_match = re.fullmatch(r"len\((.+)\)", path)
+        if len_match:
+            inner_path = len_match.group(1).strip()
+            inner_path = inner_path[6:] if inner_path.startswith("state.") else inner_path
+            val = get_value_by_path(state, inner_path)
+            if val is not None and hasattr(val, '__len__'):
+                return str(len(val))
+            return "0"
 
         # Check for transformations (e.g., .replace("-", "_"))
         transform_match = re.search(r"\.replace\((['\"])(.*?)\1,\s*(['\"])(.*?)\3\)$", path)

@@ -17,7 +17,7 @@ class LLMRepoAgent(LLMRepoExecutor):
     """
 
     def __init__(
-        self, 
+        self,
         model: Resolvable[Model] = "ollama|qwen2.5:32b",
         temperature: Resolvable[float] = "0.0",
         prompt_name: Resolvable[Prompt] = "",
@@ -25,6 +25,7 @@ class LLMRepoAgent(LLMRepoExecutor):
         tool_sets: Resolvable[ToolSets] = ["CODE_EDIT_TOOLS"],
         required_keys: Resolvable[List[str]] = [],
         repo_path: Resolvable[str] = "{{repo_path}}",
+        state_key: Resolvable[str] = "",
         **kwargs
     ):
         """Initialize the LLM agent.
@@ -37,6 +38,7 @@ class LLMRepoAgent(LLMRepoExecutor):
             tool_sets: List of tool set names (e.g. ['READ_TOOLS', 'WRITE_TOOLS'])
             required_keys: List of keys that must be present in the LLM response.
             repo_path: The local repository path (template supported).
+            state_key: If set, render the prompt template from state[state_key] instead of root state.
             **kwargs: Additional properties from LiteGraph.
         """
         super().__init__(repo_path=repo_path, **kwargs)
@@ -46,6 +48,7 @@ class LLMRepoAgent(LLMRepoExecutor):
         self.recursion_limit = recursion_limit
         self.tool_sets = tool_sets
         self.required_keys = required_keys
+        self.state_key = state_key
 
     def _run(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """Execute the agent task with validation of resolved attributes."""
@@ -104,8 +107,17 @@ class LLMRepoAgent(LLMRepoExecutor):
 
 
     def get_content(self, state: Dict[str, Any]) -> str:
-        """Fetch and compile the prompt from Langfuse."""
-        return compile_prompt(self._prompt_name, state)
+        """Fetch and compile the prompt from Langfuse.
+
+        If state_key is set, uses state[state_key] as the template context
+        instead of the root state.
+        """
+        prompt_state = state
+        if self._state_key:
+            prompt_state = state.get(self._state_key, {})
+            if not isinstance(prompt_state, dict):
+                prompt_state = state
+        return compile_prompt(self._prompt_name, prompt_state)
 
     def next_state(self, state: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
         """Update state by returning the LLM JSON result delta."""

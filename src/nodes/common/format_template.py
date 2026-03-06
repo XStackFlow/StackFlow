@@ -8,6 +8,7 @@ from jinja2 import Environment
 from src.nodes.abstract.base_node import BaseNode
 from src.inputs.standard_inputs import TemplateString
 from src.utils.setup.logger import get_logger
+from src.nodes.common.stepper import _deep_set
 
 logger = get_logger(__name__)
 
@@ -51,4 +52,6 @@ class FormatTemplate(BaseNode):
         result = tpl.render(**state)
 
         logger.info("FormatTemplate: Rendered %d chars → '%s'", len(result), self._output_key)
-        return {self._output_key: result}
+        out = {}
+        _deep_set(out, self._output_key, result)
+        return out

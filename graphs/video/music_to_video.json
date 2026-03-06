@@ -1,57 +1,13 @@
 {
-  "last_node_id": 73,
-  "last_link_id": 123,
+  "last_node_id": 121,
+  "last_link_id": 188,
   "nodes": [
-    {
-      "id": 24,
-      "type": "musicvideo/StoryboardValidator",
-      "pos": [
-        760,
-        2705.525
-      ],
-      "size": [
-        210,
-        123
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 35
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            36
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "StoryboardValidator",
-      "properties": {
-        "name": "StoryboardValidator",
-        "type": "standard",
-        "shots": "{{shots}}",
-        "keyframes": "{{keyframes}}"
-      }
-    },
     {
       "id": 18,
       "type": "langgraph/port_out",
       "pos": [
         180,
-        2738.025
+        2534.8
       ],
       "size": [
         210,
@@ -76,438 +32,18 @@
       }
     },
     {
-      "id": 49,
-      "type": "langgraph/port_out",
-      "pos": [
-        1348.3999938964844,
-        1957.525
-      ],
-      "size": [
-        218.39999389648438,
-        58
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "Out",
-          "type": null,
-          "links": [
-            84
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Portal Exit [CharFeedback]",
-      "properties": {
-        "tag": "CharFeedback"
-      }
-    },
-    {
-      "id": 51,
-      "type": "common/WithState",
-      "pos": [
-        1953.5999908447266,
-        1707.025
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 38,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 89
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            90
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithState",
-      "properties": {
-        "name": "WithState",
-        "type": "standard",
-        "state_json": "{\"regenerate_character\":\"@delete\",\"step_user_feedback\":\"@delete\",\"cur_feedback\":\"@delete\"}"
-      }
-    },
-    {
-      "id": 46,
-      "type": "common/WithStateMapper",
-      "pos": [
-        1953.5999908447266,
-        1874.025
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 39,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 82
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            95
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithStateMapper",
-      "properties": {
-        "name": "WithStateMapper",
-        "type": "standard",
-        "mapping_json": "{\"regenerate_character\":\"{{character_bible[cur_feedback.index]}}\"}"
-      }
-    },
-    {
-      "id": 57,
-      "type": "common/StubNode",
-      "pos": [
-        768.3999938964844,
-        2278.525
-      ],
-      "size": [
-        140,
-        46
-      ],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 98
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            97,
-            99
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "StubNode",
-      "properties": {
-        "name": "StubNode",
-        "type": "standard"
-      }
-    },
-    {
-      "id": 55,
-      "type": "common/WithStateMapper",
-      "pos": [
-        2285.5999908447266,
-        1874.025
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 42,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 95
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            96
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithStateMapper",
-      "properties": {
-        "name": "WithStateMapper",
-        "type": "standard",
-        "mapping_json": "{\"regenerate_character\":{\"user_feedback\":\"{{cur_feedback.feedback}}\",\"replace_index\":\"{{cur_feedback.index}}\"}}"
-      }
-    },
-    {
-      "id": 40,
-      "type": "common/Collector",
-      "pos": [
-        1646.7999877929688,
-        2017.025
-      ],
-      "size": [
-        210,
-        126
-      ],
-      "flags": {},
-      "order": 36,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 67
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            68
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Collector",
-      "properties": {
-        "name": "Collector",
-        "type": "standard",
-        "input_key": "generated_image",
-        "output_list_key": "character_images",
-        "replacement_index": "{{current_character.replace_index}}",
-        "replace": false
-      }
-    },
-    {
-      "id": 53,
-      "type": "common/WithStateMapper",
-      "pos": [
-        1348.3999938964844,
-        1790.525
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 30,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 92
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            93
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithStateMapper",
-      "properties": {
-        "name": "WithStateMapper",
-        "type": "standard",
-        "mapping_json": "{\"step_user_feedback\":\"{{user_feedback}}\"}"
-      }
-    },
-    {
-      "id": 39,
-      "type": "common/WithStateMapper",
-      "pos": [
-        1058.3999938964844,
-        2340.025
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 99
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            65
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithStateMapper",
-      "properties": {
-        "name": "WithStateMapper",
-        "type": "standard",
-        "mapping_json": "{\"character_description\":\"{{current_character.description}}\",\"character_name\":\"{{current_character.name}}\"}"
-      }
-    },
-    {
-      "id": 56,
-      "type": "common/FormatTemplate",
-      "pos": [
-        1058.3999938964844,
-        2149.025
-      ],
-      "size": [
-        210,
-        126
-      ],
-      "flags": {},
-      "order": 23,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 97
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            100
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "FormatTemplate",
-      "properties": {
-        "name": "FormatTemplate",
-        "type": "standard",
-        "template": "{% if current_character.user_feedback %}\nADDITIONAL_REQUIREMENT:\n{{ current_character.user_feedback }}\n{% endif %}",
-        "output_key": "formatted_user_feedback"
-      }
-    },
-    {
-      "id": 42,
-      "type": "common/WithState",
-      "pos": [
-        768.3999938964844,
-        1634.7625
-      ],
-      "size": [
-        210,
-        102
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 71
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            72
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "WithState",
-      "properties": {
-        "name": "WithState",
-        "type": "standard",
-        "state_json": "{\"character_description\":\"@delete\",\"character_name\":\"@delete\",\"step_character_bible\":\"@delete\",\"current_character\":\"@delete\",\"formatted_user_feedback\":\"@delete\",\"generated_image\":\"@delete\",\"user_feedback\":\"@delete\"}"
-      }
-    },
-    {
       "id": 15,
       "type": "langgraph/port_in",
       "pos": [
-        1050,
-        388.5
+        1340,
+        1203.7749999999999
       ],
       "size": [
         235.1999969482422,
         78
       ],
       "flags": {},
-      "order": 21,
+      "order": 44,
       "mode": 0,
       "inputs": [
         {
@@ -527,187 +63,18 @@
       }
     },
     {
-      "id": 4,
-      "type": "musicvideo/ReviewGate",
-      "pos": [
-        760,
-        288.5
-      ],
-      "size": [
-        210,
-        123
-      ],
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 3
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "accept",
-          "type": "state",
-          "links": [
-            57
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "regenerate",
-          "type": "state",
-          "links": [
-            27
-          ],
-          "slot_index": 1
-        }
-      ],
-      "title": "ReviewGate_Story",
-      "properties": {
-        "name": "ReviewGate",
-        "type": "router",
-        "stage": "story",
-        "output_dir": "musicvideo",
-        "review_ui": "review.html"
-      }
-    },
-    {
-      "id": 16,
-      "type": "langgraph/port_out",
-      "pos": [
-        180,
-        321
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "Out",
-          "type": null,
-          "links": [
-            26
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Portal Exit [WriteStory]",
-      "properties": {
-        "tag": "WriteStory"
-      }
-    },
-    {
-      "id": 59,
-      "type": "langgraph/port_in",
-      "pos": [
-        690,
-        727
-      ],
-      "size": [
-        235.1999969482422,
-        118
-      ],
-      "flags": {},
-      "order": 15,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 102
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": 103
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": 104
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [WriteStory]",
-      "properties": {
-        "tag": "WriteStory"
-      }
-    },
-    {
-      "id": 30,
-      "type": "musicvideo/CreativeInput",
-      "pos": [
-        400,
-        675
-      ],
-      "size": [
-        210,
-        222
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 43
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            102
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "CreativeInput",
-      "properties": {
-        "name": "CreativeInput",
-        "type": "standard",
-        "user_prompt": "",
-        "reference_image_1": "",
-        "reference_image_2": "",
-        "reference_image_3": ""
-      }
-    },
-    {
       "id": 1,
       "type": "langgraph/start",
       "pos": [
         180,
-        1000.5
+        558.8499999999999
       ],
       "size": [
         140,
         30
       ],
       "flags": {},
-      "order": 3,
+      "order": 1,
       "mode": 0,
       "outputs": [
         {
@@ -725,277 +92,18 @@
       "properties": {}
     },
     {
-      "id": 2,
-      "type": "musicvideo/MusicAnalyzer",
-      "pos": [
-        400,
-        962
-      ],
-      "size": [
-        210,
-        140
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 1
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            103
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "MusicAnalyzer",
-      "properties": {
-        "name": "MusicAnalyzer",
-        "type": "standard",
-        "music_file_path": "C:\\Users\\lxf25\\Downloads\\\u5929\u72fc\u661f.wav"
-      }
-    },
-    {
-      "id": 7,
-      "type": "musicvideo/LyricsReader",
-      "pos": [
-        400,
-        1167
-      ],
-      "size": [
-        210,
-        123
-      ],
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 13
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Out",
-          "type": "state",
-          "links": [
-            104
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "LyricsReader",
-      "properties": {
-        "name": "LyricsReader",
-        "type": "standard",
-        "lyrics_file_path": "C:\\Users\\lxf25\\Downloads\\\u6211\u7684\u5929\u72fc\u661f.txt"
-      }
-    },
-    {
-      "id": 58,
-      "type": "langgraph/port_in",
-      "pos": [
-        1365.1999969482422,
-        233.5
-      ],
-      "size": [
-        252,
-        78
-      ],
-      "flags": {},
-      "order": 28,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 101
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [GenerateChar]",
-      "properties": {
-        "tag": "GenerateChar"
-      }
-    },
-    {
-      "id": 48,
-      "type": "langgraph/port_in",
-      "pos": [
-        2907.5999908447266,
-        1886.025
-      ],
-      "size": [
-        252,
-        78
-      ],
-      "flags": {},
-      "order": 44,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 83
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [CharFeedback]",
-      "properties": {
-        "tag": "CharFeedback"
-      }
-    },
-    {
-      "id": 45,
-      "type": "common/Stepper",
-      "pos": [
-        1646.7999877929688,
-        1770.025
-      ],
-      "size": [
-        210,
-        143
-      ],
-      "flags": {},
-      "order": 35,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 93
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 84
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "done",
-          "type": "state",
-          "links": [
-            89
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "next",
-          "type": "state",
-          "links": [
-            82
-          ],
-          "slot_index": 1
-        }
-      ],
-      "title": "Stepper",
-      "properties": {
-        "name": "Stepper",
-        "type": "router",
-        "input_list_key": "step_user_feedback",
-        "output_key": "cur_feedback",
-        "input_list": "{{step_character_bible}}"
-      }
-    },
-    {
-      "id": 38,
-      "type": "common/Stepper",
-      "pos": [
-        478.3999938964844,
-        1932.1437500000002
-      ],
-      "size": [
-        210,
-        123
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 60
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "done",
-          "type": "state",
-          "links": [
-            71
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "next",
-          "type": "state",
-          "links": [
-            98
-          ],
-          "slot_index": 1
-        }
-      ],
-      "title": "Stepper",
-      "properties": {
-        "name": "Stepper",
-        "type": "router",
-        "input_list_key": "step_character_bible",
-        "output_key": "current_character",
-        "input_list": "{{step_character_bible}}"
-      }
-    },
-    {
       "id": 35,
       "type": "langgraph/port_out",
       "pos": [
         180,
-        1964.6437500000002
+        1872.91875
       ],
       "size": [
         218.39999389648438,
         58
       ],
       "flags": {},
-      "order": 4,
+      "order": 2,
       "mode": 0,
       "outputs": [
         {
@@ -1013,49 +121,18 @@
       }
     },
     {
-      "id": 28,
-      "type": "langgraph/port_in",
-      "pos": [
-        2285.5999908447266,
-        1719.025
-      ],
-      "size": [
-        252,
-        78
-      ],
-      "flags": {},
-      "order": 41,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 90
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [GenerateChar]",
-      "properties": {
-        "tag": "GenerateChar"
-      }
-    },
-    {
       "id": 34,
       "type": "langgraph/port_in",
       "pos": [
-        1953.5999908447266,
-        2041.025
+        1646.7999877929688,
+        1963.8
       ],
       "size": [
         252,
         78
       ],
       "flags": {},
-      "order": 40,
+      "order": 48,
       "mode": 0,
       "inputs": [
         {
@@ -1075,25 +152,56 @@
       }
     },
     {
-      "id": 17,
+      "id": 61,
       "type": "langgraph/port_in",
       "pos": [
-        1340,
-        2805.525
+        1646.8000030517578,
+        2447.3
+      ],
+      "size": [
+        294,
+        78
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 107,
+          "slot_index": 0
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 60,
+      "type": "langgraph/port_in",
+      "pos": [
+        1646.7999877929688,
+        1482.7749999999999
       ],
       "size": [
         226.8000030517578,
         78
       ],
       "flags": {},
-      "order": 27,
+      "order": 46,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": 0,
-          "link": 29,
-          "slot_index": 0
+          "link": 122
         },
         {
           "name": "In",
@@ -1107,18 +215,116 @@
       }
     },
     {
+      "id": 27,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        1058.3999938964844,
+        1601.0375
+      ],
+      "size": [
+        210,
+        147
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 72
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            121
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            92
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_Characters",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "characters",
+        "output_dir": "musicvideo",
+        "skip_if_key": "",
+        "review_ui": "review.html"
+      }
+    },
+    {
+      "id": 72,
+      "type": "common/BatchCollector",
+      "pos": [
+        1348.3999938964844,
+        1470.7749999999999
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 121
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            122
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "BatchCollector",
+      "properties": {
+        "name": "BatchCollector",
+        "type": "standard",
+        "input_list_key": "character_images",
+        "output_list_key": "reference_images"
+      }
+    },
+    {
       "id": 6,
       "type": "musicvideo/ReviewGate",
       "pos": [
         1050,
-        2705.525
+        2490.3
       ],
       "size": [
         210,
-        123
+        147
       ],
       "flags": {},
-      "order": 19,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -1156,28 +362,183 @@
         "type": "router",
         "stage": "storyboard",
         "output_dir": "musicvideo",
+        "skip_if_key": "",
         "review_ui": "review.html"
       }
     },
     {
-      "id": 36,
-      "type": "common/WithStateMapper",
+      "id": 17,
+      "type": "langgraph/port_in",
       "pos": [
-        1050,
-        221.5
+        1340,
+        2602.3
+      ],
+      "size": [
+        226.8000030517578,
+        78
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 29,
+          "slot_index": 0
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [PlanStory]",
+      "properties": {
+        "tag": "PlanStory"
+      }
+    },
+    {
+      "id": 58,
+      "type": "langgraph/port_in",
+      "pos": [
+        1945.1999969482422,
+        1048.7749999999999
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 59,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 101
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateChar]",
+      "properties": {
+        "tag": "GenerateChar"
+      }
+    },
+    {
+      "id": 78,
+      "type": "langgraph/port_in",
+      "pos": [
+        1407.1999969482422,
+        3367.05
+      ],
+      "size": [
+        260.3999938964844,
+        78
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 129
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateShots]",
+      "properties": {
+        "tag": "GenerateShots"
+      }
+    },
+    {
+      "id": 49,
+      "type": "langgraph/port_out",
+      "pos": [
+        1348.3999938964844,
+        1943.3
+      ],
+      "size": [
+        218.39999389648438,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            84
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [CharFeedback]",
+      "properties": {
+        "tag": "CharFeedback"
+      }
+    },
+    {
+      "id": 48,
+      "type": "langgraph/port_in",
+      "pos": [
+        2890.7999877929688,
+        1865.8
+      ],
+      "size": [
+        252,
+        78
+      ],
+      "flags": {},
+      "order": 68,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 83
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [CharFeedback]",
+      "properties": {
+        "tag": "CharFeedback"
+      }
+    },
+    {
+      "id": 76,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        810.3999938964844,
+        3420.3
       ],
       "size": [
         210,
-        102
+        147
       ],
       "flags": {},
-      "order": 20,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 57
+          "link": 128
         },
         {
           "name": "In",
@@ -1187,31 +548,42 @@
       ],
       "outputs": [
         {
-          "name": "Out",
+          "name": "accept",
           "type": "state",
           "links": [
-            101
+            130
           ],
           "slot_index": 0
+        },
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            140
+          ],
+          "slot_index": 1
         }
       ],
-      "title": "WithStateMapper",
+      "title": "ReviewGate_Storyboard",
       "properties": {
-        "name": "WithStateMapper",
-        "type": "standard",
-        "mapping_json": "{\"step_character_bible\":\"{{character_bible}}\"}"
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "keyframes",
+        "output_dir": "musicvideo",
+        "skip_if_key": "",
+        "review_ui": "review.html"
       }
     },
     {
-      "id": 26,
-      "type": "musicvideo/ImageGenerator",
+      "id": 86,
+      "type": "common/WithStateMapper",
       "pos": [
-        1348.3999938964844,
-        2080.525
+        1100.3999938964844,
+        3530.55
       ],
       "size": [
         210,
-        263
+        102
       ],
       "flags": {},
       "order": 31,
@@ -1220,12 +592,7 @@
         {
           "name": "In",
           "type": "state",
-          "link": 100
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": 65
+          "link": 140
         },
         {
           "name": "In",
@@ -1238,42 +605,66 @@
           "name": "Out",
           "type": "state",
           "links": [
-            67
+            132
           ],
           "slot_index": 0
         }
       ],
-      "title": "ImageGenerator_Char",
+      "title": "WithStateMapper",
       "properties": {
-        "name": "ImageGenerator",
+        "name": "WithStateMapper",
         "type": "standard",
-        "model": "google|gemini-3.1-flash-image-preview",
-        "prompt": "musicvideo/CharacterReference",
-        "reference_images": "{{reference_images}}",
-        "image_size": "2K",
-        "aspect_ratio": "16:9",
-        "output_dir": "musicvideo/characters"
+        "mapping_json": "{\"step_user_feedback\":\"{{user_feedback}}\"}"
       }
     },
     {
-      "id": 3,
-      "type": "musicvideo/StoryWriter",
+      "id": 84,
+      "type": "langgraph/port_out",
       "pos": [
-        470,
-        214
+        1100.3999938964844,
+        3697.55
+      ],
+      "size": [
+        226.8000030517578,
+        58
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            133
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [FrameFeedback]",
+      "properties": {
+        "tag": "FrameFeedback"
+      }
+    },
+    {
+      "id": 81,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1747.5999908447266,
+        3476.025
       ],
       "size": [
         210,
-        272
+        102
       ],
       "flags": {},
-      "order": 7,
+      "order": 51,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 26
+          "link": 134
         },
         {
           "name": "In",
@@ -1286,27 +677,1165 @@
           "name": "Out",
           "type": "state",
           "links": [
-            3
+            139
           ],
           "slot_index": 0
         }
       ],
-      "title": "StoryWriter",
+      "title": "WithStateMapper",
       "properties": {
-        "name": "StoryWriter",
+        "name": "WithStateMapper",
         "type": "standard",
-        "model": "{{STORY_MODEL}}",
-        "temperature": "0.7",
-        "prompt_name": "musicvideo/StoryWriter",
-        "recursion_limit": "100",
-        "tool_sets": [],
-        "required_keys": [
-          "story",
-          "character_bible",
-          "style_guide",
-          "scenes"
-        ],
-        "repo_path": "./"
+        "mapping_json": "{\"regenerate_frame\":\"{{keyframes[cur_feedback.index]}}\"}"
+      }
+    },
+    {
+      "id": 87,
+      "type": "common/WithStateMapper",
+      "pos": [
+        2037.5999908447266,
+        3476.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 58,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 139
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            135
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"regenerate_frame\":{\"user_feedback\":\"{{cur_feedback.feedback}}\",\"replace_index\":\"{{cur_feedback.index}}\"}}"
+      }
+    },
+    {
+      "id": 90,
+      "type": "common/Collector",
+      "pos": [
+        2411.5999908447266,
+        2888.8
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 61,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 144
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            145
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Collector",
+      "properties": {
+        "name": "Collector",
+        "type": "standard",
+        "input_key": "cur_keyframe_image",
+        "output_list_key": "keyframe_images",
+        "replacement_index": "{{cur_frame.idx}}",
+        "replace": false
+      }
+    },
+    {
+      "id": 91,
+      "type": "langgraph/port_in",
+      "pos": [
+        2701.5999908447266,
+        2912.8
+      ],
+      "size": [
+        260.3999938964844,
+        78
+      ],
+      "flags": {},
+      "order": 65,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 145
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [CollectFrames]",
+      "properties": {
+        "tag": "CollectFrames"
+      }
+    },
+    {
+      "id": 93,
+      "type": "langgraph/port_out",
+      "pos": [
+        1407.1999969482422,
+        3244.05
+      ],
+      "size": [
+        226.8000030517578,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            146
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [CollectFrames]",
+      "properties": {
+        "tag": "CollectFrames"
+      }
+    },
+    {
+      "id": 79,
+      "type": "langgraph/port_in",
+      "pos": [
+        2037.5999908447266,
+        3321.025
+      ],
+      "size": [
+        294,
+        78
+      ],
+      "flags": {},
+      "order": 57,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 131
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 95,
+      "type": "langgraph/port_in",
+      "pos": [
+        2701.5999908447266,
+        3101.8
+      ],
+      "size": [
+        294,
+        78
+      ],
+      "flags": {},
+      "order": 66,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 151
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 85,
+      "type": "common/WithState",
+      "pos": [
+        1747.5999908447266,
+        3309.025
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 137
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            131
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"regenerate_frame\":\"@delete\",\"step_user_feedback\":\"@delete\",\"cur_feedback\":\"@delete\"}"
+      }
+    },
+    {
+      "id": 88,
+      "type": "common/Stepper",
+      "pos": [
+        1747.5999908447266,
+        3022.05
+      ],
+      "size": [
+        210,
+        143
+      ],
+      "flags": {},
+      "order": 49,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 142
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 146
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            143
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            152
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "cur_keyframes",
+        "output_key": "cur_frame"
+      }
+    },
+    {
+      "id": 24,
+      "type": "musicvideo/StoryboardValidator",
+      "pos": [
+        760,
+        2502.3
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 35
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            36
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StoryboardValidator",
+      "properties": {
+        "name": "StoryboardValidator",
+        "type": "standard",
+        "shots": "{{shots}}",
+        "keyframes": "{{keyframes}}"
+      }
+    },
+    {
+      "id": 74,
+      "type": "musicvideo/GridSlicer",
+      "pos": [
+        1407.1999969482422,
+        3008.05
+      ],
+      "size": [
+        210,
+        171
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 127
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            142
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GridSlicer",
+      "properties": {
+        "name": "GridSlicer",
+        "type": "standard",
+        "image": "{{generated_image.local_path}}",
+        "count": "{{len(cur_keyframes)}}",
+        "output_dir": "musicvideo/frames"
+      }
+    },
+    {
+      "id": 66,
+      "type": "musicvideo/ImageGenerator",
+      "pos": [
+        1100.3999938964844,
+        2984.05
+      ],
+      "size": [
+        210,
+        219
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 153
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            127
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageGenerator_Grid",
+      "properties": {
+        "name": "ImageGenerator",
+        "type": "standard",
+        "model": "google|gemini-3.1-flash-image-preview",
+        "prompt": "musicvideo/GridImage",
+        "reference_images": "{{reference_images}}",
+        "image_size": "4K",
+        "aspect_ratio": "16:9",
+        "output_dir": "musicvideo/grids"
+      }
+    },
+    {
+      "id": 89,
+      "type": "common/Stepper",
+      "pos": [
+        2037.5999908447266,
+        2984.8
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 56,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 143
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            144
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            150
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "sliced_keyframe_images",
+        "output_key": "cur_keyframe_image"
+      }
+    },
+    {
+      "id": 96,
+      "type": "common/WithState",
+      "pos": [
+        2411.5999908447266,
+        3079.8
+      ],
+      "size": [
+        210,
+        122
+      ],
+      "flags": {},
+      "order": 62,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 150
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 152
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            151
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "\ud83d\uded1 WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"cur_frame\":\"@delete\",\"cur_keyframe_image\":\"@delete\",\"sliced_keyframe_images\":\"@delete\",\"generated_image\":\"@delete\",\"cur_keyframes\":\"@delete\"}",
+        "interrupt_before": true
+      }
+    },
+    {
+      "id": 62,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1340,
+        2435.3
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 108,
+          "slot_index": 0
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            107
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"step_keyframes\":\"{{keyframes}}\",\"validation_warnings\":\"@delete\",\"keyframe_images\":\"{{keyframes}}\"}"
+      }
+    },
+    {
+      "id": 20,
+      "type": "langgraph/port_out",
+      "pos": [
+        180,
+        3264.675
+      ],
+      "size": [
+        260.3999938964844,
+        58
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            112
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [GenerateKeyFrames]",
+      "properties": {
+        "tag": "GenerateKeyFrames"
+      }
+    },
+    {
+      "id": 77,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1100.3999938964844,
+        3355.05
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 130
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            129
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"step_keyframes\":\"@delete\",\"user_feedback\":\"@delete\",\"step_shots\":\"{{shots}}\"}"
+      }
+    },
+    {
+      "id": 102,
+      "type": "common/Stepper",
+      "pos": [
+        486.8000030517578,
+        4064.55
+      ],
+      "size": [
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 157
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            159
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "done",
+          "type": "state",
+          "links": null
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "step_shots",
+        "output_key": "cur_shot"
+      }
+    },
+    {
+      "id": 65,
+      "type": "common/FormatTemplate",
+      "pos": [
+        810.3999938964844,
+        3030.55
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 114
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            153
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "FormatTemplate",
+      "properties": {
+        "name": "FormatTemplate",
+        "type": "standard",
+        "template": "{% set n = cur_keyframes|length %}\n{% set cols = ceil(sqrt(n))|int %}\n{% set rows = ceil(n / cols)|int %}\n{% set orientation = \"HORIZONTAL (landscape, 16:9)\" %}\nGenerate a single {{ orientation }} image containing a {{ cols }}x{{ rows }} grid of animation keyframes for a music video.\n\nIMAGE ORIENTATION: {{ orientation }}.\n\nCHARACTER BIBLE:\n{% for char in character_bible %}\n{{ char.name }}: {{ char.description }}\n{% endfor %}\n\nSTYLE GUIDE:\n{{ style_guide }}\n\nGRID LAYOUT:\n{{ cols }} columns x {{ rows }} rows. Panels must be flush edge-to-edge with NO gaps, borders, margins, or spacing between them.\nEach panel occupies exactly 1/{{ cols }} of the width and 1/{{ rows }} of the height.\nEach panel is a {{ orientation }} frame.\nAll panels must share the same art style, color palette, and character designs for visual consistency.\n\nPANELS:\n{% for kf in cur_keyframes %}\n    {% set r = loop.index0 // cols + 1 %}\n    {% set c = loop.index0 % cols + 1 %}\nPanel ({{ r }},{{ c }}) \u2014 Keyframe {{ kf.idx }}: {{ kf.image_prompt }}\n{% endfor %}\n\nIMPORTANT:\nGenerate exactly one {{ orientation }} image with all {{ n }} panels arranged in a {{ cols }}x{{ rows }} grid with NO borders or gaps.\nMaintain consistent character appearances and art style across all panels.",
+        "output_key": "grid_prompt"
+      }
+    },
+    {
+      "id": 83,
+      "type": "langgraph/port_in",
+      "pos": [
+        2701.5999908447266,
+        3488.025
+      ],
+      "size": [
+        260.3999938964844,
+        78
+      ],
+      "flags": {},
+      "order": 67,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 136
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [FrameFeedback]",
+      "properties": {
+        "tag": "FrameFeedback"
+      }
+    },
+    {
+      "id": 98,
+      "type": "langgraph/port_out",
+      "pos": [
+        180,
+        4097.05
+      ],
+      "size": [
+        226.8000030517578,
+        58
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            157
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [GenerateShots]",
+      "properties": {
+        "tag": "GenerateShots"
+      }
+    },
+    {
+      "id": 82,
+      "type": "common/Collector",
+      "pos": [
+        2411.5999908447266,
+        3464.025
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 63,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 135
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            136
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Collector",
+      "properties": {
+        "name": "Collector",
+        "type": "standard",
+        "input_key": "regenerate_frame",
+        "output_list_key": "step_keyframes",
+        "replacement_index": "",
+        "replace": false
+      }
+    },
+    {
+      "id": 104,
+      "type": "langgraph/port_in",
+      "pos": [
+        1646.8000030517578,
+        4087.05
+      ],
+      "size": [
+        260.3999938964844,
+        78
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 163
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [GenerateShots]",
+      "properties": {
+        "tag": "GenerateShots"
+      }
+    },
+    {
+      "id": 105,
+      "type": "common/Collector",
+      "pos": [
+        1356.8000030517578,
+        4063.05
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 162
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            163
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Collector",
+      "properties": {
+        "name": "Collector",
+        "type": "standard",
+        "input_key": "generated_video",
+        "output_list_key": "shot_videos",
+        "replacement_index": "",
+        "replace": false
+      }
+    },
+    {
+      "id": 63,
+      "type": "common/BatchedStepper",
+      "pos": [
+        520.3999938964844,
+        3220.175
+      ],
+      "size": [
+        210,
+        147
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 112
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            114
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            128
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "BatchedStepper",
+      "properties": {
+        "name": "BatchedStepper",
+        "type": "router",
+        "input_list_key": "step_keyframes",
+        "output_list_key": "cur_keyframes",
+        "size": "25"
+      }
+    },
+    {
+      "id": 103,
+      "type": "common/WithStateMapper",
+      "pos": [
+        776.8000030517578,
+        4075.05
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 159
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            160
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"start_frame\":\"{{keyframe_images[cur_shot.start_keyframe_idx]}}\",\"end_frame\":\"{{keyframe_images[cur_shot.end_keyframe_idx]}}\",\"motion_prompt\":\"{{cur_shot.motion_prompt}}\"}"
+      }
+    },
+    {
+      "id": 101,
+      "type": "musicvideo/GoogleVideoGenerator",
+      "pos": [
+        1066.8000030517578,
+        3944.55
+      ],
+      "size": [
+        210,
+        363
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 160
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            162
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GoogleVideoGenerator",
+      "properties": {
+        "name": "GoogleVideoGenerator",
+        "type": "standard",
+        "model": "google|veo-3.1-fast-generate-preview",
+        "prompt": "musicvideo/ShotPrompt",
+        "start_frame": "{{start_frame.local_path}}",
+        "end_frame": "{{end_frame.local_path}}",
+        "aspect_ratio": "16:9",
+        "duration": "{{cur_shot.duration}}",
+        "resolution": "720p",
+        "generate_audio": false,
+        "output_dir": "musicvideo/clips",
+        "person_generation": "allow_adult"
+      }
+    },
+    {
+      "id": 80,
+      "type": "common/Stepper",
+      "pos": [
+        1407.1999969482422,
+        3510.05
+      ],
+      "size": [
+        210,
+        143
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 132
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 133
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            137
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            134
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "step_user_feedback",
+        "output_key": "cur_feedback",
+        "input_list": "{{step_character_bible}}"
       }
     },
     {
@@ -1314,14 +1843,14 @@
       "type": "musicvideo/StoryboardPlanner",
       "pos": [
         470,
-        2631.025
+        2427.8
       ],
       "size": [
         210,
         272
       ],
       "flags": {},
-      "order": 6,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -1362,25 +1891,24 @@
       }
     },
     {
-      "id": 62,
-      "type": "common/WithStateMapper",
+      "id": 7,
+      "type": "musicvideo/LyricsReader",
       "pos": [
-        1340,
-        2638.525
+        400,
+        536.7749999999999
       ],
       "size": [
         210,
-        102
+        123
       ],
       "flags": {},
-      "order": 26,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 108,
-          "slot_index": 0
+          "link": 13
         },
         {
           "name": "In",
@@ -1392,38 +1920,36 @@
         {
           "name": "Out",
           "type": "state",
-          "links": [
-            107
-          ],
+          "links": [],
           "slot_index": 0
         }
       ],
-      "title": "WithStateMapper",
+      "title": "LyricsReader",
       "properties": {
-        "name": "WithStateMapper",
+        "name": "LyricsReader",
         "type": "standard",
-        "mapping_json": "{\"step_keyframes\":\"{{keyframes}}\"}"
+        "lyrics_file_path": "C:\\Users\\lxf25\\Music\\\u6211\u7684\u5929\u72fc\u661f.txt"
       }
     },
     {
-      "id": 63,
-      "type": "common/BatchedStepper",
+      "id": 2,
+      "type": "musicvideo/MusicAnalyzer",
       "pos": [
-        520.3999938964844,
-        3140.025
+        400,
+        724.7749999999999
       ],
       "size": [
         210,
-        147
+        123
       ],
       "flags": {},
-      "order": 12,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 112
+          "link": 1
         },
         {
           "name": "In",
@@ -1433,38 +1959,29 @@
       ],
       "outputs": [
         {
-          "name": "next",
+          "name": "Out",
           "type": "state",
-          "links": [
-            114
-          ],
+          "links": [],
           "slot_index": 0
-        },
-        {
-          "name": "done",
-          "type": "state",
-          "links": null
         }
       ],
-      "title": "BatchedStepper",
+      "title": "MusicAnalyzer",
       "properties": {
-        "name": "BatchedStepper",
-        "type": "router",
-        "input_list_key": "step_keyframes",
-        "output_list_key": "cur_keyframes",
-        "size": "25"
+        "name": "MusicAnalyzer",
+        "type": "standard",
+        "music_file_path": "C:\\Users\\lxf25\\Music\\\u6211\u7684\u5929\u72fc\u661f.wav"
       }
     },
     {
-      "id": 65,
-      "type": "common/FormatTemplate",
+      "id": 106,
+      "type": "musicvideo/ReviewGate",
       "pos": [
-        810.3999938964844,
-        3150.525
+        690,
+        263.5
       ],
       "size": [
         210,
-        126
+        147
       ],
       "flags": {},
       "order": 18,
@@ -1473,7 +1990,90 @@
         {
           "name": "In",
           "type": "state",
-          "link": 114
+          "link": 168
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            172
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_MusicReview",
+      "properties": {
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "music_review",
+        "output_dir": "musicvideo",
+        "skip_if_key": "",
+        "review_ui": "review.html"
+      }
+    },
+    {
+      "id": 59,
+      "type": "langgraph/port_in",
+      "pos": [
+        980,
+        298
+      ],
+      "size": [
+        235.1999969482422,
+        78
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": 0,
+          "link": 172
+        },
+        {
+          "name": "In",
+          "type": 0,
+          "link": null
+        }
+      ],
+      "title": "Portal Entrance [WriteStory]",
+      "properties": {
+        "tag": "WriteStory"
+      }
+    },
+    {
+      "id": 30,
+      "type": "musicvideo/CreativeInput",
+      "pos": [
+        400,
+        214
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 43
         },
         {
           "name": "In",
@@ -1486,29 +2086,85 @@
           "name": "Out",
           "type": "state",
           "links": [
-            115
+            168
           ],
           "slot_index": 0
         }
       ],
-      "title": "FormatTemplate",
+      "title": "CreativeInput",
       "properties": {
-        "name": "FormatTemplate",
+        "name": "CreativeInput",
         "type": "standard",
-        "template": "{% set n = cur_keyframes|length %}\n{% set cols = ceil(sqrt(n))|int %}\n{% set rows = ceil(n / cols)|int %}\n{% set orientation = \"VERTICAL (portrait, 9:16)\" %}\nGenerate a single {{ orientation }} image containing a {{ cols }}x{{ rows }} grid of animation keyframes for a music video.\n\nIMAGE ORIENTATION: {{ orientation }}.\n\nCHARACTER BIBLE:\n{% for char in character_bible %}\n{{ char.name }}: {{ char.description }}\n{% endfor %}\n\nSTYLE GUIDE:\n{{ style_guide }}\n\nGRID LAYOUT:\n{{ cols }} columns x {{ rows }} rows. Panels must be flush edge-to-edge with NO gaps, borders, margins, or spacing between them.\nEach panel occupies exactly 1/{{ cols }} of the width and 1/{{ rows }} of the height.\nEach panel is a {{ orientation }} frame.\nAll panels must share the same art style, color palette, and character designs for visual consistency.\n\nPANELS:\n{% for kf in cur_keyframes %}\n    {% set r = loop.index0 // cols + 1 %}\n    {% set c = loop.index0 % cols + 1 %}\nPanel ({{ r }},{{ c }}) \u2014 Keyframe {{ kf.idx }}: {{ kf.image_prompt }}\n{% endfor %}\n\nIMPORTANT:\nGenerate exactly one {{ orientation }} image with all {{ n }} panels arranged in a {{ cols }}x{{ rows }} grid with NO borders or gaps.\nMaintain consistent character appearances and art style across all panels.",
-        "output_key": "grid_prompt"
+        "story_prompt": "",
+        "character_prompt": "",
+        "reference_image_1": "",
+        "reference_image_2": "",
+        "reference_image_3": ""
       }
     },
     {
-      "id": 61,
-      "type": "langgraph/port_in",
+      "id": 38,
+      "type": "common/Stepper",
       "pos": [
-        1646.8000030517578,
-        2650.525
+        478.3999938964844,
+        1840.41875
       ],
       "size": [
-        294,
-        78
+        210,
+        123
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 60
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            71
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            176
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "tmp.step_character_bible",
+        "output_key": "tmp.current_character",
+        "input_list": "{{step_character_bible}}"
+      }
+    },
+    {
+      "id": 4,
+      "type": "musicvideo/ReviewGate",
+      "pos": [
+        1050,
+        1091.7749999999999
+      ],
+      "size": [
+        210,
+        147
       ],
       "flags": {},
       "order": 33,
@@ -1516,40 +2172,62 @@
       "inputs": [
         {
           "name": "In",
-          "type": 0,
-          "link": 107,
-          "slot_index": 0
+          "type": "state",
+          "link": 3
         },
         {
           "name": "In",
-          "type": 0,
+          "type": "state",
           "link": null
         }
       ],
-      "title": "Portal Entrance [GenerateKeyFrames]",
+      "outputs": [
+        {
+          "name": "accept",
+          "type": "state",
+          "links": [
+            178
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "regenerate",
+          "type": "state",
+          "links": [
+            27
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "ReviewGate_Story",
       "properties": {
-        "tag": "GenerateKeyFrames"
+        "name": "ReviewGate",
+        "type": "router",
+        "stage": "story",
+        "output_dir": "musicvideo",
+        "skip_if_key": "",
+        "review_ui": "review.html"
       }
     },
     {
-      "id": 66,
-      "type": "musicvideo/ImageGenerator",
+      "id": 115,
+      "type": "common/WithState",
       "pos": [
-        1100.3999938964844,
-        3092.025
+        1340,
+        1036.7749999999999
       ],
       "size": [
         210,
-        243
+        102
       ],
       "flags": {},
-      "order": 25,
+      "order": 43,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 115
+          "link": 178
         },
         {
           "name": "In",
@@ -1562,102 +2240,37 @@
           "name": "Out",
           "type": "state",
           "links": [
-            117
+            179
           ],
           "slot_index": 0
         }
       ],
-      "title": "ImageGenerator_Grid",
+      "title": "WithState",
       "properties": {
-        "name": "ImageGenerator",
+        "name": "WithState",
         "type": "standard",
-        "model": "google|gemini-3.1-flash-image-preview",
-        "prompt": "musicvideo/GridImage",
-        "reference_images": "{{reference_images}}",
-        "image_size": "4K",
-        "aspect_ratio": "9:16",
-        "output_dir": "musicvideo/grids"
+        "state_json": "{\"tmp\":\"@delete\"}"
       }
     },
     {
-      "id": 20,
-      "type": "langgraph/port_out",
-      "pos": [
-        180,
-        3184.525
-      ],
-      "size": [
-        260.3999938964844,
-        58
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "Out",
-          "type": null,
-          "links": [
-            112
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Portal Exit [GenerateKeyFrames]",
-      "properties": {
-        "tag": "GenerateKeyFrames"
-      }
-    },
-    {
-      "id": 69,
-      "type": "langgraph/port_in",
-      "pos": [
-        1680.3999938964844,
-        3174.525
-      ],
-      "size": [
-        294,
-        78
-      ],
-      "flags": {},
-      "order": 37,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": 0,
-          "link": 118
-        },
-        {
-          "name": "In",
-          "type": 0,
-          "link": null
-        }
-      ],
-      "title": "Portal Entrance [GenerateKeyFrames]",
-      "properties": {
-        "tag": "GenerateKeyFrames"
-      }
-    },
-    {
-      "id": 68,
+      "id": 40,
       "type": "common/Collector",
       "pos": [
-        1390.3999938964844,
-        3150.525
+        1348.3999938964844,
+        2066.3
       ],
       "size": [
         210,
         126
       ],
       "flags": {},
-      "order": 32,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 117
+          "link": 67
         },
         {
           "name": "In",
@@ -1670,7 +2283,7 @@
           "name": "Out",
           "type": "state",
           "links": [
-            118
+            68
           ],
           "slot_index": 0
         }
@@ -1680,24 +2293,211 @@
         "name": "Collector",
         "type": "standard",
         "input_key": "generated_image",
-        "output_list_key": "generated_frames",
-        "replacement_index": "",
+        "output_list_key": "character_images",
+        "replacement_index": "{{tmp.current_character.replace_index}}",
         "replace": false
+      }
+    },
+    {
+      "id": 53,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1348.3999938964844,
+        1776.3
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 92
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            93
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"tmp\":{\"step_user_feedback\":\"{{user_feedback}}\"}}"
+      }
+    },
+    {
+      "id": 45,
+      "type": "common/Stepper",
+      "pos": [
+        1646.7999877929688,
+        1755.8
+      ],
+      "size": [
+        210,
+        143
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 93
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": 84
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "done",
+          "type": "state",
+          "links": [
+            182
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "next",
+          "type": "state",
+          "links": [
+            82
+          ],
+          "slot_index": 1
+        }
+      ],
+      "title": "Stepper",
+      "properties": {
+        "name": "Stepper",
+        "type": "router",
+        "input_list_key": "tmp.step_user_feedback",
+        "output_key": "tmp.cur_feedback",
+        "input_list": "{{step_character_bible}}"
+      }
+    },
+    {
+      "id": 46,
+      "type": "common/WithStateMapper",
+      "pos": [
+        1978.7999877929688,
+        1853.8
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 82
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            95
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"tmp\":{\"regenerate_character\":\"{{character_bible[cur_feedback.index]}}\"}}"
+      }
+    },
+    {
+      "id": 55,
+      "type": "common/WithStateMapper",
+      "pos": [
+        2310.7999877929688,
+        1853.8
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 60,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 95
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            96
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithStateMapper",
+      "properties": {
+        "name": "WithStateMapper",
+        "type": "standard",
+        "mapping_json": "{\"tmp\":{\"regenerate_character\":{\"user_feedback\":\"{{tmp.cur_feedback.feedback}}\",\"replace_index\":\"{{tmp.cur_feedback.index}}\"}}}"
       }
     },
     {
       "id": 47,
       "type": "common/Collector",
       "pos": [
-        2617.5999908447266,
-        1862.025
+        2600.7999877929688,
+        1841.8
       ],
       "size": [
         210,
         126
       ],
       "flags": {},
-      "order": 43,
+      "order": 64,
       "mode": 0,
       "inputs": [
         {
@@ -1725,31 +2525,31 @@
       "properties": {
         "name": "Collector",
         "type": "standard",
-        "input_key": "regenerate_character",
-        "output_list_key": "step_character_bible",
+        "input_key": "tmp.regenerate_character",
+        "output_list_key": "tmp.step_character_bible",
         "replacement_index": "",
         "replace": false
       }
     },
     {
-      "id": 60,
+      "id": 28,
       "type": "langgraph/port_in",
       "pos": [
-        1646.7999877929688,
-        1491
+        1978.7999877929688,
+        1710.8
       ],
       "size": [
-        226.8000030517578,
+        252,
         78
       ],
       "flags": {},
-      "order": 34,
+      "order": 54,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": 0,
-          "link": 122
+          "link": 182
         },
         {
           "name": "In",
@@ -1757,83 +2557,30 @@
           "link": null
         }
       ],
-      "title": "Portal Entrance [PlanStory]",
+      "title": "Portal Entrance [GenerateChar]",
       "properties": {
-        "tag": "PlanStory"
+        "tag": "GenerateChar"
       }
     },
     {
-      "id": 27,
-      "type": "musicvideo/ReviewGate",
+      "id": 36,
+      "type": "common/WithStateMapper",
       "pos": [
-        1058.3999938964844,
-        1624.2625
+        1655.1999969482422,
+        1036.7749999999999
       ],
       "size": [
         210,
-        123
+        102
       ],
       "flags": {},
-      "order": 22,
+      "order": 53,
       "mode": 0,
       "inputs": [
         {
           "name": "In",
           "type": "state",
-          "link": 72
-        },
-        {
-          "name": "In",
-          "type": "state",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "accept",
-          "type": "state",
-          "links": [
-            121
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "regenerate",
-          "type": "state",
-          "links": [
-            92
-          ],
-          "slot_index": 1
-        }
-      ],
-      "title": "ReviewGate_Characters",
-      "properties": {
-        "name": "ReviewGate",
-        "type": "router",
-        "stage": "characters",
-        "output_dir": "musicvideo",
-        "review_ui": "review.html"
-      }
-    },
-    {
-      "id": 72,
-      "type": "common/BatchCollector",
-      "pos": [
-        1348.3999938964844,
-        1479
-      ],
-      "size": {
-        "0": 210,
-        "1": 102
-      },
-      "flags": {},
-      "order": 29,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "In",
-          "type": "state",
-          "link": 121
+          "link": 179
         },
         {
           "name": "In",
@@ -1846,17 +2593,281 @@
           "name": "Out",
           "type": "state",
           "links": [
-            122
+            101
           ],
           "slot_index": 0
         }
       ],
-      "title": "BatchCollector",
+      "title": "WithStateMapper",
       "properties": {
-        "name": "BatchCollector",
+        "name": "WithStateMapper",
         "type": "standard",
-        "input_list_key": "character_images",
-        "output_list_key": "reference_images"
+        "mapping_json": "{\"tmp\":{\"step_character_bible\":\"{{story.character_bible}}\"}}"
+      }
+    },
+    {
+      "id": 3,
+      "type": "musicvideo/StoryWriter",
+      "pos": [
+        760,
+        1055.7749999999999
+      ],
+      "size": [
+        210,
+        219
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 174
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "StoryWriter",
+      "properties": {
+        "name": "StoryWriter",
+        "type": "standard",
+        "model": "{{STORY_MODEL}}",
+        "temperature": "1.25",
+        "prompt": "{{tmp.story_prompt}}",
+        "required_keys": [
+          "instruments",
+          "emotions",
+          "mood",
+          "genre",
+          "energy_arc",
+          "story",
+          "character_bible",
+          "style_guide",
+          "scenes"
+        ],
+        "music_file_path": "{{music_analyzed_result.music_file_path}}"
+      }
+    },
+    {
+      "id": 56,
+      "type": "common/FormatTemplate",
+      "pos": [
+        768.3999938964844,
+        2066.3
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 176
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            100
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "FormatTemplate",
+      "properties": {
+        "name": "FormatTemplate",
+        "type": "standard",
+        "template": "Generate a CHARACTER REFERENCE SHEET for \"{{ tmp.current_character.name }}\" photographed in a neutral photography studio.\n\nCHARACTER DESCRIPTION:\n{{ tmp.current_character.description }}\n\nSTYLE GUIDE:\n{{ story.style_guide }}\n{% if user_prompts.character_prompt %}\nCHARACTER DIRECTION:\n{{ user_prompts.character_prompt }}\n{% endif %}\n{% if tmp.current_character.user_feedback %}\nADDITIONAL REQUIREMENT:\n{{ tmp.current_character.user_feedback }}\n{% endif %}\n\nLAYOUT (left to right, evenly spaced across the image):\n1. LEFT THIRD \u2014 Full-body front view, standing in a neutral pose, head to toe visible\n2. CENTER THIRD \u2014 3/4 angle view (slightly turned), same outfit and proportions\n3. RIGHT THIRD \u2014 Close-up portrait from the shoulders up, showing face details clearly\n\nRULES:\n- Neutral studio backdrop (soft gray or muted tone), no scenery, no props\n- All three views must depict the EXACT same person with identical clothing, hair, and features\n- Every detail from the character description must be visible (tattoos, jewelry, scars, etc.)\n- Art style must match the style guide exactly\n- Label the character's name at the top center of the image\n- This is a reference sheet for consistency \u2014 prioritize clarity and detail over style or action\n- AVOID the typical AI-generated look: no plastic skin, no airbrushed smoothness, no glowing rim lighting, no overly symmetrical features\n- Add natural imperfections: subtle skin texture, asymmetry, fabric wrinkles, stray hairs\n- Lighting should be flat and even (like a studio reference sheet), not dramatic or cinematic\n- Prefer Asian Chinese features for characters unless the character description specifies otherwise",
+        "output_key": "tmp.character_prompt"
+      }
+    },
+    {
+      "id": 16,
+      "type": "langgraph/port_out",
+      "pos": [
+        180,
+        1136.2749999999999
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "Out",
+          "type": null,
+          "links": [
+            188
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Portal Exit [WriteStory]",
+      "properties": {
+        "tag": "WriteStory"
+      }
+    },
+    {
+      "id": 111,
+      "type": "common/FormatTemplate",
+      "pos": [
+        470,
+        1102.2749999999999
+      ],
+      "size": [
+        210,
+        126
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 188
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            174
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "FormatTemplate",
+      "properties": {
+        "name": "FormatTemplate",
+        "type": "standard",
+        "template": "# StoryWriter \u2014 Music Video Visual Story Generation\n\nYou are a music video director and visual storyteller. You will create a complete visual blueprint for a music video based on the song's structure, lyrics, and timing. The viewer will watch the video while listening to the song, so every visual moment must emotionally match what they hear.\n\n## Song Info\n\nBPM: {{ music_analyzed_result.bpm }}, Duration: {{ music_analyzed_result.total_duration }}s, Segments: {{ music_analyzed_result.segments | length }}\n\n## Lyrics\n\n{% for line in lyrics.lines %}{{ line }}\n{% endfor %}\n\n## Song Structure\n\nThe song is broken into segments (intro, verse, chorus, bridge, solo, outro, etc.). Each segment below has a label, timestamps, duration, and the lyrics sung during it.\n\n**Your `scenes` array MUST have exactly one scene per segment**, with `segment_idx` matching the index shown.\n\n{% for seg in music_analyzed_result.segments %}[{{ loop.index0 }}] {{ seg.label }} ({{ seg.start }}s \u2013 {{ seg.end }}s, {{ seg.duration }}s)\n{% set seg_lyrics = [] %}{% for lt in lyrics.timed %}{% if lt.time >= seg.start - 1 and lt.time < seg.end - 1 %}{% if seg_lyrics.append(lt.text) %}{% endif %}{% endif %}{% endfor %}{% if seg_lyrics %}Lyrics: {{ seg_lyrics | join(' / ') }}{% else %}Lyrics: (instrumental){% endif %}\n{% endfor %}\n\n## How to use the song structure\n\n- The **label** tells you the segment's musical role \u2014 use the role hint to guide the visual tone.\n- **Lyrics** show the words sung during that segment. The visuals should reflect or complement them.\n- **Instrumental segments** (no lyrics) are opportunities for purely visual storytelling \u2014 abstract imagery, landscapes, montages, or character moments.\n- **Duration** matters: a 3-second hook needs one striking image; a 30-second chorus can have sweeping camera moves and multiple beats.\n- **Visual continuity**: scenes should flow into each other like a real music video, not feel like disconnected slides.\n- **Recurring choruses** should share a visual motif (same or similar setting/pose) but with escalating intensity each time.\n\n## Your Task\n\nCreate a complete visual blueprint for this music video. Output a JSON object with these exact keys:\n\n### 1. `instruments` (array)\nAn array of instruments you can hear in the track. For each instrument, provide:\n- `name`: the instrument name (e.g. \"acoustic guitar\", \"piano\", \"drum kit\", \"synthesizer\", \"bass guitar\", \"vocals\")\n- `role`: its role in the arrangement (e.g. \"lead melody\", \"rhythm/chords\", \"bass line\", \"percussion\", \"backing harmony\", \"lead vocals\")\n- `presence`: how prominent it is (\"dominant\", \"supporting\", \"subtle\")\n\n### 2. `emotions` (array)\nThe primary emotions conveyed by the music, in order of prominence. Each entry:\n- `emotion`: the emotion name (e.g. \"longing\", \"hope\", \"joy\", \"melancholy\", \"tenderness\")\n- `intensity`: \"strong\", \"moderate\", or \"subtle\"\n\n### 3. `mood` (string)\nA single paragraph describing the overall mood, atmosphere, and feeling of the track. Be specific about how the mood evolves.\n\n### 4. `genre` (string)\nThe genre or style (e.g. \"pop ballad\", \"indie rock\", \"R&B\", \"electronic\")\n\n### 5. `energy_arc` (string)\nDescribe how the energy level changes throughout the song (e.g. \"starts soft and intimate, builds through the chorus, drops for the bridge, then surges to the final chorus\")\n\n### 6. `story` (string)\nA 2-4 paragraph narrative arc for the music video. Describe the overall story \u2014 beginning, middle, end. What is the emotional journey? What is the central conflict or theme? The story must follow the emotional arc of the music.\n\n### 7. `character_bible` (array)\nDefine **1 or 2 main characters** (never more than 2). Each character is an object with:\n- `name`: A short name for the character\n- `description`: EXACT physical description that will be copied VERBATIM into every image generation prompt. Must include:\n  - Gender, age range, hair (style + color), eyes, skin tone, build\n  - Specific clothing (colors, textures, style)\n  - Any distinguishing features (tattoos, jewelry, scars, etc.)\n\nExample:\n```json\n[\n  {\n    \"name\": \"Mia\",\n    \"description\": \"A Chinese woman in her late 20s with shoulder-length straight black hair, dark brown almond-shaped eyes, warm ivory skin with a natural flush on her cheeks. She wears a vintage navy blue leather jacket over a cream silk blouse, dark fitted jeans, and silver hoop earrings. She has a small crescent moon tattoo behind her left ear.\"\n  }\n]\n```\n\n### 8. `style_guide` (string)\nDefine the visual style for EVERY generated image. Include:\n- Art style (e.g., cinematic, anime, watercolor, photorealistic)\n- Color palette (3-5 specific colors)\n- Lighting direction (e.g., golden hour, neon, dramatic chiaroscuro)\n- Texture/film quality (e.g., 35mm film grain, clean digital, soft focus)\n\nFormat as a single descriptive paragraph.\n\n### 9. `scenes` (array)\nOne scene per segment. Each element must have:\n- `segment_idx`: Index matching the segment (0-based)\n- `setting`: Where does this scene take place? Be specific about the environment.\n- `action`: What is happening? What are the characters doing? Reference the lyrics being sung if applicable.\n- `mood`: The emotional tone of this scene\n- `camera`: Camera angle and movement (e.g., \"wide establishing shot slowly pushing in\", \"handheld close-up, slightly shaky\")\n\n## Rules\n\n1. The story must follow the emotional arc of the music \u2014 verses build narrative, choruses are emotional peaks, bridges are turning points.\n2. Every scene must be visualizable \u2014 no abstract emotions, only concrete visual actions and settings.\n3. The character_bible descriptions will be pasted word-for-word into image prompts. Make them precise and visual.\n4. **Maximum 2 characters.** Fewer characters means better visual consistency across the entire video.\n5. Keep the story grounded \u2014 the viewer should understand the story without hearing the lyrics.\n6. Characters MUST be Asian Chinese \u2014 the character_bible descriptions must explicitly state Chinese ethnicity and include East Asian facial features. Hair can be any color or style (dyed, natural, etc.). Only deviate from Chinese ethnicity if the story direction explicitly requests otherwise.\n7. Characters should be exceptionally attractive \u2014 design them to be strikingly handsome or beautiful. Include features like sharp jawlines, clear skin, expressive eyes, and well-proportioned faces. Think top-tier C-drama or K-drama casting.\n\n{% if user_prompts.story_prompt is defined and user_prompts.story_prompt %}## Story Direction\n{{ user_prompts.story_prompt }}\n{% endif %}\n{% if user_feedback is defined and user_feedback %}## Feedback from Previous Review\n{{ user_feedback }}\n{% endif %}\n\n## Output Format\n\nReturn ONLY a valid JSON object with keys: `instruments`, `emotions`, `mood`, `genre`, `energy_arc`, `story`, `character_bible`, `style_guide`, `scenes`.\nDo not include any explanation or markdown \u2014 just the JSON.",
+        "output_key": "tmp.story_prompt"
+      }
+    },
+    {
+      "id": 26,
+      "type": "musicvideo/ImageGenerator",
+      "pos": [
+        1058.3999938964844,
+        2019.8
+      ],
+      "size": [
+        210,
+        219
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 100
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            67
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "ImageGenerator_Char",
+      "properties": {
+        "name": "ImageGenerator",
+        "type": "standard",
+        "model": "{{IMAGE_MODEL}}",
+        "prompt": "{{tmp.character_prompt}}",
+        "reference_images": "{{reference_images}}",
+        "image_size": "2K",
+        "aspect_ratio": "16:9",
+        "output_dir": "musicvideo/characters"
+      }
+    },
+    {
+      "id": 42,
+      "type": "common/WithState",
+      "pos": [
+        768.3999938964844,
+        1623.5375
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "In",
+          "type": "state",
+          "link": 71
+        },
+        {
+          "name": "In",
+          "type": "state",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Out",
+          "type": "state",
+          "links": [
+            72
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "WithState",
+      "properties": {
+        "name": "WithState",
+        "type": "standard",
+        "state_json": "{\"tmp\":\"@delete\",\"generated_image\":\"@delete\"}"
       }
     }
   ],
@@ -1882,14 +2893,6 @@
       1,
       0,
       7,
-      0,
-      "state"
-    ],
-    [
-      26,
-      16,
-      0,
-      3,
       0,
       "state"
     ],
@@ -1942,27 +2945,11 @@
       "state"
     ],
     [
-      57,
-      4,
-      0,
-      36,
-      0,
-      "state"
-    ],
-    [
       60,
       35,
       0,
       38,
       0,
-      "state"
-    ],
-    [
-      65,
-      39,
-      0,
-      26,
-      1,
       "state"
     ],
     [
@@ -2022,22 +3009,6 @@
       "state"
     ],
     [
-      89,
-      45,
-      0,
-      51,
-      0,
-      "state"
-    ],
-    [
-      90,
-      51,
-      0,
-      28,
-      0,
-      "state"
-    ],
-    [
       92,
       27,
       1,
@@ -2070,30 +3041,6 @@
       "state"
     ],
     [
-      97,
-      57,
-      0,
-      56,
-      0,
-      "state"
-    ],
-    [
-      98,
-      38,
-      1,
-      57,
-      0,
-      "state"
-    ],
-    [
-      99,
-      57,
-      0,
-      39,
-      0,
-      "state"
-    ],
-    [
       100,
       56,
       0,
@@ -2107,30 +3054,6 @@
       0,
       58,
       0,
-      "state"
-    ],
-    [
-      102,
-      30,
-      0,
-      59,
-      0,
-      "state"
-    ],
-    [
-      103,
-      2,
-      0,
-      59,
-      1,
-      "state"
-    ],
-    [
-      104,
-      7,
-      0,
-      59,
-      2,
       "state"
     ],
     [
@@ -2166,30 +3089,6 @@
       "state"
     ],
     [
-      115,
-      65,
-      0,
-      66,
-      0,
-      "state"
-    ],
-    [
-      117,
-      66,
-      0,
-      68,
-      0,
-      "state"
-    ],
-    [
-      118,
-      68,
-      0,
-      69,
-      0,
-      "state"
-    ],
-    [
       121,
       27,
       0,
@@ -2204,6 +3103,286 @@
       60,
       0,
       "state"
+    ],
+    [
+      127,
+      66,
+      0,
+      74,
+      0,
+      "state"
+    ],
+    [
+      128,
+      63,
+      1,
+      76,
+      0,
+      "state"
+    ],
+    [
+      129,
+      77,
+      0,
+      78,
+      0,
+      "state"
+    ],
+    [
+      130,
+      76,
+      0,
+      77,
+      0,
+      "state"
+    ],
+    [
+      131,
+      85,
+      0,
+      79,
+      0,
+      "state"
+    ],
+    [
+      132,
+      86,
+      0,
+      80,
+      0,
+      "state"
+    ],
+    [
+      133,
+      84,
+      0,
+      80,
+      1,
+      "state"
+    ],
+    [
+      134,
+      80,
+      1,
+      81,
+      0,
+      "state"
+    ],
+    [
+      135,
+      87,
+      0,
+      82,
+      0,
+      "state"
+    ],
+    [
+      136,
+      82,
+      0,
+      83,
+      0,
+      "state"
+    ],
+    [
+      137,
+      80,
+      0,
+      85,
+      0,
+      "state"
+    ],
+    [
+      139,
+      81,
+      0,
+      87,
+      0,
+      "state"
+    ],
+    [
+      140,
+      76,
+      1,
+      86,
+      0,
+      "state"
+    ],
+    [
+      142,
+      74,
+      0,
+      88,
+      0,
+      "state"
+    ],
+    [
+      143,
+      88,
+      0,
+      89,
+      0,
+      "state"
+    ],
+    [
+      144,
+      89,
+      0,
+      90,
+      0,
+      "state"
+    ],
+    [
+      145,
+      90,
+      0,
+      91,
+      0,
+      "state"
+    ],
+    [
+      146,
+      93,
+      0,
+      88,
+      1,
+      "state"
+    ],
+    [
+      150,
+      89,
+      1,
+      96,
+      0,
+      "state"
+    ],
+    [
+      151,
+      96,
+      0,
+      95,
+      0,
+      "state"
+    ],
+    [
+      152,
+      88,
+      1,
+      96,
+      1,
+      "state"
+    ],
+    [
+      153,
+      65,
+      0,
+      66,
+      0,
+      "state"
+    ],
+    [
+      157,
+      98,
+      0,
+      102,
+      0,
+      "state"
+    ],
+    [
+      159,
+      102,
+      0,
+      103,
+      0,
+      "state"
+    ],
+    [
+      160,
+      103,
+      0,
+      101,
+      0,
+      "state"
+    ],
+    [
+      162,
+      101,
+      0,
+      105,
+      0,
+      "state"
+    ],
+    [
+      163,
+      105,
+      0,
+      104,
+      0,
+      "state"
+    ],
+    [
+      168,
+      30,
+      0,
+      106,
+      0,
+      "state"
+    ],
+    [
+      172,
+      106,
+      0,
+      59,
+      0,
+      "state"
+    ],
+    [
+      174,
+      111,
+      0,
+      3,
+      0,
+      "state"
+    ],
+    [
+      176,
+      38,
+      1,
+      56,
+      0,
+      "state"
+    ],
+    [
+      178,
+      4,
+      0,
+      115,
+      0,
+      "state"
+    ],
+    [
+      179,
+      115,
+      0,
+      36,
+      0,
+      "state"
+    ],
+    [
+      182,
+      45,
+      0,
+      28,
+      0,
+      "state"
+    ],
+    [
+      188,
+      16,
+      0,
+      111,
+      0,
+      "state"
     ]
   ],
   "groups": [
@@ -2211,9 +3390,9 @@
       "title": "WriteStory",
       "bounding": [
         140,
-        140,
-        1517,
-        396
+        963,
+        2097,
+        369
       ],
       "color": "#3f789e",
       "font_size": 24
@@ -2222,9 +3401,9 @@
       "title": "Start Input",
       "bounding": [
         140,
-        601,
-        825,
-        739
+        140,
+        1115,
+        758
       ],
       "color": "#3f789e",
       "font_size": 24
@@ -2233,9 +3412,9 @@
       "title": "GenerateChar",
       "bounding": [
         140,
-        1405,
-        3060,
-        1087
+        1397,
+        3043,
+        892
       ],
       "color": "#3f789e",
       "font_size": 24
@@ -2244,7 +3423,7 @@
       "title": "PlanStory",
       "bounding": [
         140,
-        2557,
+        2354,
         1841,
         396
       ],
@@ -2255,9 +3434,20 @@
       "title": "GenerateKeyFrames",
       "bounding": [
         140,
-        3018,
-        1874,
-        367
+        2815,
+        2896,
+        991
+      ],
+      "color": "#3f789e",
+      "font_size": 24
+    },
+    {
+      "title": "GenerateShots",
+      "bounding": [
+        140,
+        3871,
+        1807,
+        487
       ],
       "color": "#3f789e",
       "font_size": 24
@@ -2268,13 +3458,6 @@
     "initial_state": "{}"
   },
   "version": 0.4,
-  "_viewport": {
-    "offset": [
-      363.1606140136719,
-      -2632.193359375
-    ],
-    "scale": 0.848154775763946
-  },
   "_module_deps": {
     "musicvideo": {
       "origin": "external",

@@ -4,6 +4,8 @@ Pops a batch of items from the front of state[input_list_key] into
 state[output_list_key]. Routes "next" while items remain, "done" when empty.
 
 The source list in state is mutated (popped from front) and written back.
+
+Supports dot-notation for nested keys (e.g. "tmp.items" reads/writes state["tmp"]["items"]).
 """
 
 from typing import Any, Dict, List
@@ -11,6 +13,7 @@ from typing import Any, Dict, List
 from src.nodes.abstract.router_node import RouterNode
 from src.inputs.standard_inputs import Resolvable
 from src.utils.setup.logger import get_logger
+from src.nodes.common.stepper import _deep_get, _deep_set
 
 logger = get_logger(__name__)
 
@@ -22,6 +25,8 @@ class BatchedStepper(RouterNode):
     into state[output_list_key].
     Writes the shortened list back to state[input_list_key].
     Routes "done" when the list is empty.
+
+    Supports dot-notation for nested keys (e.g. "tmp.items" -> state["tmp"]["items"]).
     """
 
     def __init__(
@@ -47,7 +52,7 @@ class BatchedStepper(RouterNode):
         out_key = self._output_list_key or "current_batch"
         batch_size = self._size or 1
 
-        items = list(state.get(in_key) or [])
+        items = list(_deep_get(state, in_key) or [])
 
         if not items:
             logger.info("BatchedStepper: list empty, routing 'done'")
@@ -58,8 +63,7 @@ class BatchedStepper(RouterNode):
 
         logger.info("BatchedStepper [%s]: popped %d items, %d remaining", in_key, len(batch), len(remaining))
 
-        return {
-            out_key: batch,
-            in_key: remaining,
-            "next_step": "next",
-        }
+        result = {"next_step": "next"}
+        _deep_set(result, out_key, batch)
+        _deep_set(result, in_key, remaining)
+        return result

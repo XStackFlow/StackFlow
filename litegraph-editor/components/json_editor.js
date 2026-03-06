@@ -221,6 +221,9 @@ export function openJSONEditor(node, widget, pName, canvas, isDirty, onSave = nu
                 .jt-leaf { display:flex; align-items:baseline; padding:2px 4px 2px 20px; }
                 .jt-sep  { color:#555; margin:0 3px; }
                 .jt-str  { color:#ce9178; }
+                .jt-str.jt-multiline { cursor:pointer; }
+                .jt-str.jt-multiline:hover { text-decoration:underline; }
+                .jt-str.jt-expanded  { white-space:pre-wrap; }
                 .jt-num  { color:#b5cea8; }
                 .jt-bool { color:#569cd6; }
                 .jt-null { color:#666; }
@@ -237,7 +240,7 @@ export function openJSONEditor(node, widget, pName, canvas, isDirty, onSave = nu
             if (typeof v === 'number')  return `<span class="jt-num">${v}</span>`;
             const escaped = esc(v);
             if (typeof v === 'string' && v.includes('\n')) {
-                return `<span class="jt-str" style="white-space:pre-wrap">"${escaped}"</span>`;
+                return `<span class="jt-str jt-multiline" onclick="this.classList.toggle('jt-expanded')">"${escaped}"</span>`;
             }
             return `<span class="jt-str">"${escaped}"</span>`;
         }

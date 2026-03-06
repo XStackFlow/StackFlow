@@ -32,6 +32,7 @@ import json
 from src.graphs.graph_factory import build_langgraph_from_json, extract_edges, extract_interrupts, extract_all_node_ids
 from src.utils.exceptions import ConfigurationError
 from src.utils.setup.const import GRAPH_SAVE_PATH, PROJECT_ROOT, OUTPUT_DIR
+from src.utils.setup.module_registry import get_module_graph_dirs, resolve_module_graph_path
 from src.utils.setup.env_utils import read_env_file, write_env_var
 from src.utils.setup.logger import get_logger, get_thread_logs, get_persistent_session_logs
 from src.utils.setup.db import create_checkpointer, get_checkpointer
@@ -663,7 +664,7 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
 
         with open(file_path, "r", encoding="utf-8") as f:
             graph_json = json.load(f)
-        
+
         async def run_get_status(cp):
             workflow = build_langgraph_from_json(graph_json, get_node_registry(), graph_id=root_graph_id)
             interrupts = extract_interrupts(graph_json)
@@ -2649,6 +2650,24 @@ async def seed_state(request: SeedStateRequest):
 # ── Module UI Serving ─────────────────────────────────────────────────────────
 # Serve files from the output/ directory so UI pages can display generated images/videos.
 # Files are served at: /output/{path}
+
+@app.get("/serve_file")
+async def serve_local_file(path: str):
+    """Serve a local media file (audio/image/video) for review UI playback."""
+    from fastapi.responses import FileResponse
+    import mimetypes
+
+    file_path = Path(path).resolve()
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    allowed = ("audio/", "image/", "video/")
+    if not content_type or not any(content_type.startswith(p) for p in allowed):
+        raise HTTPException(status_code=403, detail=f"File type not allowed: {content_type}")
+
+    return FileResponse(file_path, media_type=content_type)
+
 
 @app.get("/output/{path:path}")
 async def serve_output_file(path: str):

@@ -281,6 +281,11 @@ function autoLayout(graph, canvas) {
     const nodeH = n => (n.size?.[1] ?? 60) + 10;
     const nodeW = n => n.size?.[0] ?? 180;
 
+    // Capture original vertical center so column sorts can preserve existing order
+    for (const n of allNodes) {
+        n._origY = n.pos[1] + nodeH(n) / 2;
+    }
+
     // ===================================================================
     //  Core sub-graph layout — positions a set of nodes starting at (0, 0)
     //  Returns { width, height } of the bounding box.
@@ -366,7 +371,7 @@ function autoLayout(graph, canvas) {
             if (b.type === 'langgraph/start') return  1;
             if (a.type === 'langgraph/end')   return  1;
             if (b.type === 'langgraph/end')   return -1;
-            return a.id - b.id;
+            return (a._origY ?? 0) - (b._origY ?? 0);
         });
         cols[0].forEach((n, i) => idxInCol.set(n.id, i));
 
@@ -379,7 +384,9 @@ function autoLayout(graph, canvas) {
             cols[c].sort((a, b) => {
                 const diff = avgPredIdx(a) - avgPredIdx(b);
                 if (Math.abs(diff) > 0.001) return diff;
-                return (minPredSlot.get(a.id) ?? Infinity) - (minPredSlot.get(b.id) ?? Infinity);
+                const slotDiff = (minPredSlot.get(a.id) ?? Infinity) - (minPredSlot.get(b.id) ?? Infinity);
+                if (isFinite(slotDiff) && Math.abs(slotDiff) > 0.001) return slotDiff;
+                return (a._origY ?? 0) - (b._origY ?? 0);
             });
             cols[c].forEach((n, i) => idxInCol.set(n.id, i));
         }
@@ -397,7 +404,9 @@ function autoLayout(graph, canvas) {
                 if (Math.abs(diff) > 0.001) return diff;
                 const slotDiff = (minPredSlot.get(a.id) ?? Infinity) - (minPredSlot.get(b.id) ?? Infinity);
                 if (Math.abs(slotDiff) > 0.001) return slotDiff;
-                return avgSuccIdx(a) - avgSuccIdx(b);
+                const succDiff = avgSuccIdx(a) - avgSuccIdx(b);
+                if (isFinite(succDiff) && Math.abs(succDiff) > 0.001) return succDiff;
+                return (a._origY ?? 0) - (b._origY ?? 0);
             });
             cols[c].forEach((n, i) => idxInCol.set(n.id, i));
         }
@@ -606,6 +615,15 @@ function autoLayout(graph, canvas) {
         }
 
         // --- Step 3: Layout the meta-graph ---
+        // Capture original vertical center so groups preserve their existing order
+        for (const item of metaItems) {
+            if (item.isGroup) {
+                const g = item.group;
+                item._origY = g.pos[1] + (g.size?.[1] ?? 0) / 2;
+            } else {
+                item._origY = item.node._origY ?? item.node.pos[1];
+            }
+        }
         layoutNodeSet(metaItems, metaLinks);
 
         // --- Step 4: Translate group-internal nodes to final global positions ---

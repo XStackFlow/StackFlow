@@ -6,7 +6,7 @@ to state[output_list_key] and writes it back.
 When replacement_index is a non-empty string, replaces the item at that index.
 Empty string (default) means append.
 
-Both input_key and output_list_key are state key names (not templates).
+Supports dot-notation for nested keys (e.g. "tmp.image" -> state["tmp"]["image"]).
 """
 
 from typing import Any, Dict
@@ -14,6 +14,7 @@ from typing import Any, Dict
 from src.nodes.abstract.base_node import BaseNode
 from src.inputs.standard_inputs import Resolvable
 from src.utils.setup.logger import get_logger
+from src.nodes.common.stepper import _deep_get, _deep_set
 
 logger = get_logger(__name__)
 
@@ -37,8 +38,8 @@ class Collector(BaseNode):
         key = self._input_key or "generated_image"
         out = self._output_list_key or "collected_items"
 
-        value = state.get(key)
-        items = list(state.get(out) or [])
+        value = _deep_get(state, key)
+        items = list(_deep_get(state, out) or [])
 
         if self._replacement_index not in (None, ""):
             idx = int(self._replacement_index)
@@ -52,4 +53,6 @@ class Collector(BaseNode):
             items.append(value)
             logger.info("Collector: appended %s to %s (now %d items)", key, out, len(items))
 
-        return {out: items}
+        result = {}
+        _deep_set(result, out, items)
+        return result
