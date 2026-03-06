@@ -15,6 +15,45 @@ import { reloadLogs, updateActiveSessions } from './execution.js';
 const API_BASE = "http://localhost:8000";
 
 /**
+ * Fit the viewport so all nodes are visible, centred with padding.
+ * Used as fallback when a graph has no saved _viewport.
+ */
+export function fitViewportToNodes(canvas, graph) {
+    const nodes = graph._nodes || [];
+    if (!nodes.length) {
+        canvas.ds.offset[0] = 0;
+        canvas.ds.offset[1] = 0;
+        canvas.ds.scale = 1;
+        return;
+    }
+    const PAD = 80;
+    let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+    for (const n of nodes) {
+        const w = n.size?.[0] || 210;
+        const h = n.size?.[1] || 100;
+        bx0 = Math.min(bx0, n.pos[0]);
+        by0 = Math.min(by0, n.pos[1]);
+        bx1 = Math.max(bx1, n.pos[0] + w);
+        by1 = Math.max(by1, n.pos[1] + h);
+    }
+    for (const g of (graph._groups || [])) {
+        bx0 = Math.min(bx0, g.pos[0]);
+        by0 = Math.min(by0, g.pos[1]);
+        bx1 = Math.max(bx1, g.pos[0] + g.size[0]);
+        by1 = Math.max(by1, g.pos[1] + g.size[1]);
+    }
+    const gw = bx1 - bx0 + PAD * 2;
+    const gh = by1 - by0 + PAD * 2;
+    const bodyZoom = parseFloat(getComputedStyle(document.body).zoom) || 1;
+    const visW = window.innerWidth / bodyZoom;
+    const visH = window.innerHeight / bodyZoom;
+    const scale = Math.min(visW / gw, visH / gh, 1.0);
+    canvas.ds.scale = scale;
+    canvas.ds.offset[0] = visW / (2 * scale) - (bx0 + bx1) / 2;
+    canvas.ds.offset[1] = visH / (2 * scale) - (by0 + by1) / 2;
+}
+
+/**
  * Per-type origin metadata populated by fetchNodes().
  * Keys are full LiteGraph type strings (e.g. "github/ImageTagExtractor").
  * Values: { origin: "core"|"builtin"|"external", source_url: string|null, module_id: string }
@@ -842,12 +881,16 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
             graph.configure(data);
             setHistoryBlock(false);
 
-            // Restore saved viewport (pan + zoom), or reset to default if absent
+            // Restore saved viewport (pan + zoom), or fit-to-content if absent
             if (canvas?.ds) {
                 const vp = data._viewport;
-                canvas.ds.offset[0] = (vp && Array.isArray(vp.offset)) ? vp.offset[0] : 0;
-                canvas.ds.offset[1] = (vp && Array.isArray(vp.offset)) ? vp.offset[1] : 0;
-                canvas.ds.scale     = (vp && typeof vp.scale === "number") ? vp.scale : 1;
+                if (vp && Array.isArray(vp.offset) && typeof vp.scale === "number") {
+                    canvas.ds.offset[0] = vp.offset[0];
+                    canvas.ds.offset[1] = vp.offset[1];
+                    canvas.ds.scale     = vp.scale;
+                } else {
+                    fitViewportToNodes(canvas, graph);
+                }
                 canvas.setDirty(true, true);
             }
 
@@ -910,19 +953,24 @@ export async function switchGraph(graph, canvas, isDirty, graphName, pushHistory
         return;
     }
 
-    if (selector) selector.value = graphName;
-    localStorage.setItem("stackflow_last_graph", graphName);
+    if (!subgraphNode && fullPathOverride === null) {
+        // Only update selector & last-graph for root-level graph switches
+        if (selector) selector.value = graphName;
+        localStorage.setItem("stackflow_last_graph", graphName);
+    }
 
     if (pushHistory) {
         const url = new URL(window.location);
-        url.searchParams.set('graph', graphName);
 
         const currentThreadId = new URLSearchParams(window.location.search).get('thread_id');
         if (subgraphNode || fullPathOverride) {
+            // Navigating into/within subgraphs — keep root graph unchanged
             if (currentThreadId) {
                 url.searchParams.set('thread_id', currentThreadId);
             }
         } else {
+            // Switching to a new root graph
+            url.searchParams.set('graph', graphName);
             const newGraphBase = graphName.replace(".json", "");
             const newThreadId = `${newGraphBase}_${sessionId}`;
             url.searchParams.set('thread_id', newThreadId);
