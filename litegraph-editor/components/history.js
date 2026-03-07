@@ -9,6 +9,13 @@ let pendingSave = null;
 let lastActionName = "Initial Load";
 let lastKnownState = "";
 
+// Debounce timers from initHistoryHooks (module-level so cancelPendingSaves can clear them)
+let afterChangeTimer = null;
+let propertyChangeTimer = null;
+let moveTimer = null;
+let resizeTimer = null;
+let groupMoveTimer = null;
+
 /**
  * Remove execution-specific visual states from a JSON-serialized graph state.
  */
@@ -81,6 +88,26 @@ export function initHistory(g, c, dirtyObj, logFn) {
 
 export function setHistoryBlock(val) {
     isHistoryAction = val;
+}
+
+/**
+ * Cancel all pending debounced history saves.
+ * Call this before loading a new graph to prevent stale timers
+ * from marking the freshly-loaded graph as dirty.
+ */
+export function cancelPendingSaves() {
+    clearTimeout(pendingSave);
+    clearTimeout(afterChangeTimer);
+    clearTimeout(propertyChangeTimer);
+    clearTimeout(moveTimer);
+    clearTimeout(resizeTimer);
+    clearTimeout(groupMoveTimer);
+    pendingSave = null;
+    afterChangeTimer = null;
+    propertyChangeTimer = null;
+    moveTimer = null;
+    resizeTimer = null;
+    groupMoveTimer = null;
 }
 
 export function saveHistory(actionName = "Action", immediate = false) {
@@ -313,7 +340,6 @@ export function initHistoryHooks(LiteGraph) {
     };
 
     // --- Group move/resize ---
-    let groupMoveTimer = null;
     const originalGroupMove = LiteGraph.LGraphGroup.prototype.move;
     LiteGraph.LGraphGroup.prototype.move = function (deltax, deltay, ignore_nodes) {
         originalGroupMove.apply(this, arguments);
@@ -332,7 +358,6 @@ export function initHistoryHooks(LiteGraph) {
     };
 
     // --- Node move (throttled) ---
-    let moveTimer = null;
     const originalOnNodeMoved = canvas.onNodeMoved;
     canvas.onNodeMoved = function (node) {
         if (originalOnNodeMoved) originalOnNodeMoved.apply(this, arguments);
@@ -349,7 +374,6 @@ export function initHistoryHooks(LiteGraph) {
     };
 
     // --- Property/widget value changes ---
-    let propertyChangeTimer = null;
     const originalSetProperty = LiteGraph.LGraphNode.prototype.setProperty;
     LiteGraph.LGraphNode.prototype.setProperty = function (name, value) {
         const prev = this.properties ? this.properties[name] : undefined;
@@ -361,7 +385,6 @@ export function initHistoryHooks(LiteGraph) {
     };
 
     // --- Node resize ---
-    let resizeTimer = null;
     const originalSetSize = LiteGraph.LGraphNode.prototype.setSize;
     LiteGraph.LGraphNode.prototype.setSize = function (size) {
         originalSetSize.apply(this, arguments);
@@ -371,7 +394,6 @@ export function initHistoryHooks(LiteGraph) {
     };
 
     // --- Catch-all: afterChange ---
-    let afterChangeTimer = null;
     const originalAfterChange = graph.afterChange;
     graph.afterChange = function () {
         if (originalAfterChange) originalAfterChange.apply(this, arguments);

@@ -130,7 +130,8 @@ def execute_langchain(
         RuntimeError: For other execution failures.
     """
 
-    _executor = create_react_agent(llm, tools)
+    from langgraph.checkpoint.memory import MemorySaver
+    _executor = create_react_agent(llm, tools, checkpointer=MemorySaver())
 
     logger.info("Model: %s", llm.__class__.__name__)
     logger.info("Working directory: %s", repo_path.resolve())
@@ -183,7 +184,8 @@ def execute_langchain(
                 config={
                     "recursion_limit": recursion_limit,
                     "callbacks": all_callbacks,
-                    "run_name": run_name
+                    "run_name": run_name,
+                    "configurable": {"thread_id": f"{thread_id}_{safe_run_name}"},
                 }
             )
 

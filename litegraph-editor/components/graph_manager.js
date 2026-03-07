@@ -5,7 +5,7 @@
 
 import { LiteGraph } from 'litegraph.js';
 import { addLog } from './logging.js';
-import { setHistoryBlock, clearHistory } from './history.js';
+import { setHistoryBlock, clearHistory, cancelPendingSaves } from './history.js';
 import { openJSONEditor } from './json_editor.js';
 import { openFileBrowser } from './file_browser.js';
 import { getSessionId } from './session.js';
@@ -851,10 +851,23 @@ export async function fetchGraphList(graph, canvas, isDirty, loadGraphFn, retrie
         }
 
         if (graphToLoad) {
-            select.value = graphToLoad;
-            localStorage.setItem("stackflow_last_graph", graphToLoad);
-            if (reloadCurrent) {
-                await loadGraphFn(graphToLoad);
+            const inSubgraph = new URLSearchParams(window.location.search).get('subgraph_node');
+            if (inSubgraph) {
+                // Inside a subgraph — load the subgraph file, not the root graph
+                const segments = inSubgraph.split('@@');
+                const lastSeg = segments[segments.length - 1];
+                const match = lastSeg.match(/^.*?\((.*?)\)$/);
+                const subgraphFile = match ? match[1] : graphToLoad;
+                select.value = subgraphFile;
+                if (reloadCurrent) {
+                    await loadGraphFn(subgraphFile);
+                }
+            } else {
+                select.value = graphToLoad;
+                localStorage.setItem("stackflow_last_graph", graphToLoad);
+                if (reloadCurrent) {
+                    await loadGraphFn(graphToLoad);
+                }
             }
         }
 
@@ -877,6 +890,7 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
         if (!res.ok) return;
         const data = await res.json();
         if (data) {
+            cancelPendingSaves();
             setHistoryBlock(true);
             graph.configure(data);
             setHistoryBlock(false);
@@ -895,7 +909,7 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
             }
 
             clearHistory();
-            isDirty.value = false;
+            cancelPendingSaves();
 
             // Validate properties.name matches node type
             if (graph._nodes) {
@@ -934,6 +948,12 @@ export async function loadGraph(graph, isDirty, graphName, canvas = null) {
                     }
                 });
             }
+
+            // Final cleanup: cancel any timers that LiteGraph hooks may have
+            // scheduled during node validation / configure, and ensure the
+            // freshly-loaded graph is not marked dirty.
+            cancelPendingSaves();
+            isDirty.value = false;
         } else {
             graph.clear();
         }
@@ -954,10 +974,13 @@ export async function switchGraph(graph, canvas, isDirty, graphName, pushHistory
     }
 
     if (!subgraphNode && fullPathOverride === null) {
-        // Only update selector & last-graph for root-level graph switches
-        if (selector) selector.value = graphName;
+        // Root-level graph switch — update last-graph bookmark
         localStorage.setItem("stackflow_last_graph", graphName);
     }
+
+    // Always update the selector to reflect the currently displayed graph
+    // so that saving targets the correct file.
+    if (selector) selector.value = graphName;
 
     if (pushHistory) {
         const url = new URL(window.location);
@@ -1004,6 +1027,13 @@ export async function switchGraph(graph, canvas, isDirty, graphName, pushHistory
     await loadGraph(graph, isDirty, graphName, canvas);
     updateBreadcrumbs(graph, canvas, isDirty);
     reloadLogs(graph, canvas);
+
+    // Safety net: after all graph-switching operations complete, ensure the
+    // freshly-loaded graph starts with a clean dirty state.  Stale timers from
+    // onPropertyChanged / afterChange hooks during configure() can otherwise
+    // race and flip isDirty back to true.
+    cancelPendingSaves();
+    isDirty.value = false;
 }
 
 /**

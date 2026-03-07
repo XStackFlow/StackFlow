@@ -224,13 +224,17 @@ export async function saveGraphToServer(graph, isDirty, fetchGraphListFn, update
 
                 isDirty.value = false;
                 if (selector) selector.value = savedName;
-                localStorage.setItem("stackflow_last_graph", savedName);
 
+                // Only update root graph references when not inside a subgraph
                 const url = new URL(window.location);
-                if (url.searchParams.get("graph") !== savedName) {
-                    url.searchParams.set("graph", savedName);
-                    window.history.replaceState({ graphName: savedName }, "", url);
-                    if (updateBreadcrumbsFn) updateBreadcrumbsFn();
+                const inSubgraph = !!url.searchParams.get("subgraph_node");
+                if (!inSubgraph) {
+                    localStorage.setItem("stackflow_last_graph", savedName);
+                    if (url.searchParams.get("graph") !== savedName) {
+                        url.searchParams.set("graph", savedName);
+                        window.history.replaceState({ graphName: savedName }, "", url);
+                        if (updateBreadcrumbsFn) updateBreadcrumbsFn();
+                    }
                 }
 
                 if (fetchGraphListFn) await fetchGraphListFn(5, false);

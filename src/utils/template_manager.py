@@ -79,7 +79,7 @@ def resolve_templates(data: Any, state: Dict[str, Any]) -> Any:
     if isinstance(data, str):
         return render_template(data, state)
     elif isinstance(data, dict):
-        return {k: resolve_templates(v, state) for k, v in data.items()}
+        return {render_template(k, state) if isinstance(k, str) and '{{' in k else k: resolve_templates(v, state) for k, v in data.items()}
     elif isinstance(data, list):
         return [resolve_templates(item, state) for item in data]
     return data

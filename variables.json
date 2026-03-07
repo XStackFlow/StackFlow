@@ -5,5 +5,6 @@
   "CHAT_MODEL": "ollama-gpu|gemma3:12b",
   "STORY_MODEL": "google|gemini-3.1-pro-preview",
   "STORYBOARD_MODEL": "google|gemini-3.1-pro-preview",
-  "IMAGE_MODEL": "google|gemini-3.1-flash-image-preview"
+  "IMAGE_MODEL": "google|gemini-3.1-flash-image-preview",
+  "VIDEO_MODEL": "google|veo-3.1-generate-preview"
 }
