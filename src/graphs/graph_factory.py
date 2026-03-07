@@ -38,8 +38,7 @@ def merge_dicts(left: dict, right: dict) -> dict:
         if v == _DELETE_SENTINEL:
             merged.pop(k, None)
         elif k in merged and isinstance(merged[k], dict) and isinstance(v, dict):
-            # Shallow merge for dictionaries/namespaces
-            merged[k] = {**merged[k], **v}
+            merged[k] = merge_dicts(merged[k], v)
         else:
             merged[k] = v
     return merged
@@ -635,8 +634,8 @@ def _internal_build_langgraph(graph_json: Dict[str, Any], node_registry: Dict[st
             logger.debug("Auto-Namespacing node: %s -> Namespace: %s (Mode: %s)", unique_id, assigned_ns, mode)
             node_fn = create_namespaced_wrapper(assigned_ns, node_fn, mode)
 
-        # Apply retries only to functional nodes (not special control nodes)
-        if node_type not in ["langgraph/start", "langgraph/end", "langgraph/WithNamespace"]:
+        # Apply retries only to functional nodes (not special control nodes or subgraphs)
+        if node_type not in ["langgraph/start", "langgraph/end", "langgraph/WithNamespace", "langgraph/subgraph"]:
             workflow.add_node(unique_id, node_fn, retry=standard_retry_policy)
         else:
             workflow.add_node(unique_id, node_fn)

@@ -163,7 +163,8 @@ async def lifespan(app: FastAPI):
 
     async with create_checkpointer() as checkpointer:
         app.state.checkpointer = checkpointer
-        logger.info("Checkpointer ready (postgres)")
+        backend = "postgres" if os.getenv("LANGGRAPH_CHECKPOINTER", "").lower() == "postgres" else "sqlite"
+        logger.info("Checkpointer ready (%s)", backend)
 
         # Auto-start graphs configured via AUTO_START_GRAPHS env var.
         # Format: comma-separated "graph_id:session_id" entries.
@@ -450,8 +451,16 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                         return list(dict.fromkeys(all_ids + base))
                     return base
 
-                import psycopg
-                DB_RETRY_LIMIT = 3
+                # Build tuple of retriable DB exceptions based on backend
+                _db_errors = ()
+                if os.getenv("LANGGRAPH_CHECKPOINTER", "").lower() == "postgres":
+                    try:
+                        import psycopg
+                        _db_errors = (psycopg.OperationalError, psycopg.InterfaceError)
+                    except ImportError:
+                        pass
+
+                DB_RETRY_LIMIT = 3 if _db_errors else 1
                 for _db_attempt in range(DB_RETRY_LIMIT):
                     try:
                         async with get_checkpointer(app) as cp:
@@ -462,7 +471,9 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                                                 .aget_state({"configurable": {"thread_id": thread_id}}))
                             is_interrupted = bool(post_state.next)
                         break  # success
-                    except (psycopg.OperationalError, psycopg.InterfaceError) as db_err:
+                    except BaseException as db_err:
+                        if not _db_errors or not isinstance(db_err, _db_errors):
+                            raise
                         if _db_attempt < DB_RETRY_LIMIT - 1:
                             logger.warning(
                                 "Postgres connection lost during execution (attempt %d/%d): %s — reconnecting and resuming from checkpoint",
@@ -2638,13 +2649,22 @@ async def seed_state(request: SeedStateRequest):
             return {"status": "success", "message": f"Marked '{effective_as_node}' as completed. Execution will resume from its downstream nodes."}
 
         # Retry on connection errors — get_checkpointer auto-reconnects
-        import psycopg
+        _db_errors_mc = (OSError,)
+        if os.getenv("LANGGRAPH_CHECKPOINTER", "").lower() == "postgres":
+            try:
+                import psycopg
+                _db_errors_mc = (psycopg.OperationalError, psycopg.InterfaceError, OSError)
+            except ImportError:
+                pass
+
         last_err = None
-        for _attempt in range(3):
+        for _attempt in range(3 if len(_db_errors_mc) > 1 else 1):
             try:
                 async with get_checkpointer(app) as cp:
                     return await run_seed_state(cp)
-            except (psycopg.OperationalError, psycopg.InterfaceError, OSError) as e:
+            except BaseException as e:
+                if not isinstance(e, _db_errors_mc):
+                    raise
                 last_err = e
                 logger.warning("mark_completed DB error (attempt %d/3): %s — retrying", _attempt + 1, e)
                 await asyncio.sleep(1)
