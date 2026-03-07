@@ -119,17 +119,25 @@ async def get_checkpointer(app=None):
     shared_cp = getattr(app.state, "checkpointer", None) if app else None
 
     if shared_cp:
-        # Verify the shared connection is still alive
+        # Verify the shared connection is still alive.
+        # shared_cp.conn is a raw AsyncConnection (not a pool), so use it directly.
         healthy = False
         try:
-            async with shared_cp.conn.connection(timeout=3) as conn:
-                await conn.execute("SELECT 1")
+            if shared_cp.conn.closed:
+                raise ConnectionError("connection already closed")
+            await shared_cp.conn.execute("SELECT 1")
             healthy = True
         except Exception as e:
             logger.warning("Shared Postgres connection lost (%s) — reconnecting", e)
 
         if healthy:
-            yield shared_cp
+            try:
+                yield shared_cp
+            except BaseException:
+                # Mark shared connection as dead so next call reconnects
+                if app:
+                    app.state.checkpointer = None
+                raise
             return
 
         # Close the dead shared connection to free the slot
@@ -145,17 +153,13 @@ async def get_checkpointer(app=None):
     import psycopg
 
     last_err = None
+    cp_context = None
     for attempt in range(MAX_RETRIES):
         try:
             cp_context = AsyncPostgresSaver.from_conn_string(get_conn_string())
             cp = await cp_context.__aenter__()
             await cp.setup()
-            # Store as new shared checkpointer so future calls reuse it
-            if app:
-                app.state.checkpointer = cp
-                app.state._checkpointer_context = cp_context
-            yield cp
-            return
+            break  # connected successfully
         except (
             psycopg.OperationalError,
             psycopg.InterfaceError,
@@ -168,13 +172,27 @@ async def get_checkpointer(app=None):
                     await cp_context.__aexit__(type(e), e, e.__traceback__)
                 except Exception:
                     pass
+                cp_context = None
             delay = RETRY_BACKOFF[min(attempt, len(RETRY_BACKOFF) - 1)]
             logger.warning(
                 "Postgres reconnect failed (attempt %d/%d): %s — retrying in %ds",
                 attempt + 1, MAX_RETRIES, e, delay,
             )
             await asyncio.sleep(delay)
+    else:
+        raise ConnectionError(
+            f"Failed to reconnect to PostgreSQL after {MAX_RETRIES} attempts: {last_err}"
+        )
 
-    raise ConnectionError(
-        f"Failed to reconnect to PostgreSQL after {MAX_RETRIES} attempts: {last_err}"
-    )
+    # Store as new shared checkpointer so future calls reuse it
+    if app:
+        app.state.checkpointer = cp
+        app.state._checkpointer_context = cp_context
+
+    try:
+        yield cp
+    except BaseException:
+        # Connection died during use — invalidate shared reference
+        if app:
+            app.state.checkpointer = None
+        raise
