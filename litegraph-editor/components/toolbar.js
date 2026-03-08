@@ -816,6 +816,7 @@ export function initToolbar(graph, canvas, isDirty, {
     const rerunBtn = document.getElementById("rerun-graph");
     if (rerunBtn) {
         rerunBtn.addEventListener("click", async () => {
+            if (!confirm("Rerun will clear all state and restart the graph from scratch. Continue?")) return;
             const thread_id = getThreadId();
             if (thread_id) {
                 pushLog(thread_id, "🔄 RERUN: Resetting and restarting graph...", "info");
