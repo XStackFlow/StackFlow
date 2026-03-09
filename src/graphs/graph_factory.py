@@ -20,6 +20,23 @@ logger = get_logger(__name__)
 _DELETE_SENTINEL = "@delete"
 
 
+def _normalize_int_keys(d: dict) -> dict:
+    """Convert string-numeric keys to int.
+
+    JSON serialization (checkpoint) turns int dict keys into strings.
+    This normalizes them back so ``"0"`` and ``0`` don't coexist.
+    """
+    out = {}
+    for k, v in d.items():
+        if isinstance(k, str):
+            try:
+                k = int(k)
+            except (ValueError, TypeError):
+                pass
+        out[k] = v
+    return out
+
+
 def merge_dicts(left: dict, right: dict) -> dict:
     """Reducer function to merge two dictionaries.
 
@@ -38,7 +55,10 @@ def merge_dicts(left: dict, right: dict) -> dict:
         if v == _DELETE_SENTINEL:
             merged.pop(k, None)
         elif k in merged and isinstance(merged[k], dict) and isinstance(v, dict):
-            merged[k] = merge_dicts(merged[k], v)
+            merged[k] = merge_dicts(
+                _normalize_int_keys(merged[k]),
+                _normalize_int_keys(v),
+            )
         else:
             merged[k] = v
     return merged

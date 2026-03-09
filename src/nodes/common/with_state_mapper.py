@@ -50,7 +50,13 @@ class WithStateMapper(BaseNode):
             new_data[key] = template_manager.render_template(template, state)
         
         if new_data:
-            logger.info("Mapping %d keys into state", len(new_data))
+            for k, v in new_data.items():
+                if isinstance(v, dict):
+                    logger.info("Mapping key '%s' -> dict with %d entries (keys: %s)", k, len(v), list(v.keys())[:20])
+                elif isinstance(v, list):
+                    logger.info("Mapping key '%s' -> list with %d entries", k, len(v))
+                else:
+                    logger.info("Mapping key '%s' -> %s", k, type(v).__name__)
             return new_data
             
         return {}

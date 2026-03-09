@@ -66,7 +66,9 @@ def get_value_by_path(data: Any, path: str, root: Any = None) -> Any:
                 else:
                     return None
             elif isinstance(current, dict):
-                current = current.get(str(idx))
+                # Try int key first, then string — checkpoint serialization
+                # may convert int keys to strings or vice versa.
+                current = current.get(idx) if idx in current else current.get(str(idx))
             else:
                 return None
         if current is None:
