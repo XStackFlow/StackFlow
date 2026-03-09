@@ -52,6 +52,11 @@ def _write_modules_json(installed: list[str]) -> None:
         f.write("\n")
 
 
+def get_all_module_dirs() -> list[tuple[str, Path]]:
+    """Return (module_id, module_dir) for every module with a manifest.json."""
+    return [(d.name, d) for d, _pkg in _iter_module_dirs()]
+
+
 def get_installed_modules() -> list[str]:
     """Return sorted list of active module IDs.
 

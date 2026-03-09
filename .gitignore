@@ -71,3 +71,4 @@ logs/
 **/memory/chroma_db/**
 output/
 graphs/
+data/

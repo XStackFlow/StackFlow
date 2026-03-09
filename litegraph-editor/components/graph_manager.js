@@ -1264,8 +1264,42 @@ export async function openPackageManager(refreshNodes) {
     body.appendChild(ghRow);
     body.appendChild(grid);
 
+    // ── Footer — Reinstall button ───────────────────────────────────
+    const footer = document.createElement("div");
+    footer.style.cssText = "display:flex;justify-content:flex-end;padding:10px 16px;border-top:1px solid #333;";
+
+    const reinstallBtn = document.createElement("button");
+    reinstallBtn.textContent = "📦 Reinstall Dependencies";
+    reinstallBtn.style.cssText = "padding:6px 16px;background:#444;color:#ccc;border:1px solid #555;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;";
+    reinstallBtn.addEventListener("click", async () => {
+        if (!confirm("Reinstall all pip dependencies and restart the server?")) return;
+        reinstallBtn.disabled = true;
+        reinstallBtn.textContent = "Installing…";
+        try {
+            const res = await fetch(`${API_BASE}/reinstall`, { method: "POST" });
+            if (res.ok) {
+                const data = await res.json();
+                reinstallBtn.textContent = "Restarting…";
+                if (data.errors?.length) {
+                    console.warn("Reinstall errors:", data.errors);
+                }
+                setTimeout(() => location.reload(), 5000);
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                alert(`Reinstall failed: ${errData.detail || res.status}`);
+                reinstallBtn.disabled = false;
+                reinstallBtn.textContent = "📦 Reinstall Dependencies";
+            }
+        } catch {
+            // Server restarting — connection lost is expected
+            setTimeout(() => location.reload(), 8000);
+        }
+    });
+    footer.appendChild(reinstallBtn);
+
     modal.appendChild(header);
     modal.appendChild(body);
+    modal.appendChild(footer);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 

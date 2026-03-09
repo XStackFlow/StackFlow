@@ -2758,11 +2758,11 @@ async def restart_server():
     import os
     import threading
     import time
-    
+
     logger.info("=" * 80)
     logger.info("RESTART REQUEST RECEIVED FROM UI")
     logger.info("=" * 80)
-    
+
     def perform_restart():
         time.sleep(1.0) # Give more time for the response to reach the UI
         # Clear terminal before restart
@@ -2772,6 +2772,68 @@ async def restart_server():
 
     threading.Thread(target=perform_restart, daemon=True).start()
     return {"message": "Restarting server process..."}
+
+
+@app.post("/reinstall")
+async def reinstall_deps():
+    """Reinstall all pip dependencies (core + modules), then restart the server."""
+    import subprocess
+    import sys
+    import os
+    import threading
+    import time
+
+    logger.info("=" * 80)
+    logger.info("REINSTALL REQUEST RECEIVED FROM UI")
+    logger.info("=" * 80)
+
+    stackflow_home = Path(__file__).resolve().parent.parent
+    venv_pip = stackflow_home / "venv" / "bin" / "pip"
+    if not venv_pip.exists():
+        raise HTTPException(status_code=500, detail="venv/bin/pip not found")
+
+    errors = []
+
+    # 1. Core requirements
+    core_req = stackflow_home / "requirements.txt"
+    if core_req.exists():
+        logger.info("Installing core requirements…")
+        result = subprocess.run(
+            [str(venv_pip), "install", "-r", str(core_req)],
+            capture_output=True, text=True, timeout=300,
+        )
+        if result.returncode != 0:
+            errors.append(f"core: {result.stderr[-500:]}")
+        else:
+            logger.info("Core requirements installed.")
+
+    # 2. Module requirements (builtin + installed)
+    from src.utils.setup.module_registry import get_all_module_dirs
+    for module_id, module_dir in get_all_module_dirs():
+        req_file = module_dir / "requirements.txt"
+        if req_file.exists():
+            logger.info("Installing requirements for module '%s'…", module_id)
+            result = subprocess.run(
+                [str(venv_pip), "install", "-r", str(req_file)],
+                capture_output=True, text=True, timeout=300,
+            )
+            if result.returncode != 0:
+                errors.append(f"{module_id}: {result.stderr[-300:]}")
+            else:
+                logger.info("Module '%s' requirements installed.", module_id)
+
+    if errors:
+        logger.error("Some pip installs failed: %s", errors)
+
+    # 3. Restart
+    def perform_restart():
+        time.sleep(1.0)
+        sys.stdout.write("\033[2J\033[H")
+        sys.stdout.flush()
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    threading.Thread(target=perform_restart, daemon=True).start()
+    return {"message": "Dependencies reinstalled. Restarting…", "errors": errors}
 
 if __name__ == "__main__":
     import uvicorn
