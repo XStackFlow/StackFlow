@@ -135,6 +135,8 @@ def _initialize_by_type(ptype: str, opts: dict, model_name: str, temperature: fl
             base_url=base_url,
             api_key=api_key,
             temperature=temperature,
+            timeout=300,
+            max_retries=2,
             name=f"OpenAI:{model_name}"
         )
 
@@ -157,6 +159,8 @@ def _initialize_by_type(ptype: str, opts: dict, model_name: str, temperature: fl
             location=location,
             temperature=temperature,
             project=project,
+            timeout=300,
+            max_retries=2,
             name=f"Google:{model_name}"
         )
 

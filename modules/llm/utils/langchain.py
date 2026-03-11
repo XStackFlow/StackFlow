@@ -29,6 +29,26 @@ from modules.llm.tools.tool_context import repo_path_context
 logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
+# Persistent in-memory checkpointers — keyed by outer thread_id so the
+# inner ReAct agent can resume its conversation after stop/resume.
+# ---------------------------------------------------------------------------
+_agent_checkpointers: Dict[str, Any] = {}
+
+
+def _get_agent_checkpointer(thread_id: str):
+    """Return a MemorySaver that persists across calls for the same thread."""
+    from langgraph.checkpoint.memory import MemorySaver
+    if thread_id not in _agent_checkpointers:
+        _agent_checkpointers[thread_id] = MemorySaver()
+    return _agent_checkpointers[thread_id]
+
+
+def clear_agent_checkpointer(thread_id: str):
+    """Remove a cached checkpointer when a graph execution finishes."""
+    _agent_checkpointers.pop(thread_id, None)
+
+
+# ---------------------------------------------------------------------------
 # Per-agent file logger – records every tool call to a dedicated log file
 # Logs go to: logs/graph/<thread_id>/agents/<agent_name>.log
 # ---------------------------------------------------------------------------
@@ -130,8 +150,10 @@ def execute_langchain(
         RuntimeError: For other execution failures.
     """
 
-    from langgraph.checkpoint.memory import MemorySaver
-    _executor = create_react_agent(llm, tools, checkpointer=MemorySaver())
+    # Use a persistent checkpointer so conversations survive stop/resume
+    thread_id_raw = THREAD_ID_CONTEXT.get() or "unknown"
+    checkpointer = _get_agent_checkpointer(thread_id_raw)
+    _executor = create_react_agent(llm, tools, checkpointer=checkpointer)
 
     logger.info("Model: %s", llm.__class__.__name__)
     logger.info("Working directory: %s", repo_path.resolve())
