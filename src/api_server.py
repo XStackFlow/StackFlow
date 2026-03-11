@@ -772,6 +772,12 @@ async def get_status(thread_id: str, subgraph_node: Optional[str] = None):
                             res[k] = [recursive_unwrap(i, merge_to_root=merge_to_root, depth=depth+1) if isinstance(i, dict) else i for i in v]
                         else:
                             res[k] = v
+                # Include namespaced subgraph states so the UI can display them
+                for k, v in namespaces.items():
+                    if isinstance(v, dict):
+                        res[k] = recursive_unwrap(v, merge_to_root=merge_to_root, depth=depth+1)
+                    else:
+                        res[k] = v
                 return res
 
             extracted_db_state = recursive_unwrap(raw_values) if raw_values else {}
