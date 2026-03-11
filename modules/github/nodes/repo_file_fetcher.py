@@ -61,7 +61,15 @@ class RepoFileFetcher(BaseNode):
                 raise RuntimeError(msg)
         else:
             content_b64 = result.stdout.replace("\n", "").strip()
-            content = base64.b64decode(content_b64).decode("utf-8")
-            logger.info("Fetched %d bytes from %s/%s", len(content), repo, file_path)
+            if not content_b64 or content_b64 == "null":
+                msg = f"GitHub API returned no content for {file_path} from {repo}@{ref} (file may be too large or binary)"
+                if self.optional:
+                    logger.warning("%s — continuing with empty value", msg)
+                    content = ""
+                else:
+                    raise RuntimeError(msg)
+            else:
+                content = base64.b64decode(content_b64).decode("utf-8")
+                logger.info("Fetched %d bytes from %s/%s", len(content), repo, file_path)
 
         return {"fetched_file_content": content}
