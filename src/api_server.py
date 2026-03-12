@@ -378,6 +378,12 @@ async def run_graph_task(params: Dict[str, Any], thread_id: str, graph_json: Dic
                         logger.info("Resuming execution for thread %s from checkpoint (recursion_limit: %d).", thread_id, config_checkpoint['recursion_limit'])
                     else:
                         logger.info("Starting NEW execution for thread %s (recursion_limit: %d).", thread_id, config_checkpoint['recursion_limit'])
+                        # Fresh run — clear any stale inner-agent conversations
+                        try:
+                            from modules.llm.utils.langchain import clear_agent_checkpointer
+                            clear_agent_checkpointer(thread_id)
+                        except ImportError:
+                            pass
                     
                     # Use astream_events to get real-time node start/end events
                     async for event in graph_runnable.astream_events(input_data, config=config_checkpoint, version="v2"):
@@ -2219,6 +2225,13 @@ async def reset_thread(thread_id: str):
                 log_file.unlink()
                 logger.info("Persistent logs deleted for thread %s", thread_id)
 
+            # Clear cached inner-agent conversations
+            try:
+                from modules.llm.utils.langchain import clear_agent_checkpointer
+                clear_agent_checkpointer(thread_id)
+            except ImportError:
+                pass
+
             return {"message": "Memory and logs cleared for thread %s" % thread_id}
         except Exception as e:
             logger.error("Failed to reset thread %s: %s", thread_id, e)
@@ -2651,6 +2664,13 @@ async def seed_state(request: SeedStateRequest):
             # 6. Clear active_tasks so get_graph_status re-derives status from checkpoint
             if thread_id in active_tasks:
                 del active_tasks[thread_id]
+
+            # 7. Clear cached inner-agent conversation for the completed node
+            try:
+                from modules.llm.utils.langchain import clear_agent_checkpointer
+                clear_agent_checkpointer(thread_id)
+            except ImportError:
+                pass
 
             return {"status": "success", "message": f"Marked '{effective_as_node}' as completed. Execution will resume from its downstream nodes."}
 
