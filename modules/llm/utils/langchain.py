@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Union
 from uuid import UUID
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage, AIMessage
 from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.prebuilt import create_react_agent
 from src.utils.setup.const import PROJECT_ROOT
@@ -35,17 +35,76 @@ logger = get_logger(__name__)
 _agent_checkpointers: Dict[str, Any] = {}
 
 
-def _get_agent_checkpointer(thread_id: str):
-    """Return a MemorySaver that persists across calls for the same thread."""
+def _get_agent_checkpointer(key: str):
+    """Return a MemorySaver that persists across calls for the same node.
+
+    The *key* should uniquely identify a specific node invocation within a
+    graph execution (e.g. ``{thread_id}_{run_name}``) so that each node
+    gets its own independent conversation history while still supporting
+    resume after stop/resume cycles.
+    """
     from langgraph.checkpoint.memory import MemorySaver
-    if thread_id not in _agent_checkpointers:
-        _agent_checkpointers[thread_id] = MemorySaver()
-    return _agent_checkpointers[thread_id]
+    if key not in _agent_checkpointers:
+        _agent_checkpointers[key] = MemorySaver()
+    return _agent_checkpointers[key]
 
 
-def clear_agent_checkpointer(thread_id: str):
-    """Remove a cached checkpointer when a graph execution finishes."""
-    _agent_checkpointers.pop(thread_id, None)
+def clear_agent_checkpointer(key: str):
+    """Remove a cached checkpointer when a node execution finishes."""
+    _agent_checkpointers.pop(key, None)
+
+
+def _sanitize_checkpointer(checkpointer, agent_thread_id: str):
+    """Fix incomplete tool calls in the checkpointer's saved messages.
+
+    When a graph is stopped mid-tool-call, the last AIMessage may have
+    tool_calls without corresponding ToolMessages. This causes
+    INVALID_CHAT_HISTORY on resume. We patch in synthetic error
+    ToolMessages so the LLM can continue gracefully.
+    """
+    try:
+        config = {"configurable": {"thread_id": agent_thread_id}}
+        tup = checkpointer.get_tuple(config)
+        if not tup:
+            return
+
+        checkpoint = tup.checkpoint
+        messages = checkpoint.get("channel_values", {}).get("messages", [])
+        if not messages:
+            return
+
+        # Collect tool_call IDs that have a corresponding ToolMessage
+        answered_ids = set()
+        for msg in messages:
+            if isinstance(msg, ToolMessage):
+                answered_ids.add(msg.tool_call_id)
+
+        # Find AIMessages with unanswered tool_calls
+        patches = []
+        for msg in messages:
+            if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
+                for tc in msg.tool_calls:
+                    tc_id = tc.get("id") or tc.get("tool_call_id", "")
+                    if tc_id and tc_id not in answered_ids:
+                        patches.append(ToolMessage(
+                            content="[Tool call interrupted — the graph was stopped before this tool could complete. You may retry the tool call.]",
+                            tool_call_id=tc_id,
+                            name=tc.get("name", "unknown"),
+                        ))
+                        answered_ids.add(tc_id)
+
+        if patches:
+            logger.info("Patching %d incomplete tool call(s) in checkpointer for thread %s", len(patches), agent_thread_id)
+            channel_values = checkpoint["channel_values"]
+            channel_values["messages"] = messages + patches
+            checkpointer.put(
+                config,
+                checkpoint,
+                tup.metadata,
+                {},
+            )
+    except Exception as e:
+        logger.warning("Failed to sanitize checkpointer messages: %s", e)
 
 
 # ---------------------------------------------------------------------------
@@ -129,7 +188,8 @@ def execute_langchain(
     tools: list,
     recursion_limit: int = 25,
     callbacks: list[BaseCallbackHandler] = None,
-    run_name: str = "LangGraph Node"
+    run_name: str = "LangGraph Node",
+    prompt_name: str = "",
 ) -> Dict[str, Any]:
     """Execute a task using a LangChain LLM and a specific tool set.
 
@@ -141,6 +201,7 @@ def execute_langchain(
         recursion_limit: Maximum number of steps the node can take.
         callbacks: Optional list of LangChain callback handlers.
         run_name: Name of the run for tracing.
+        prompt_name: Name of the Langfuse prompt (used for checkpointer keying).
 
     Returns:
         JSON result from the execution.
@@ -150,9 +211,12 @@ def execute_langchain(
         RuntimeError: For other execution failures.
     """
 
-    # Use a persistent checkpointer so conversations survive stop/resume
+    # Use a persistent checkpointer so conversations survive stop/resume.
+    # Key by thread_id + namespace + prompt_name so each node gets its own MemorySaver.
     thread_id_raw = THREAD_ID_CONTEXT.get() or "unknown"
-    checkpointer = _get_agent_checkpointer(thread_id_raw)
+    namespace = NAMESPACE_CONTEXT.get() or "global"
+    checkpointer_key = f"{thread_id_raw}_{namespace}_{prompt_name}" if prompt_name else f"{thread_id_raw}_{namespace}"
+    checkpointer = _get_agent_checkpointer(checkpointer_key)
     _executor = create_react_agent(llm, tools, checkpointer=checkpointer)
 
     logger.info("Model: %s", llm.__class__.__name__)
@@ -199,6 +263,9 @@ def execute_langchain(
             all_callbacks = [agent_handler]
             if callbacks:
                 all_callbacks.extend(callbacks)
+
+            # Sanitize any incomplete tool calls from a previous interrupted run
+            _sanitize_checkpointer(checkpointer, f"{thread_id}_{safe_run_name}")
 
             # Run the reactive agent
             result = _executor.invoke(

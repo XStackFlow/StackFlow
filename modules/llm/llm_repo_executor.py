@@ -140,7 +140,8 @@ class LLMRepoExecutor(BaseNode):
                 tools=tools,
                 recursion_limit=self._recursion_limit,
                 callbacks=[self.langfuse_handler] if self.langfuse_handler else None,
-                run_name=self.__class__.__name__
+                run_name=self.__class__.__name__,
+                prompt_name=getattr(self, "_prompt_name", ""),
             )
 
             # Flush langfuse traces to ensure they are sent before the process potentially exits
