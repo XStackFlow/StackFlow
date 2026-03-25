@@ -64,7 +64,7 @@ def get_or_clone_repository(repo_url: str, repo_name: str, temp_prefix: str = "s
     # 1. Check if the "key" already points to a healthy workspace
     if keyed_path.is_symlink():
         target = Path(os.readlink(keyed_path))
-        if target.exists():
+        if target.exists() and (target / ".git").exists():
             logger.info("Using existing workspace for '%s' (linked to: %s)", repo_name, target)
             return keyed_path
     elif keyed_path.is_dir() and (keyed_path / ".git").exists():
