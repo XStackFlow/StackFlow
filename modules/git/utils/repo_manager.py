@@ -62,12 +62,15 @@ def get_or_clone_repository(repo_url: str, repo_name: str, temp_prefix: str = "s
     keyed_path = working_dir / repo_name
     
     # 1. Check if the "key" already points to a healthy workspace
+    # NOTE: We check for .git/HEAD (not just .git/) because macOS temp cleanup
+    # can remove files inside .git while leaving the empty directory structure,
+    # causing a false-positive health check.
     if keyed_path.is_symlink():
         target = Path(os.readlink(keyed_path))
-        if target.exists() and (target / ".git").exists():
+        if target.exists() and (target / ".git" / "HEAD").exists():
             logger.info("Using existing workspace for '%s' (linked to: %s)", repo_name, target)
             return keyed_path
-    elif keyed_path.is_dir() and (keyed_path / ".git").exists():
+    elif keyed_path.is_dir() and (keyed_path / ".git" / "HEAD").exists():
         logger.info("Using existing directory workspace for '%s' at %s", repo_name, keyed_path)
         return keyed_path
 
