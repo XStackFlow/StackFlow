@@ -1768,15 +1768,28 @@ async def install_module_from_github(body: GithubInstallRequest):
 
 @app.post("/modules/{module_id}/uninstall")
 async def uninstall_module_endpoint(module_id: str):
-    """Uninstall a module by deleting its directory from installed/."""
-    from src.utils.setup.module_registry import INSTALLED_DIR
-    module_dir = INSTALLED_DIR / module_id
-    if not module_dir.exists():
-        raise HTTPException(status_code=400, detail=f"Module '{module_id}' is a built-in module and cannot be uninstalled.")
-    def _force_remove_readonly(func, path, exc_info):
-        os.chmod(path, stat.S_IWRITE)
-        func(path)
-    shutil.rmtree(module_dir, onerror=_force_remove_readonly)
+    """Uninstall a module.
+
+    External modules (installed/) are removed by deleting their directory.
+    Built-in modules (modules/) are deactivated by removing them from
+    modules.json — the source stays on disk so they can be re-enabled later.
+    """
+    from src.utils.setup.module_registry import (
+        INSTALLED_DIR, MODULES_DIR, uninstall_module,
+    )
+    external_dir = INSTALLED_DIR / module_id
+    builtin_dir = MODULES_DIR / module_id
+
+    if external_dir.exists():
+        def _force_remove_readonly(func, path, exc_info):
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        shutil.rmtree(external_dir, onerror=_force_remove_readonly)
+    elif builtin_dir.exists():
+        uninstall_module(module_id)
+    else:
+        raise HTTPException(status_code=404, detail=f"Module '{module_id}' not found.")
+
     invalidate_node_registry()
 
     # Sync prompts so stale prompts from the removed module get archived

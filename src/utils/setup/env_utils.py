@@ -76,9 +76,13 @@ def load_env() -> None:
     # Root .env (core config: DB, Langfuse, etc.)
     load_dotenv(PROJECT_ROOT / ".env", override=False)
 
-    # Module .env files (module-specific config)
-    from src.utils.setup.module_registry import _iter_module_dirs
+    # Module .env files (module-specific config) — only for active modules.
+    # Deactivated built-ins keep their files on disk but must not leak env vars.
+    from src.utils.setup.module_registry import _iter_module_dirs, get_installed_modules
+    active = set(get_installed_modules())
     for module_dir, _pkg in _iter_module_dirs():
+        if module_dir.name not in active:
+            continue
         module_env = module_dir / ".env"
         if module_env.exists():
             load_dotenv(module_env, override=False)

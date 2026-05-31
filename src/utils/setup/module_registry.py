@@ -9,12 +9,19 @@ Everything in installed/ with a manifest.json is always active.
 """
 
 import json
+import os
+import threading
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 MODULES_DIR = PROJECT_ROOT / "modules"
 INSTALLED_DIR = PROJECT_ROOT / "installed"
 MODULES_JSON = PROJECT_ROOT / "modules.json"
+
+# Per-hook wall-clock budget. A misbehaving module (e.g. one that blocks on a
+# slow TCP timeout to an unreachable embedding host) must not stall the rest of
+# server startup. Override with STACKFLOW_MODULE_HOOK_TIMEOUT.
+_HOOK_TIMEOUT_S = float(os.environ.get("STACKFLOW_MODULE_HOOK_TIMEOUT", "15"))
 
 __all__ = ["MODULES_DIR", "INSTALLED_DIR", "get_installed_modules", "get_module_package",
            "get_manifest", "get_all_manifests", "run_module_startup_hooks", "run_module_route_registrations",
@@ -106,36 +113,104 @@ def get_manifest(name: str) -> dict:
     raise FileNotFoundError(f"No manifest found for module '{name}'")
 
 
+def _run_with_timeout(fn, timeout: float):
+    """Run fn() in a daemon thread, returning (ok, error_or_none).
+
+    A timeout is reported as a TimeoutError. The thread is left running on
+    timeout (Python can't kill threads); since it's a daemon, it won't block
+    interpreter exit.
+    """
+    result: dict = {"err": None}
+
+    def _target():
+        try:
+            fn()
+        except BaseException as e:  # noqa: BLE001 — propagate everything
+            result["err"] = e
+
+    t = threading.Thread(target=_target, daemon=True)
+    t.start()
+    t.join(timeout)
+    if t.is_alive():
+        return False, TimeoutError(f"hook exceeded {timeout:.0f}s budget")
+    return result["err"] is None, result["err"]
+
+
 def run_module_startup_hooks() -> None:
-    """Call on_startup() for each installed module that defines it."""
+    """Fire on_startup() for each installed module without blocking the caller.
+
+    Modules are pluggable — a slow or hanging hook (e.g. one waiting on an
+    unreachable embedding host) must not stall server startup or any other
+    module's hook. Each hook is spawned in its own daemon thread; the function
+    returns immediately. Failures and timeouts are recorded asynchronously in
+    the node-registry load-error map so the editor's "load error" badge
+    surfaces them once they happen.
+    """
     import importlib
     from src.utils.setup.logger import get_logger
+    from src.utils.setup.node_registry import _LOAD_ERRORS  # noqa: PLC2701
     logger = get_logger(__name__)
+
+    def _run_hook(mid: str, hook):
+        deadline = threading.Event()
+
+        def _watchdog():
+            if not deadline.wait(_HOOK_TIMEOUT_S):
+                logger.error("Module '%s' on_startup exceeded %.0fs budget", mid, _HOOK_TIMEOUT_S)
+                _LOAD_ERRORS[mid] = f"on_startup exceeded {_HOOK_TIMEOUT_S:.0f}s budget"
+
+        threading.Thread(target=_watchdog, daemon=True).start()
+        try:
+            hook()
+        except BaseException as e:  # noqa: BLE001 — surface everything
+            logger.error("Module '%s' on_startup failed: %s", mid, e)
+            _LOAD_ERRORS[mid] = f"on_startup failed: {e}"
+        finally:
+            deadline.set()
 
     for mid in get_installed_modules():
         try:
             pkg = get_module_package(mid)
             mod = importlib.import_module(f"{pkg}.{mid}")
-            if callable(getattr(mod, "on_startup", None)):
-                mod.on_startup()
+            hook = getattr(mod, "on_startup", None)
+            if not callable(hook):
+                continue
+            threading.Thread(
+                target=_run_hook, args=(mid, hook), daemon=True,
+                name=f"on_startup[{mid}]",
+            ).start()
         except Exception as e:
-            logger.error("Module '%s' startup hook failed: %s", mid, e)
+            logger.error("Module '%s' on_startup dispatch failed: %s", mid, e)
+            _LOAD_ERRORS[mid] = f"on_startup dispatch failed: {e}"
 
 
 def run_module_route_registrations(app) -> None:
-    """Call register_routes(app) for each installed module that defines it."""
+    """Call register_routes(app) for each installed module that defines it.
+
+    Unlike on_startup, route registration must complete before the app starts
+    serving — otherwise routes added afterwards may never reach the router.
+    Each call is bounded by a timeout so a misbehaving module fails fast
+    instead of stalling startup, but the loop itself is synchronous.
+    """
     import importlib
     from src.utils.setup.logger import get_logger
+    from src.utils.setup.node_registry import _LOAD_ERRORS  # noqa: PLC2701
     logger = get_logger(__name__)
 
     for mid in get_installed_modules():
         try:
             pkg = get_module_package(mid)
             mod = importlib.import_module(f"{pkg}.{mid}")
-            if callable(getattr(mod, "register_routes", None)):
-                mod.register_routes(app)
+            hook = getattr(mod, "register_routes", None)
+            if not callable(hook):
+                continue
+            ok, err = _run_with_timeout(lambda h=hook: h(app), _HOOK_TIMEOUT_S)
+            if not ok:
+                logger.error("Module '%s' route registration failed: %s", mid, err)
+                _LOAD_ERRORS[mid] = f"register_routes failed: {err}"
         except Exception as e:
             logger.error("Module '%s' route registration failed: %s", mid, e)
+            _LOAD_ERRORS[mid] = f"register_routes failed: {e}"
 
 
 def get_module_graph_dirs() -> list[tuple[str, Path]]:
